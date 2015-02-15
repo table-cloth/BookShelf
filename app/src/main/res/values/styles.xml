@@ -5,4 +5,12 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <!-- 背景透明のカスタムテンプレート -->
+    <drawable name="translucent">#00000000</drawable>
+    <drawable name="halfTranslucent">#44000000</drawable>
+
+    <style name="Theme.CustomDialog" parent="android:style/Theme.Translucent">
+        <item name="android:windowBackground">@drawable/halfTranslucent</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
 </resources>
