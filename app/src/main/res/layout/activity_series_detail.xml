@@ -1,0 +1,316 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_main"
+    tools:context=".MyActivity" >
+
+    <RelativeLayout
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:background="#44000000" >
+
+<!--         <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/banner" / -->>
+    </RelativeLayout>
+
+    <!-- header -->
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/btn_gray"
+            android:text="戻る" />
+
+        <Button
+            android:id="@+id/btn_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/btn_gray"
+            android:text="編集" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="作品の詳細情報"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <!-- main view -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/banner"
+        android:layout_below="@id/header" >
+
+        <!-- 基本コンテンツ -->
+
+        <RelativeLayout
+            android:id="@+id/contens_basic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp" >
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
+                android:layout_centerVertical="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/no_image" />
+
+            <ImageView
+                android:id="@+id/plus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignBottom="@id/image"
+                android:layout_alignRight="@id/image"
+                android:layout_marginBottom="30dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/plus"
+                android:visibility="invisible" />
+
+            <!-- 画像の横のコンテンツ -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/image"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="タイトル：" />
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="10dp"
+                    android:text="---"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="作者：" />
+
+                <TextView
+                    android:id="@+id/author"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="10dp"
+                    android:text="---"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!--  -->
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- 編集領域 -->
+
+        <RelativeLayout
+            android:id="@+id/edit_area"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" >
+
+            <TextView
+                android:id="@+id/edit_area_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="所持巻数の情報を編集"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/edit_area_title" >
+
+                <LinearLayout
+                    android:id="@+id/picker_btn_area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical" >
+
+                    <Button
+                        android:id="@+id/btn_add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="3dp"
+                        android:background="@drawable/btn_positive"
+                        android:padding="3dp"
+                        android:text="追加"
+                        android:textSize="10sp" />
+
+                    <Button
+                        android:id="@+id/btn_delete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/btn_gray"
+                        android:padding="3dp"
+                        android:text="削除"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <NumberPicker
+                    android:id="@+id/number_picker"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@id/picker_btn_area"
+                    android:focusable="false" />
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <!-- 詳細コンテンツ -->
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/edit_area"
+            android:layout_below="@id/contens_basic" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/magazine_area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="掲載誌：" />
+
+                    <TextView
+                        android:id="@+id/magazine"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/company_area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="出版社：" />
+
+                    <TextView
+                        android:id="@+id/company"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/volume_area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="所持巻：" />
+
+                    <TextView
+                        android:id="@+id/volume"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/memo_area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="メモ：" />
+
+                    <TextView
+                        android:id="@+id/memo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!--
+                <LinearLayout
+                    android:id="@+id/tags_area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="タグ：" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="#ff00ff" >
+                    </RelativeLayout>
+                </LinearLayout>
+                -->
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+</RelativeLayout>
