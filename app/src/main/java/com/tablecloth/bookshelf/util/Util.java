@@ -37,7 +37,7 @@ public class Util {
     	// adView を作成する
         AdView adView = new AdView(activity);
         adView.setAdUnitId(G.AD_UNIT_ID);
-        adView.setAdSize(AdSize.SMART_BANNER);
+        adView.setAdSize(AdSize.BANNER);
 
 //        // 属性 android:id="@+id/mainLayout" が与えられているものとして
 //        // LinearLayout をルックアップする
