@@ -1,5 +1,7 @@
 package com.tablecloth.bookshelf.util;
 
+import java.util.Collection;
+
 /**
  * あらゆるクラスで使用する用の定数を保格納する
  * Created by shnomura on 2014/08/17.
@@ -21,6 +23,8 @@ public class G {
     final public static int REQUEST_CODE_IMAGE_GALLERYS = 6;
     final public static int REQUEST_CODE_IMAGE_CAMERA = 7;
 
+    final public static int REQUEST_CODE_UPDATE_DIALOG = 100;
+
 
     final public static int DATA_TYPE_SERIES = 0;
     final public static int DATA_TYPE_BOOK = 1;
@@ -35,12 +39,21 @@ public class G {
     final public static int SELECT_DATA_VOLUME = 7;
     final public static int SELECT_DATA_TAGS = 8;
     
-    final public static String SEARCH_CONTENT_ALL = "*"; // 検索条件＝無条件の場合に指定
+//    final public static String SEARCH_CONTENT_ALL = "%"; // 検索条件＝無条件の場合に指定
     final public static int SEARCH_MODE_ALL = 0; // 検索対象＝全ての場合にしてい
     final public static int SEARCH_MODE_TITLE = 1; // 検索対象＝タイトルの場合にしてい
     final public static int SEARCH_MODE_AUTHOR = 2; // 検索対象＝作者の場合にしてい
     final public static int SEARCH_MODE_COMPANY = 3; // 検索対象＝出版社の場合にしてい
     final public static int SEARCH_MODE_MAGAZINES = 4; // 検索対象＝掲載誌の場合にしてい
+    // 各種検索条件一覧
+    final public static String[] SEARCH_MODE_LIST = {
+            "全て", // SEARCH_MODE_ALL
+            "タイトル名", // SEARCH_MODE_ALL
+            "作者名", // SEARCH_MODE_ALL
+            "出版社名", // SEARCH_MODE_ALL
+            "掲載誌名", // SEARCH_MODE_ALL
+    };
+
 
     final public static int MODE_VIEW = 0; // デフォルトの閲覧モード
 //  final public static int MODE_DELETE = 1; // 削除モード

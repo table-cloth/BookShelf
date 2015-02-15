@@ -14,6 +14,13 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_my);
+
+
+        // バージョン情報関連
+
+
+
+
         // 次のActivityを開始
         startActivity(new Intent(this, ListActivity.class));
         SplashActivity.this.finish();

@@ -11,6 +11,7 @@ import java.util.Calendar;
 import com.tablecloth.bookshelf.activity.ListActivity;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ImageUtil;
+import com.tablecloth.bookshelf.util.Util;
 
 /**
  * Created by shnomura on 2014/08/16.
@@ -127,29 +128,38 @@ public class FilterDao {
         sql.append(" SELECT * FROM ");
         sql.append(DB.BookSeriesTable.TABLE_NAME);
         if(searchContent != null && searchContent.length() > 0) {
-            String whereClause = DB.BookSeriesTable.TABLE_NAME + "." + G.SEARCH_CONTENT_ALL;
-            switch (searchMode) {
-    		case G.SEARCH_MODE_ALL:
-    		default:
-//    			whereClause = DB.BookSeriesTable.TABLE_NAME + "." + G.SEARCH_CONTENT_ALL;
-//    			break;
-    		case G.SEARCH_MODE_TITLE:
-    			whereClause = DB.BookSeriesTable.TITLE_NAME;
-    			break;
-    		case G.SEARCH_MODE_AUTHOR:
-    			whereClause = DB.BookSeriesTable.AUTHOR_NAME;
-    			break;
-    		case G.SEARCH_MODE_COMPANY:
-    			whereClause = DB.BookSeriesTable.COMPANY_NAME;
-    			break;
-    		case G.SEARCH_MODE_MAGAZINES:
-    			whereClause = DB.BookSeriesTable.MAGAZINE_NAME;
-    			break;
-    		}
-            sql.append(" WHERE ");
+            // 検索モードによってWhere文を変える
+            int[] modes;
+            if(searchMode == G.SEARCH_MODE_ALL) {
+                modes = new int[]{ G.SEARCH_MODE_TITLE, G.SEARCH_MODE_AUTHOR, G.SEARCH_MODE_COMPANY, G.SEARCH_MODE_MAGAZINES };
+            } else {
+                modes = new int[] { searchMode };
+            }
+            String whereClause = " WHERE "; // 検索条件文字列
+            for(int i = 0 ; i < modes.length ; i ++) {
+                // ２件目以降の検索条件時はORをつける
+                if(i > 0 && !Util.isEmpty(whereClause)) {
+                    whereClause += " OR ";
+                }
+                switch (modes[i]) {
+                    case G.SEARCH_MODE_TITLE:
+                        whereClause += DB.BookSeriesTable.TITLE_NAME;
+                        break;
+                    case G.SEARCH_MODE_AUTHOR:
+                        whereClause += DB.BookSeriesTable.AUTHOR_NAME;
+                        break;
+                    case G.SEARCH_MODE_COMPANY:
+                        whereClause += DB.BookSeriesTable.COMPANY_NAME;
+                        break;
+                    case G.SEARCH_MODE_MAGAZINES:
+                        whereClause += DB.BookSeriesTable.MAGAZINE_NAME;
+                        break;
+                }
+                whereClause += " LIKE  '%";
+                whereClause += searchContent;
+                whereClause += "%' ";
+            }
             sql.append(whereClause);
-            sql.append(" LIKE");
-            sql.append(" '%" + searchContent + "%' ");
         }
 
 
@@ -351,7 +361,9 @@ public class FilterDao {
     /**
      * 巻数情報の保存
      * 最終更新日時を返す
-     * @param data
+     *
+     * @param seriesId 作品用ID
+     * @param volume 巻数
      */
     public static void saveVolume(int seriesId, int volume) {
         if(isSeriesVolumeExist(seriesId, volume)) {
@@ -371,7 +383,7 @@ public class FilterDao {
     /**
      * 巻数情報の削除
      * 復元不可能なので要注意
-     * @param seriesId
+     * @param seriesId 作品用ID
      * @return
      */
     public static void deleteVolume(int seriesId, int volume) {
@@ -380,7 +392,10 @@ public class FilterDao {
     
     /**
      * 巻数情報DB用カーソル作成
-     * @param data
+     *
+     * @param seriesId 作品用ID
+     * @param volume 巻数
+     * @param isUpdate 更新 or 新規追加かのフラグ
      * @return
      */
     private static ContentValues convertSeriesVolume2ContentValues(int seriesId, int volume, boolean isUpdate) {
@@ -395,7 +410,13 @@ public class FilterDao {
         if(!isUpdate) cv.put(DB.BookDetail.LAST_UPDATE_UNIX, now.getTimeInMillis());
         return cv;
     }
-    
+
+    /**
+     * 巻数情報を取得
+     * @param context
+     * @param seriesId 作品用ID
+     * @return
+     */
     public static int[] loadVolumes(Context context, int seriesId) {
         instantiateDB(context);
 
