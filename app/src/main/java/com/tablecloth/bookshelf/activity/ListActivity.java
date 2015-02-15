@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -46,6 +47,7 @@ import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
+import com.tablecloth.bookshelf.util.VersionUtil;
 
 /**
  * Created by shnomura on 2014/08/16.
@@ -55,6 +57,7 @@ public class ListActivity extends Activity{
     private CustomListView mListView;
     ArrayList<SeriesData> mDataArrayList = new ArrayList<SeriesData>();
     ListAdapter mListAdapter;
+    Spinner spinnerView;
     
     
     
@@ -97,6 +100,9 @@ public class ListActivity extends Activity{
         // 広告の初期化処理
         Util.initAdview(this, (ViewGroup)findViewById(R.id.banner));
 
+        // バージョン情報の確認・アップデートダイアログの表示・及びバージョン情報の更新
+        VersionUtil versionUtil = new VersionUtil(ListActivity.this);
+        versionUtil.showUpdateDialog();
     }
     
     @Override
@@ -107,6 +113,9 @@ public class ListActivity extends Activity{
         refreshData();
     }
 
+    /**
+     * 一覧情報を再取得・再表示する
+     */
     private void refreshData() {
 
         mDataArrayList.clear();
@@ -177,7 +186,9 @@ public class ListActivity extends Activity{
                     author.setText(series.mAuthor);
                     volume.setText(series.getVolumeString());
                     Bitmap bitmap = series.getImage(ListActivity.this);
-                    if(bitmap != null) image.setImageBitmap(bitmap);
+                    if(bitmap != null) {
+                        image.setImageBitmap(bitmap);
+                    }
                     else {
                     	image.setImageResource(R.drawable.no_image);
                     }
@@ -250,14 +261,23 @@ public class ListActivity extends Activity{
 			}
 		});
 
-        ((Spinner)findViewById(R.id.spinner_search_content)).setAdapter(getSpinnerAdapter());
-//        // 検索対象選択スピナーボタン
-//        findViewById(R.id.spinner_search_content).setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				ToastUtil.show(ListActivity.this, "スピナータップ");
-//			}
-//		});
+        // 検索対象選択スピナーボタン
+        spinnerView = ((Spinner)findViewById(R.id.spinner_search_content));
+        spinnerView.setAdapter(getSpinnerAdapter());
+        spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Spinnerの選択肢の順番=検索モードの並び順となっていることを確認すること
+                mSearchMode = position;
+                // 検索対象変化後に再度情報を読み込む
+                refreshData();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
     
     /**
@@ -308,6 +328,17 @@ public class ListActivity extends Activity{
             		refreshData();
             		ToastUtil.show(ListActivity.this, "作品を追加しました");
             	}
+                break;
+
+            // アップデートダイアログ
+            case G.REQUEST_CODE_UPDATE_DIALOG:
+                if(resultCode == G.RESULT_POSITIVE) {
+                    // マーケットへ飛ばす
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketUriStr(ListActivity.this.getPackageName(), "update_dialog")));
+                    if(intent != null) {
+                        startActivity(intent);
+                    }
+                }
                 break;
         }
     }
@@ -361,13 +392,22 @@ public class ListActivity extends Activity{
 
     // Spinnerアアプターについて
     // http://techbooster.jpn.org/andriod/ui/606/
-//    sds
     private ArrayAdapter<String> getSpinnerAdapter() {
     	ArrayAdapter<String> adapter = new ArrayAdapter<String>(ListActivity.this, android.R.layout.simple_spinner_item);
-    	
+
+        // 検索用Spinner選択肢
+        for(int i = 0 ; i < G.SEARCH_MODE_LIST.length ; i ++) {
+            adapter.add(G.SEARCH_MODE_LIST[i]);
+        }
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
     	return adapter;
     }
-    
+
+    /**
+     * 一覧表示・検索表示等のモードを切り替える
+     * @param newMode
+     */
     private void switchMode(int newMode) {
     	switch(newMode) {
     		case G.MODE_VIEW:

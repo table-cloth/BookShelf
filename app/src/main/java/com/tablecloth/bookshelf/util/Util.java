@@ -58,4 +58,15 @@ public class Util {
 //        AdRequest adRequest = new AdRequest.Builder().build();
 //        adView.loadAd(adRequest);
     }
+
+    /**
+     * 特定のアプリのマーケットへ飛ばすURLを取得
+     * @param packageName
+     * @param referrer
+     * @return
+     */
+    public static String getMarketUriStr(String packageName,String referrer) {
+        return "market://details?id=" + packageName + "&referrer=" + referrer;
+    }
+
 }
