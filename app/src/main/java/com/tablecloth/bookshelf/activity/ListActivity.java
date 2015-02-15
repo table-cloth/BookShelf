@@ -361,7 +361,7 @@ public class ListActivity extends Activity{
 
     // Spinnerアアプターについて
     // http://techbooster.jpn.org/andriod/ui/606/
-    sds
+//    sds
     private ArrayAdapter<String> getSpinnerAdapter() {
     	ArrayAdapter<String> adapter = new ArrayAdapter<String>(ListActivity.this, android.R.layout.simple_spinner_item);
     	
