@@ -1,9 +1,10 @@
 package com.tablecloth.bookshelf.util;
 
 /**
+ * GoogleAnalytics用イベント一覧
  * Created by shnomura on 2015/02/19.
  */
-public class Event {
+public class GAEvent {
     /**
      * イベントの種別
      * →イベントの発生画面に変更したい
