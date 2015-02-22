@@ -37,7 +37,7 @@ import com.tablecloth.bookshelf.util.Util;
  * Created by minami on 14/09/07.
  * １作品の詳細表示画面
  */
-public class SeriesDetailActivity extends Activity {
+public class SeriesDetailActivity extends BaseActivity {
 
     SeriesData mSeriesData = null;
     int mSeriesId = -1;

@@ -42,6 +42,7 @@ import com.tablecloth.bookshelf.dialog.SettingsDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.CustomListView;
 import com.tablecloth.bookshelf.util.DBUtil;
+import com.tablecloth.bookshelf.util.Event;
 import com.tablecloth.bookshelf.util.FileUtil;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
@@ -52,7 +53,7 @@ import com.tablecloth.bookshelf.util.VersionUtil;
 /**
  * Created by shnomura on 2014/08/16.
  */
-public class ListActivity extends Activity{
+public class ListActivity extends BaseActivity {
 
     private CustomListView mListView;
     ArrayList<SeriesData> mDataArrayList = new ArrayList<SeriesData>();
@@ -226,6 +227,7 @@ public class ListActivity extends Activity{
             public void onClick(View v) {
                 Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "作品情報を追加", "追加", -1);
                 startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
+                sendGoogleAnalyticsEvent(Event.Category.USER_ACTION, Event.Action.LIST_ACTIVITY, Event.Label.TAP_ADD_SERIES_BTN);
 //                long unix = Calendar.getInstance().getTimeInMillis() / 1000L;
 //                SeriesData data = new SeriesData("タイトル"+unix);
 //                data.mAuthor = "作者" + unix;
@@ -412,11 +414,13 @@ public class ListActivity extends Activity{
     	switch(newMode) {
     		case G.MODE_VIEW:
     		default:
+                sendGoogleAnalyticsEvent(Event.Category.USER_ACTION, Event.Action.LIST_ACTIVITY, Event.Label.SHOW_MODE_VIEW);
     			findViewById(R.id.header_area_mode_view).setVisibility(View.VISIBLE);
-    			findViewById(R.id.header_area_mode_search).setVisibility(View.GONE); 
+    			findViewById(R.id.header_area_mode_search).setVisibility(View.GONE);
     			break;
     			
     		case G.MODE_SEARCH:
+                sendGoogleAnalyticsEvent(Event.Category.USER_ACTION, Event.Action.LIST_ACTIVITY, Event.Label.SHOW_MODE_SEARCH);
     			findViewById(R.id.header_area_mode_view).setVisibility(View.GONE);
     			findViewById(R.id.header_area_mode_search).setVisibility(View.VISIBLE); 
     			findViewById(R.id.search_content).requestFocus();

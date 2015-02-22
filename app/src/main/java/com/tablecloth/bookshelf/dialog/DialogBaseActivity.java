@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
 
+import com.tablecloth.bookshelf.activity.BaseActivity;
+
 /**
  * Created by shnomura on 2014/08/17.
  */
-public abstract class DialogBaseActivity extends Activity {
+public abstract class DialogBaseActivity extends BaseActivity {
 
     final protected static String KEY_TITLE = "title";
     final protected static String KEY_MESSAGE = "message";
