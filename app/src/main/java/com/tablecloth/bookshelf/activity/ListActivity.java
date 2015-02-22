@@ -1,8 +1,6 @@
 package com.tablecloth.bookshelf.activity;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -19,31 +17,18 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import com.google.android.gms.actions.ReserveIntents;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.util.CustomListView;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.FilterDao;
-import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
-import com.tablecloth.bookshelf.dialog.SettingsDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
-import com.tablecloth.bookshelf.util.CustomListView;
-import com.tablecloth.bookshelf.util.DBUtil;
-import com.tablecloth.bookshelf.util.Event;
-import com.tablecloth.bookshelf.util.FileUtil;
+import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
@@ -64,8 +49,6 @@ public class ListActivity extends BaseActivity {
     
     // http://shogogg.hatenablog.jp/entry/20110118/1295326773
     int mDraggingPosition = -1;
-
-//    String filterInfo = null;
 
     // データ編集時用のID情報一時保管庫
     // 使い終わったらnullにする
@@ -135,12 +118,6 @@ public class ListActivity extends BaseActivity {
                 }
             }
         }
-//        if(filterInfo == null) {
-//            // とりあえず全ての情報を取得する
-//
-//        } else {
-//            // 指定のデータのみ読み込む
-//        }
 
         mListAdapter.notifyDataSetChanged();
     }
@@ -227,12 +204,7 @@ public class ListActivity extends BaseActivity {
             public void onClick(View v) {
                 Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "作品情報を追加", "追加", -1);
                 startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
-                sendGoogleAnalyticsEvent(Event.Category.USER_ACTION, Event.Action.LIST_ACTIVITY, Event.Label.TAP_ADD_SERIES_BTN);
-//                long unix = Calendar.getInstance().getTimeInMillis() / 1000L;
-//                SeriesData data = new SeriesData("タイトル"+unix);
-//                data.mAuthor = "作者" + unix;
-//                FilterDao.saveSeries(data);
-//                refreshData();
+                sendGoogleAnalyticsEvent(GAEvent.Category.USER_ACTION, GAEvent.Action.LIST_ACTIVITY, GAEvent.Label.TAP_ADD_SERIES_BTN);
             }
         });
         
@@ -242,7 +214,6 @@ public class ListActivity extends BaseActivity {
 			public void onClick(View v) {
 				switchMode(G.MODE_SEARCH);
 		    	refreshData();
-//				mMode = MODE_SEARCH;
 			}
 		});
         
@@ -414,13 +385,13 @@ public class ListActivity extends BaseActivity {
     	switch(newMode) {
     		case G.MODE_VIEW:
     		default:
-                sendGoogleAnalyticsEvent(Event.Category.USER_ACTION, Event.Action.LIST_ACTIVITY, Event.Label.SHOW_MODE_VIEW);
+                sendGoogleAnalyticsEvent(GAEvent.Category.USER_ACTION, GAEvent.Action.LIST_ACTIVITY, GAEvent.Label.SHOW_MODE_VIEW);
     			findViewById(R.id.header_area_mode_view).setVisibility(View.VISIBLE);
     			findViewById(R.id.header_area_mode_search).setVisibility(View.GONE);
     			break;
     			
     		case G.MODE_SEARCH:
-                sendGoogleAnalyticsEvent(Event.Category.USER_ACTION, Event.Action.LIST_ACTIVITY, Event.Label.SHOW_MODE_SEARCH);
+                sendGoogleAnalyticsEvent(GAEvent.Category.USER_ACTION, GAEvent.Action.LIST_ACTIVITY, GAEvent.Label.SHOW_MODE_SEARCH);
     			findViewById(R.id.header_area_mode_view).setVisibility(View.GONE);
     			findViewById(R.id.header_area_mode_search).setVisibility(View.VISIBLE); 
     			findViewById(R.id.search_content).requestFocus();

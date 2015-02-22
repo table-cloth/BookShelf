@@ -7,6 +7,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.tablecloth.bookshelf.BookShelfApplication;
+import com.tablecloth.bookshelf.R;
 
 
 /**
@@ -54,4 +55,5 @@ public class BaseActivity extends Activity {
                 .setLabel(label)
                 .build());
     }
+
 }
