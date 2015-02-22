@@ -17,9 +17,21 @@ public class JsonUtil {
      * @return
      */
     public static JSONObject getJsonObject(String jsonStr) {
+        if(Util.isEmpty(jsonStr)) return null;
         JSONObject obj = null;
         try {
             obj = new JSONObject(jsonStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    public static JSONObject getJsonObject(JSONObject jsonObj, String key) {
+        if(jsonObj == null) return null;
+        JSONObject obj = null;
+        try {
+            obj = jsonObj.getJSONObject(key);
         } catch (Exception e) {
             e.printStackTrace();
         }

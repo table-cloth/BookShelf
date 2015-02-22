@@ -55,7 +55,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CustomDialog"
             />
-        
+        <activity
+            android:name="com.tablecloth.bookshelf.dialog.BtnListDialogActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CustomDialog"
+            />
+        <activity
+            android:name="com.tablecloth.bookshelf.dialog.SearchDialogActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CustomDialog"
+            />
     </application>
 
 </manifest>
