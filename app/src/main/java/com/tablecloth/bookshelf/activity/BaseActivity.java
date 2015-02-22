@@ -2,6 +2,8 @@ package com.tablecloth.bookshelf.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Looper;
+import android.os.Handler;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -10,13 +12,20 @@ import com.tablecloth.bookshelf.BookShelfApplication;
 import com.tablecloth.bookshelf.R;
 
 
+
 /**
  * Created by shnomura on 2015/02/19.
  */
 public class BaseActivity extends Activity {
+
+    protected Handler mHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Looper looper = getMainLooper();
+        mHandler = new Handler(looper);
 
         // GoogleAnalyticsを初期化
         getGoogleAnalyticsTracker();

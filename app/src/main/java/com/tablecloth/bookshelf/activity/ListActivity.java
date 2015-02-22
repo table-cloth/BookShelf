@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,8 +22,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
+import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
 import com.tablecloth.bookshelf.util.CustomListView;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.FilterDao;
@@ -31,9 +35,14 @@ import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
+import com.tablecloth.bookshelf.util.JsonUtil;
+import com.tablecloth.bookshelf.util.Rakuten;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.VersionUtil;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Created by shnomura on 2014/08/16.
@@ -202,9 +211,13 @@ public class ListActivity extends BaseActivity {
         findViewById(R.id.add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "作品情報を追加", "追加", -1);
-                startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
-                sendGoogleAnalyticsEvent(GAEvent.Category.USER_ACTION, GAEvent.Action.LIST_ACTIVITY, GAEvent.Label.TAP_ADD_SERIES_BTN);
+                // 登録種類を詮索
+                Intent intent = BtnListDialogActivity.getIntent(ListActivity.this, "作品登録方法を選択", "作品を登録する方法を選択してください", "決定", "キャンセル");
+                startActivityForResult(intent, G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE);
+
+//                Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "作品情報を追加", "追加", -1);
+//                startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
+//                sendGoogleAnalyticsEvent(GAEvent.Category.USER_ACTION, GAEvent.Action.LIST_ACTIVITY, GAEvent.Label.TAP_ADD_SERIES_BTN);
             }
         });
         
@@ -311,6 +324,74 @@ public class ListActivity extends BaseActivity {
                     if(intent != null) {
                         startActivity(intent);
                     }
+                }
+                break;
+            // 作品の登録方法を選択
+            case G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE:
+                if(resultCode == G.RESULT_POSITIVE) {
+                    Intent intent;
+                    int selectedId = data.getIntExtra(G.RESULT_DATA_SELECTED_ID, G.RESULT_DATA_SELECTED_BTN_ISBN);
+                    switch (selectedId) {
+                        // ISBN登録画面
+                        case G.RESULT_DATA_SELECTED_BTN_ISBN:
+                        default:
+                            intent = SearchDialogActivity.getIntent(ListActivity.this, "作品を検索", "作品を検索する項目を選択してください", "検索", "キャンセル");
+                            startActivityForResult(intent, G.REQUEST_CODE_LIST_SEARCH_RAKUTEN);
+                            break;
+                        // 作品手動登録画面
+                        case G.RESULT_DATA_SELECTED_BTN_MANUAL:
+                            intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "作品情報を追加", "追加", -1);
+                            startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
+                            break;
+                    }
+                }
+                break;
+            // 楽天APIを使用して検索
+            case G.REQUEST_CODE_LIST_SEARCH_RAKUTEN:
+                if(resultCode == G.RESULT_POSITIVE) {
+
+                    // 検索対象、及び検索内容を取得
+                    final String key = data.getStringExtra(G.RESULT_DATA_SELECTED_KEY);
+                    final String value = data.getStringExtra(G.RESULT_DATA_SELECTED_VALUE);
+
+                    // HTTPアクセスが入るので別スレッドで回す
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            // 楽天APIを利用してJSONを取得する。
+                            String url = Rakuten.getRakutenBooksBookURI(ListActivity.this, key, value);
+                            Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(ListActivity.this, url);
+
+
+                            final String jsonStr = loader.loadInBackground();
+
+                            // JSONを取得後に検索結果一覧・または補完済みの作品登録画面を表示
+                            // 検索結果が0件の場合：「取得できる作品がありませんでした。内容を変更しもう一度お試しください。」という通知を表示
+                            // 検索結果が1件の場合：作品登録画面を開き、取得できている全ての情報を入力済みの状態で表示する
+                            // 検索結果が2件以上の場合：作品一覧画面を開き、求めている作品を選んでもらう。選択後は「検索結果が1件の場合」と同じ流れになる
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // 検索結果が空の場合はトースト通知でお知らせ
+                                    if(Util.isEmpty(jsonStr)) {
+                                        ToastUtil.show(ListActivity.this, "取得できる作品がありませんでした。内容を変更しもう一度お試しください。");
+                                    } else {
+                                        // JSON情報を分析する
+                                        JSONObject jsonObj = JsonUtil.getJsonObject(jsonStr);
+                                        JSONArray jsonArray = JsonUtil.getJsonArray(jsonObj, Rakuten.Key.ITEM_LIST);
+                                        List<JSONObject> jsonObjList = JsonUtil.getJsonObjectsList(jsonArray);
+                                        for(int i = 0 ; i < jsonObjList.size() ; i ++ ) {
+                                            JSONObject detailData = JsonUtil.getJsonObject(jsonObjList.get(i), Rakuten.Key.ITEM_DETAIL);
+                                            String title = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME);
+                                            Log.e("BOOK_DATA", "BOOK_DATA::"+title);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }).start();
+
                 }
                 break;
         }

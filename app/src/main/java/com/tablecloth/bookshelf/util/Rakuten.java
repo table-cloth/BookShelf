@@ -1,8 +1,20 @@
 package com.tablecloth.bookshelf.util;
 
+import android.content.AsyncTaskLoader;
 import android.content.Context;
 
 import com.tablecloth.bookshelf.R;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
 
 /**
  * Created by shnomura on 2015/02/22.
@@ -22,14 +34,27 @@ public class Rakuten {
         final public static String IMAGE_URL_SMALL = "smallImageUrl";
         final public static String IMAGE_URL_MEDIUM = "mediumImageUrl";
         final public static String IMAGE_URL_LARGE = "largeImageUrl";
+        final public static String ISBN = "isbnjan";
     }
+
+    // 楽天API用の検索対象一覧
+    final public static String[] SEARCH_CONTENT_LIST = {
+            "タイトル名",
+            "タイトル名（カナ入力）",
+            "作者名",
+            "作者名（カナ入力）",
+            "掲載誌名",
+            "掲載誌名（カナ入力）",
+            "出版社名",
+            "ISBN",
+    };
 
     /**
      * 楽天API・書籍検索専用のURLを返す
      * 一番細かく情報が取れるので、可能であればこちらを使う
      * @return
      */
-    protected String getRakutenBooksBookURI(Context context, String key, String value) {
+    public static String getRakutenBooksBookURI(Context context, String key, String value) {
         // 楽天ブックス系API・楽天ブックス書籍検索API
         // https://app.rakuten.co.jp/services/api/BooksBook/Search/20130522?format=json&isbn=9784812471692&applicationId=1019452313987815323
         // 楽天ブックス系API・楽天ブックス総合検索API
@@ -46,7 +71,7 @@ public class Rakuten {
      * @param value
      * @return
      */
-    protected String getRakutenBooksTotalUri(Context context, String key, String value) {
+    public static String getRakutenBooksTotalUri(Context context, String key, String value) {
         String apiName = context.getString(R.string.rakuten_api_name_all);
         return getRakutenURI(context, apiName, key, value);
     }
@@ -58,7 +83,7 @@ public class Rakuten {
      * @param value
      * @return
      */
-    private String getRakutenURI(Context context, String apiName, String key, String value) {
+    private static String getRakutenURI(Context context, String apiName, String key, String value) {
         String uri = "";
         uri += "https://app.rakuten.co.jp/services/api/";
         uri += apiName;
@@ -67,4 +92,50 @@ public class Rakuten {
         uri += "&applicationId=" + context.getString(R.string.id_rakuten_app_id);
         return uri;
     }
+
+    /**
+     * 非同期でHTTPアクセスを行い、楽天WebAPIから情報を取得するためのクラス
+     * http://codezine.jp/article/detail/7276?p=2
+     *
+     */
+    public static class RakutenAPIAsyncLoader extends AsyncTaskLoader<String> {
+        String mUrl = ""; // 呼び出すWebApi用URL
+
+        public RakutenAPIAsyncLoader(Context context, String url) {
+            super(context);
+            mUrl = url;
+        }
+
+        @Override
+        public String loadInBackground() {
+            // WebAPIの呼び出し処理(HTTP通信等）を行う
+            HttpClient httpClient = new DefaultHttpClient();
+            try {
+                String responseBody = httpClient.execute(new HttpGet(mUrl),
+                        // UTF-8でデコードするためhandleResponseをオーバーライドする
+                        new ResponseHandler<String>() {
+                            @Override
+                            public String handleResponse(HttpResponse response)
+                                    throws ClientProtocolException, IOException {
+
+                                // 成功時のみデータを返す。それ以外は空文字を返す
+                                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
+                                    return EntityUtils.toString(response.getEntity(), "UTF-8");
+                                }
+                                return "";
+                            }
+                        });
+
+                return responseBody;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                httpClient.getConnectionManager().shutdown();
+            }
+            return "";
+        }
+    }
+
 }
