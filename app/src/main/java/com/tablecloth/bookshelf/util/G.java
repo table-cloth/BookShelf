@@ -68,6 +68,8 @@ public class G {
     final public static int MODE_VIEW = 0; // デフォルトの閲覧モード
 //  final public static int MODE_DELETE = 1; // 削除モード
     final public static int MODE_SEARCH = 2; // 検索モード
+    final public static int MODE_API_SEARCH_RESULT = 3; // 楽天APIでの検索結果を表示
+
     // intentの情報
     final public static String INTENT_SERIES_ID = "series_id";
 }

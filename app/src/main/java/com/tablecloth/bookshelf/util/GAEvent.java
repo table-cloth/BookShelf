@@ -28,6 +28,7 @@ public class GAEvent {
     public class Label {
         final public static String SHOW_MODE_VIEW = "LIST_SHOW_MODE_VIEW"; // 画面表示タイプ・一覧表示
         final public static String SHOW_MODE_SEARCH = "LIST_SHOW_MODE_SEARCH"; // 画面表示タイプ・検索表示
+        final public static String SHOW_MODE_API_SEARCH_RESULT = "SHOW_MODE_API_SEARCH_RESULT"; // 画面表示タイプ・WebAPI検索結果表示
         final public static String TAP_ADD_SERIES_BTN = "TAP_ADD_SERIES_BTN"; // 作品追加ボタンタップ
     }
 }
