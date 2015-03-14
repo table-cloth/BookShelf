@@ -59,10 +59,13 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         // 内容設定
         // タイトル
         setRowContents(findViewById(R.id.data_detail_row_title), "タイトル", sSeriesData.mTitle);
+        setRowContents(findViewById(R.id.data_detail_row_title_pronunciation), "タイトル（カナ）", sSeriesData.mTitlePronunciation);
         // 作者
         setRowContents(findViewById(R.id.data_detail_row_author), "作者", sSeriesData.mAuthor);
+        setRowContents(findViewById(R.id.data_detail_row_author_pronunciation), "作者（カナ）", sSeriesData.mAuthorPronunciation);
         // 掲載誌
         setRowContents(findViewById(R.id.data_detail_row_magazine), "掲載誌", sSeriesData.mMagazine);
+        setRowContents(findViewById(R.id.data_detail_row_magazine_pronunctaion), "掲載誌（カナ）", sSeriesData.mMagazinePronunciation);
         // 出版社
         setRowContents(findViewById(R.id.data_detail_row_company), "出版社", sSeriesData.mCompany);
         // メモ
@@ -90,10 +93,13 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
                     return;
                 }
                 sSeriesData.mTitle = title;
+                sSeriesData.mTitlePronunciation = getRowContents(findViewById(R.id.data_detail_row_title_pronunciation));
                 // 作者
                 sSeriesData.mAuthor = getRowContents(findViewById(R.id.data_detail_row_author));
+                sSeriesData.mAuthorPronunciation = getRowContents(findViewById(R.id.data_detail_row_author_pronunciation));
                 // 掲載誌
                 sSeriesData.mMagazine = getRowContents(findViewById(R.id.data_detail_row_magazine));
+                sSeriesData.mMagazinePronunciation = getRowContents(findViewById(R.id.data_detail_row_magazine_pronunctaion));
                 // 出版社
                 sSeriesData.mCompany = getRowContents(findViewById(R.id.data_detail_row_company));
                 // メモ

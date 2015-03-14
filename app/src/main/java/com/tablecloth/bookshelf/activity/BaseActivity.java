@@ -10,7 +10,7 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.tablecloth.bookshelf.BookShelfApplication;
 import com.tablecloth.bookshelf.R;
-
+import com.tablecloth.bookshelf.util.Util;
 
 
 /**
@@ -53,15 +53,36 @@ public class BaseActivity extends Activity {
 
     /**
      * GoogleAnalyticsに個別のイベントを送信する関数
-     * @param category
-     * @param action
-     * @param label
+     * @param type
+     * @param event
+     * @param param
      */
-    protected void sendGoogleAnalyticsEvent(String category, String action, String label) {
+    protected void sendGoogleAnalyticsEvent(String type, String event, String param) {
+        if(Util.isEmpty(type)) return;
+        if(Util.isEmpty(param)) {
+            getGoogleAnalyticsTracker().send(new HitBuilders.EventBuilder()
+                    .setCategory(type)
+                    .setAction(event)
+                    .build());
+        } else {
+            getGoogleAnalyticsTracker().send(new HitBuilders.EventBuilder()
+                    .setCategory(type)
+                    .setAction(event)
+                    .setLabel(param)
+                    .build());
+
+        }
+    }
+    /**
+     * GoogleAnalyticsに個別のイベントを送信する関数
+     * @param type
+     * @param event
+     */
+    protected void sendGoogleAnalyticsEvent(String type, String event) {
+        if(Util.isEmpty(type)) return;
         getGoogleAnalyticsTracker().send(new HitBuilders.EventBuilder()
-                .setCategory(category)
-                .setAction(action)
-                .setLabel(label)
+                .setCategory(type)
+                .setAction(event)
                 .build());
     }
 

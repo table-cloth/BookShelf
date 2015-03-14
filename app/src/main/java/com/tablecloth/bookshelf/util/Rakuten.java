@@ -87,6 +87,11 @@ public class Rakuten {
      * @return
      */
     private static String getRakutenURI(Context context, String apiName, String key, String value) {
+        if(!Util.isEmpty(value)) {
+            value = value.replace("　", "%E3%80%80");
+            value = value.replace(" ", "%20");
+        }
+
         String uri = "";
         uri += "https://app.rakuten.co.jp/services/api/";
         uri += apiName;
