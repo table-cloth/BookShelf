@@ -30,6 +30,7 @@ import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ImageUtil;
+import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 
@@ -154,13 +155,24 @@ public class SeriesDetailActivity extends BaseActivity {
 	        ((TextView)findViewById(R.id.magazine)).setText(mSeriesData.mMagazine);
 	        ((TextView)findViewById(R.id.memo)).setText(mSeriesData.mMemo);
 	        ((TextView)findViewById(R.id.volume)).setText(mSeriesData.getVolumeString());
-	        Bitmap bitmap = mSeriesData.getImage(SeriesDetailActivity.this);
-	        if(bitmap != null) {
-	        	mImageView.setImageBitmap(bitmap);
-	        	findViewById(R.id.plus).setVisibility(View.GONE);
-	        } else {
-	        	findViewById(R.id.plus).setVisibility(View.VISIBLE);
-	        }
+            final View plus = findViewById(R.id.plus);
+	        mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                @Override
+                public void onFinish(Bitmap bitmap) {
+                    if(bitmap != null) {
+                        mImageView.setImageBitmap(bitmap);
+                        plus.setVisibility(View.GONE);
+                    } else {
+                        plus.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    plus.setVisibility(View.VISIBLE);
+                }
+            });
+
     	}
     }
     
@@ -208,13 +220,23 @@ public class SeriesDetailActivity extends BaseActivity {
                  	   e.printStackTrace();
                     }
             		FilterDao.saveSeries(mSeriesData);
-					Bitmap bitmap = mSeriesData.getImage(SeriesDetailActivity.this);
-			        if(bitmap != null) {
-			        	mImageView.setImageBitmap(bitmap);
-			        	findViewById(R.id.plus).setVisibility(View.GONE);
-			        } else {
-			        	findViewById(R.id.plus).setVisibility(View.VISIBLE);
-			        }
+                    final View plus = findViewById(R.id.plus);
+					mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                        @Override
+                        public void onFinish(Bitmap bitmap) {
+                            if(bitmap != null) {
+                                mImageView.setImageBitmap(bitmap);
+                                plus.setVisibility(View.GONE);
+                            } else {
+                                plus.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                        @Override
+                        public void onError() {
+                            plus.setVisibility(View.VISIBLE);
+                        }
+                    });
             	}
             	break;
             case G.REQUEST_CODE_IMAGE_GALLERYS:
@@ -243,13 +265,23 @@ public class SeriesDetailActivity extends BaseActivity {
 					}
 				}
 				FilterDao.saveSeries(mSeriesData);
-				Bitmap bitmap = mSeriesData.getImage(SeriesDetailActivity.this);
-				if (bitmap != null) {
-					mImageView.setImageBitmap(bitmap);
-					findViewById(R.id.plus).setVisibility(View.GONE);
-				} else {
-					findViewById(R.id.plus).setVisibility(View.VISIBLE);
-				}
+                final View plus = findViewById(R.id.plus);
+				mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                    @Override
+                    public void onFinish(Bitmap bitmap) {
+                        if (bitmap != null) {
+                            mImageView.setImageBitmap(bitmap);
+                            findViewById(R.id.plus).setVisibility(View.GONE);
+                        } else {
+                            findViewById(R.id.plus).setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onError() {
+                        findViewById(R.id.plus).setVisibility(View.VISIBLE);
+                    }
+                });
 			}
 			break;
         }

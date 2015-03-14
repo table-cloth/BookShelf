@@ -44,7 +44,7 @@ public class BtnListDialogActivity extends DialogBaseActivity {
                     // ISBN検索
                     default:
                     case R.id.radio_0:
-                        selectedBtn = G.RESULT_DATA_SELECTED_BTN_ISBN;
+                        selectedBtn = G.RESULT_DATA_SELECTED_BTN_SEARCH;
                         break;
                     // 手動検索
                     case R.id.radio_1:

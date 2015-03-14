@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,6 +36,7 @@ import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.JsonUtil;
+import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
@@ -56,7 +57,7 @@ public class ListActivity extends BaseActivity {
 
     // 楽天WebAPIでの検索結果の保持用変数
     ArrayList<SeriesData> mApiSearchResultArrayList = new ArrayList<SeriesData>();
-    
+    JSONObject mAPISearchResultJsonObject = null;
     
     
     // http://shogogg.hatenablog.jp/entry/20110118/1295326773
@@ -172,7 +173,6 @@ public class ListActivity extends BaseActivity {
             TextView title;
             TextView author;
             TextView volume;
-            ImageView image;
             View v = convertView;
 
             if(v==null){
@@ -186,19 +186,30 @@ public class ListActivity extends BaseActivity {
                     title = (TextView) v.findViewById(R.id.title);
                     author = (TextView) v.findViewById(R.id.author);
                     volume = (TextView) v.findViewById(R.id.volume);
-                    image = (ImageView) v.findViewById(R.id.image);
+                    final ImageView image = (ImageView) v.findViewById(R.id.image);
 
                     title.setText(series.mTitle);
                     author.setText(series.mAuthor);
                     volume.setText(series.getVolumeString());
-                    Bitmap bitmap = series.getImage(ListActivity.this);
-                    if(bitmap != null) {
-                        image.setImageBitmap(bitmap);
-                    }
-                    else {
-                    	image.setImageResource(R.drawable.no_image);
-                    }
+                    image.setImageResource(R.drawable.no_image);
+                    series.getImage(mHandler, ListActivity.this, new ListenerUtil.LoadBitmapListener() {
+                        @Override
+                        public void onFinish(Bitmap bitmap) {
+                            if(bitmap != null) {
+                                image.setImageBitmap(bitmap);
+                            }
+                            else {
+                                image.setImageResource(R.drawable.no_image);
+                            }
+                        }
 
+                        @Override
+                        public void onError() {
+                            image.setImageResource(R.drawable.no_image);
+                        }
+                    });
+
+                    // WebAPIの検索結果時以外は先品詳細画面へ
                     if(mMode != G.MODE_API_SEARCH_RESULT) {
                         // リストの各要素のタッチイベント
                         v.findViewById(R.id.delete_btn).setOnClickListener(new View.OnClickListener() {
@@ -226,8 +237,9 @@ public class ListActivity extends BaseActivity {
                         v.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "確認", "この作品を本棚に追加しますか？", "はい", "いいえ");
-                                ListActivity.this
+                                Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "この作品を追加しますか？", "追加", series);
+//                                Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "確認", "この作品を本棚に追加しますか？", "はい", "いいえ");
+                                ListActivity.this.startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
                             }
                         });
                     }
@@ -345,6 +357,7 @@ public class ListActivity extends BaseActivity {
             // 基本的な保存処理は「作品情報追加画面」に任せる
             case G.REQUEST_CODE_LIST_ADD_SERIES:
             	if(resultCode == G.RESULT_POSITIVE) {
+                    switchMode(G.MODE_VIEW);
             		refreshData();
             		ToastUtil.show(ListActivity.this, "作品を追加しました");
             	}
@@ -364,10 +377,10 @@ public class ListActivity extends BaseActivity {
             case G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE:
                 if(resultCode == G.RESULT_POSITIVE) {
                     Intent intent;
-                    int selectedId = data.getIntExtra(G.RESULT_DATA_SELECTED_ID, G.RESULT_DATA_SELECTED_BTN_ISBN);
+                    int selectedId = data.getIntExtra(G.RESULT_DATA_SELECTED_ID, G.RESULT_DATA_SELECTED_BTN_SEARCH);
                     switch (selectedId) {
-                        // ISBN登録画面
-                        case G.RESULT_DATA_SELECTED_BTN_ISBN:
+                        // 検索結果からの登録画面
+                        case G.RESULT_DATA_SELECTED_BTN_SEARCH:
                         default:
                             intent = SearchDialogActivity.getIntent(ListActivity.this, "作品を検索", "作品を検索する項目を選択してください", "検索", "キャンセル");
                             startActivityForResult(intent, G.REQUEST_CODE_LIST_SEARCH_RAKUTEN);
@@ -414,9 +427,13 @@ public class ListActivity extends BaseActivity {
                                         mApiSearchResultArrayList = new ArrayList<SeriesData>();
 
                                         // JSON情報を分析する
-                                        JSONObject jsonObj = JsonUtil.getJsonObject(jsonStr);
-                                        JSONArray jsonArray = JsonUtil.getJsonArray(jsonObj, Rakuten.Key.ITEM_LIST);
+                                        mAPISearchResultJsonObject = JsonUtil.getJsonObject(jsonStr);
+                                        JSONArray jsonArray = JsonUtil.getJsonArray(mAPISearchResultJsonObject, Rakuten.Key.ITEM_LIST);
                                         List<JSONObject> jsonObjList = JsonUtil.getJsonObjectsList(jsonArray);
+
+                                        String count = JsonUtil.getJsonObjectData(mAPISearchResultJsonObject, Rakuten.Key.SEARCH_RESULT_COUNT);
+                                        ToastUtil.show(ListActivity.this, count+"件の作品がヒットしました");
+
                                         for(int i = 0 ; i < jsonObjList.size() ; i ++ ) {
                                             JSONObject detailData = JsonUtil.getJsonObject(jsonObjList.get(i), Rakuten.Key.ITEM_DETAIL);
                                             SeriesData data = new SeriesData();
@@ -428,9 +445,15 @@ public class ListActivity extends BaseActivity {
                                             data.mMagazine = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME);
                                             data.mMagazinePronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME_KANA);
                                             data.mCompany = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.COMPANY_NAME);
-//                                            data.mImagePath = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_LARGE);
-//                                            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_MEDIUM);
-//                                            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_SMALL);
+                                            // 画像は現在未対応（そのうち対応入れる）
+                                            // URLを保持できる用に機能の変更が必要
+                                            String imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_LARGE);
+                                            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_MEDIUM);
+                                            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_SMALL);
+                                            // URLの取得に成功した場合は登録する
+                                            if(!Util.isEmpty(imageUrl)) {
+                                                data.mImagePath = imageUrl;
+                                            }
 
                                             mApiSearchResultArrayList.add(data);
                                         }
@@ -538,5 +561,16 @@ public class ListActivity extends BaseActivity {
                 break;
     	}
     	mMode = newMode;
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            if (mMode != G.MODE_VIEW) {
+                switchMode(G.MODE_VIEW);
+            } else {
+                return super.onKeyDown(keyCode, event);
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

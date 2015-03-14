@@ -15,7 +15,7 @@ public class G {
     final public static int RESULT_NEGATIVE = 2;
 
     final public static String RESULT_DATA_SELECTED_ID = "selected_id"; // intを返す
-    final public static int RESULT_DATA_SELECTED_BTN_ISBN = 0;
+    final public static int RESULT_DATA_SELECTED_BTN_SEARCH = 0;
     final public static int RESULT_DATA_SELECTED_BTN_MANUAL = 1;
     final public static String RESULT_DATA_SELECTED_KEY = "selected_key"; // Stringを返す
     final public static String RESULT_DATA_SELECTED_VALUE = "selected_value"; // Stringを返す

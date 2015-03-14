@@ -2,13 +2,20 @@ package com.tablecloth.bookshelf.db;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
+import android.os.Handler;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Queue;
 
 import com.tablecloth.bookshelf.util.ImageUtil;
+import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 
@@ -42,37 +49,126 @@ public class SeriesData {
         mTagsList = new ArrayList<String>();
     }
     
-    public Bitmap getImage(Activity activity) {
-    	if(mImageCache != null) return mImageCache;
-    	if(Util.isEmpty(mImagePath)) return null;
-    	try {
-    		mImageCache = ImageUtil.getBitmapFromPath(activity, mImagePath);
-    		ExifInterface exifInterface = new ExifInterface(mImagePath);
-    		int exifR = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-    		int orientation = Integer.parseInt(exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION));
-    		switch (exifR) {
-    		case ExifInterface.ORIENTATION_ROTATE_90:
-                mImageCache = ImageUtil.rotateBitmap(mImageCache, 90);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                mImageCache = ImageUtil.rotateBitmap(mImageCache, 180);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                mImageCache = ImageUtil.rotateBitmap(mImageCache, 270);
-                break;
-            default:
-                break;
-    		}
-    		return mImageCache;
-    	} catch(OutOfMemoryError e) {
-    		ToastUtil.show(activity, "メモリー不足のため、画像の取得に失敗しました");
-    		e.printStackTrace();
-    	} catch (IOException e) {
-    		ToastUtil.show(activity, "予期せぬエラーのため、画像の取得に失敗しました");
-    		e.printStackTrace();
-		}
-    	return null;
+    public void getImage(final Handler handler, Activity activity, final ListenerUtil.LoadBitmapListener listener) {
+    	if(mImageCache != null) {
+            listener.onFinish(mImageCache);
+            return;
+        }
+    	if(Util.isEmpty(mImagePath)) {
+            return;
+        }
+        // 画像パスからの取得
+        getImageByPath(activity, new ListenerUtil.LoadBitmapListener() {
+            @Override
+            public void onFinish(final Bitmap bitmap) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onFinish(bitmap);
+                    }
+                });
+            }
+
+            @Override
+            public void onError() {
+                // パスからの取得に失敗した場合はURLからの取得を試す
+                getImageByUrl(new ListenerUtil.LoadBitmapListener() {
+                    @Override
+                    public void onFinish(final Bitmap bitmap) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                listener.onFinish(bitmap);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError() {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                listener.onError();
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
+
+    /**
+     * 画像ファイルパスから画像を取得する
+     * @param activity
+     * @param listener
+     */
+    private void getImageByPath(Activity activity, ListenerUtil.LoadBitmapListener listener) {
+        if(Util.isEmpty(mImagePath)) {
+            listener.onError();
+            return;
+        }
+        try {
+            mImageCache = ImageUtil.getBitmapFromPath(activity, mImagePath);
+            if(mImageCache != null) {
+                ExifInterface exifInterface = new ExifInterface(mImagePath);
+                int exifR = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+                switch (exifR) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        mImageCache = ImageUtil.rotateBitmap(mImageCache, 90);
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        mImageCache = ImageUtil.rotateBitmap(mImageCache, 180);
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        mImageCache = ImageUtil.rotateBitmap(mImageCache, 270);
+                        break;
+                    default:
+                        break;
+                }
+                listener.onFinish(mImageCache);
+                return;
+            }
+        } catch(OutOfMemoryError e) {
+            ToastUtil.show(activity, "メモリー不足のため、画像の取得に失敗しました");
+            e.printStackTrace();
+        } catch (IOException e) {
+            ToastUtil.show(activity, "予期せぬエラーのため、画像の取得に失敗しました");
+            e.printStackTrace();
+        }
+        listener.onError();
+    }
+
+    /**
+     * 画像URLから画像を取得する
+     * @param listener
+     */
+    private void getImageByUrl(final ListenerUtil.LoadBitmapListener listener) {
+        if(Util.isEmpty(mImagePath)) {
+            listener.onError();
+            return;
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(mImagePath);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setDoInput(true);
+                    connection.connect();
+                    Bitmap bitmap = BitmapFactory.decodeStream(connection.getInputStream());
+                    if(bitmap != null) {
+                        listener.onFinish(bitmap);
+                        return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                listener.onError();
+            }
+        }).start();
+    }
+
     public void setImage(String filePath, Bitmap bitmap) {
     	if(bitmap == null) {
     		if(mImageCache != null) {

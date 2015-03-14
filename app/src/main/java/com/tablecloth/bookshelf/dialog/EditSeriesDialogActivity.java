@@ -25,6 +25,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
 
     private SeriesData sSeriesData = null;
     private int mSeriesId = -1;
+    private static SeriesData sTmpSeriesData = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +34,18 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         Intent intent = getIntent();
 
         mSeriesId = intent.getIntExtra(KEY_ID, -1);
-        
-        // 作品IDが取得できれば、情報をDBから読み取る
-        if(mSeriesId >= 0) sSeriesData = FilterDao.loadSeries(EditSeriesDialogActivity.this, mSeriesId);
+
+        // SeriesIDが登録されていない場合、tmpSeriesDataに一部情報が存在するかを確認する
+        if(mSeriesId <= -1 && sTmpSeriesData != null) {
+            mSeriesId = sTmpSeriesData.mSeriesId;
+            sSeriesData = sTmpSeriesData;
+        } else {
+            // 作品IDが取得できれば、情報をDBから読み取る
+            if(mSeriesId >= 0) sSeriesData = FilterDao.loadSeries(EditSeriesDialogActivity.this, mSeriesId);
+        }
         // 取得に失敗した場合、新規登録の場合は空のデータを作成
         if(sSeriesData == null) sSeriesData = new SeriesData();
+        sTmpSeriesData = null;
 
         // テキスト設定
         ((TextView)findViewById(R.id.title)).setText(intent.getStringExtra(KEY_TITLE));
@@ -145,8 +153,20 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
 //        intent.putExtra(KEY_BTN_NEGATIVE, "キャンセル");
 
         return intent;
+    }
 
-}
+    public static Intent getIntent(Context context, String title, String btnPositive, SeriesData seriesData) {
+        Intent intent = new Intent(context, EditSeriesDialogActivity.class);
+
+        intent.putExtra(KEY_TITLE, title);
+        intent.putExtra(KEY_BTN_POSITIVE, btnPositive);
+        sTmpSeriesData = seriesData;
+
+//        intent.putExtra(KEY_BTN_NEGATIVE, "キャンセル");
+
+        return intent;
+
+    }
 
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
