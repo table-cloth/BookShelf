@@ -37,6 +37,7 @@ import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.JsonUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
+import com.tablecloth.bookshelf.util.ProgressUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
@@ -58,6 +59,8 @@ public class ListActivity extends BaseActivity {
     // 楽天WebAPIでの検索結果の保持用変数
     ArrayList<SeriesData> mApiSearchResultArrayList = new ArrayList<SeriesData>();
     JSONObject mAPISearchResultJsonObject = null;
+
+    ProgressUtil mProgress;
     
     
     // http://shogogg.hatenablog.jp/entry/20110118/1295326773
@@ -80,6 +83,8 @@ public class ListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_list);
+
+        mProgress = new ProgressUtil(ListActivity.this);
 
         //mMode = MODE_VIEW;
         switchMode(G.MODE_VIEW);
@@ -143,7 +148,11 @@ public class ListActivity extends BaseActivity {
                 break;
             // 検索結果を表示する。
             case G.MODE_API_SEARCH_RESULT:
-                mDataArrayList = mApiSearchResultArrayList;
+                if(mApiSearchResultArrayList != null) {
+                    for(int i = 0 ; i < mApiSearchResultArrayList.size() ; i ++) {
+                        mDataArrayList.add(mApiSearchResultArrayList.get(i));
+                    }
+                }
                 break;
         }
 
@@ -190,7 +199,12 @@ public class ListActivity extends BaseActivity {
 
                     title.setText(series.mTitle);
                     author.setText(series.mAuthor);
-                    volume.setText(series.getVolumeString());
+                    if(mMode == G.MODE_API_SEARCH_RESULT) {
+                        volume.setVisibility(View.GONE);
+                    } else {
+                        volume.setText(series.getVolumeString());
+                        volume.setVisibility(View.VISIBLE);
+                    }
                     image.setImageResource(R.drawable.no_image);
                     series.getImage(mHandler, ListActivity.this, new ListenerUtil.LoadBitmapListener() {
                         @Override
@@ -260,10 +274,7 @@ public class ListActivity extends BaseActivity {
                 // 登録種類を詮索
                 Intent intent = BtnListDialogActivity.getIntent(ListActivity.this, "作品登録方法を選択", "作品を登録する方法を選択してください", "決定", "キャンセル");
                 startActivityForResult(intent, G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE);
-
-//                Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "作品情報を追加", "追加", -1);
-//                startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
-//                sendGoogleAnalyticsEvent(GAEvent.Category.USER_ACTION, GAEvent.Action.LIST_ACTIVITY, GAEvent.Label.TAP_ADD_SERIES_BTN);
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
             }
         });
         
@@ -271,6 +282,7 @@ public class ListActivity extends BaseActivity {
         findViewById(R.id.btn_search).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SEARCH_BTN);
 				switchMode(G.MODE_SEARCH);
 		    	refreshData();
 			}
@@ -292,6 +304,13 @@ public class ListActivity extends BaseActivity {
 		    	refreshData();
 			}
 		});
+        findViewById(R.id.btn_api_cancel).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchMode(G.MODE_VIEW);
+                refreshData();
+            }
+        });
 
         // 検索対象選択スピナーボタン
         spinnerView = ((Spinner)findViewById(R.id.spinner_search_content));
@@ -396,6 +415,7 @@ public class ListActivity extends BaseActivity {
             // 楽天APIを使用して検索
             case G.REQUEST_CODE_LIST_SEARCH_RAKUTEN:
                 if(resultCode == G.RESULT_POSITIVE) {
+                    mProgress.start("検索中…", null);
 
                     // 検索対象、及び検索内容を取得
                     final String key = data.getStringExtra(G.RESULT_DATA_SELECTED_KEY);
@@ -410,7 +430,6 @@ public class ListActivity extends BaseActivity {
                             String url = Rakuten.getRakutenBooksBookURI(ListActivity.this, key, value);
                             Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(ListActivity.this, url);
 
-
                             final String jsonStr = loader.loadInBackground();
 
                             // JSONを取得後に検索結果一覧・または補完済みの作品登録画面を表示
@@ -420,44 +439,39 @@ public class ListActivity extends BaseActivity {
                             mHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    // 検索結果が空の場合はトースト通知でお知らせ
+
                                     if(Util.isEmpty(jsonStr)) {
-                                        ToastUtil.show(ListActivity.this, "取得できる作品がありませんでした。内容を変更しもう一度お試しください。");
-                                    } else {
-                                        mApiSearchResultArrayList = new ArrayList<SeriesData>();
+                                        // 取得失敗した場合は書籍全般として再建策するする
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                // 楽天APIを利用してJSONを取得する。
+                                                String url = Rakuten.getRakutenBooksTotalUri(ListActivity.this, key, value);
+                                                Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(ListActivity.this, url);
 
-                                        // JSON情報を分析する
-                                        mAPISearchResultJsonObject = JsonUtil.getJsonObject(jsonStr);
-                                        JSONArray jsonArray = JsonUtil.getJsonArray(mAPISearchResultJsonObject, Rakuten.Key.ITEM_LIST);
-                                        List<JSONObject> jsonObjList = JsonUtil.getJsonObjectsList(jsonArray);
+                                                final String jsonRetryStr = loader.loadInBackground();
 
-                                        String count = JsonUtil.getJsonObjectData(mAPISearchResultJsonObject, Rakuten.Key.SEARCH_RESULT_COUNT);
-                                        ToastUtil.show(ListActivity.this, count+"件の作品がヒットしました");
+                                                mHandler.post(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        if(Util.isEmpty(jsonRetryStr)) {
+                                                            mProgress.close();
+                                                            // 検索結果が空の場合はトースト通知でお知らせ
+                                                            ToastUtil.show(ListActivity.this, "取得できる作品がありませんでした。内容を変更しもう一度お試しください。");
+                                                        } else {
+                                                            convertJsonStr2JsonArrayObject(jsonStr);
+                                                            mProgress.close();
+                                                            switchMode(G.MODE_API_SEARCH_RESULT);
+                                                            refreshData();
+                                                        }
+                                                    }
+                                                });
 
-                                        for(int i = 0 ; i < jsonObjList.size() ; i ++ ) {
-                                            JSONObject detailData = JsonUtil.getJsonObject(jsonObjList.get(i), Rakuten.Key.ITEM_DETAIL);
-                                            SeriesData data = new SeriesData();
-
-                                            data.mTitle = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME);
-                                            data.mTitlePronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME_KANA);
-                                            data.mAuthor = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME);
-                                            data.mAuthorPronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME_KANA);
-                                            data.mMagazine = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME);
-                                            data.mMagazinePronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME_KANA);
-                                            data.mCompany = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.COMPANY_NAME);
-                                            // 画像は現在未対応（そのうち対応入れる）
-                                            // URLを保持できる用に機能の変更が必要
-                                            String imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_LARGE);
-                                            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_MEDIUM);
-                                            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_SMALL);
-                                            // URLの取得に成功した場合は登録する
-                                            if(!Util.isEmpty(imageUrl)) {
-                                                data.mImagePath = imageUrl;
                                             }
-
-                                            mApiSearchResultArrayList.add(data);
-                                        }
-
+                                        }).start();
+                                    } else {
+                                        convertJsonStr2JsonArrayObject(jsonStr);
+                                        mProgress.close();
                                         switchMode(G.MODE_API_SEARCH_RESULT);
                                         refreshData();
                                     }
@@ -470,6 +484,58 @@ public class ListActivity extends BaseActivity {
                 break;
         }
     }
+
+    /**
+     * Json文字列から検索結果一覧情報を取得・メンバ変数に保持する
+     * @param jsonStr
+     */
+    private void convertJsonStr2JsonArrayObject(String jsonStr) {
+        mApiSearchResultArrayList = new ArrayList<SeriesData>();
+
+        // JSON情報を分析する
+        mAPISearchResultJsonObject = JsonUtil.getJsonObject(jsonStr);
+        JSONArray jsonArray = JsonUtil.getJsonArray(mAPISearchResultJsonObject, Rakuten.Key.ITEM_LIST);
+        List<JSONObject> jsonObjList = JsonUtil.getJsonObjectsList(jsonArray);
+
+        String count = JsonUtil.getJsonObjectData(mAPISearchResultJsonObject, Rakuten.Key.SEARCH_RESULT_COUNT);
+        int countVal = -1;
+        try {
+            countVal = Integer.valueOf(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(countVal > 30) {
+            ToastUtil.show(ListActivity.this, "30件以上の作品がヒットしました");
+        } else {
+            ToastUtil.show(ListActivity.this, count+"件の作品がヒットしました");
+        }
+
+        // 取得した結果を作品情報一覧へと分解する
+        for(int i = 0 ; i < jsonObjList.size() ; i ++ ) {
+            JSONObject detailData = JsonUtil.getJsonObject(jsonObjList.get(i), Rakuten.Key.ITEM_DETAIL);
+            SeriesData data = new SeriesData();
+
+            data.mTitle = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME);
+            data.mTitlePronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME_KANA);
+            data.mAuthor = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME);
+            data.mAuthorPronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME_KANA);
+            data.mMagazine = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME);
+            data.mMagazinePronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME_KANA);
+            data.mCompany = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.COMPANY_NAME);
+            // 画像は現在未対応（そのうち対応入れる）
+            // URLを保持できる用に機能の変更が必要
+            String imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_LARGE);
+            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_MEDIUM);
+            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_SMALL);
+            // URLの取得に成功した場合は登録する
+            if(!Util.isEmpty(imageUrl)) {
+                data.mImagePath = imageUrl;
+            }
+
+            mApiSearchResultArrayList.add(data);
+        }
+    }
+
     
 //    class DragListener extends CustomListView.SimpleDragListener {
 //        @Override
@@ -540,23 +606,26 @@ public class ListActivity extends BaseActivity {
     	switch(newMode) {
     		case G.MODE_VIEW:
     		default:
-                sendGoogleAnalyticsEvent(GAEvent.Category.USER_ACTION, GAEvent.Action.LIST_ACTIVITY, GAEvent.Label.SHOW_MODE_VIEW);
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_VIEW);
     			findViewById(R.id.header_area_mode_view).setVisibility(View.VISIBLE);
     			findViewById(R.id.header_area_mode_search).setVisibility(View.GONE);
+                findViewById(R.id.header_area_mode_api_search).setVisibility(View.GONE);
                 findViewById(R.id.btn_search).setVisibility(View.VISIBLE);
                 break;
     			
     		case G.MODE_SEARCH:
-                sendGoogleAnalyticsEvent(GAEvent.Category.USER_ACTION, GAEvent.Action.LIST_ACTIVITY, GAEvent.Label.SHOW_MODE_SEARCH);
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_SEARCH);
     			findViewById(R.id.header_area_mode_view).setVisibility(View.GONE);
-    			findViewById(R.id.header_area_mode_search).setVisibility(View.VISIBLE); 
+    			findViewById(R.id.header_area_mode_search).setVisibility(View.VISIBLE);
+                findViewById(R.id.header_area_mode_api_search).setVisibility(View.GONE);
     			findViewById(R.id.search_content).requestFocus();
                 findViewById(R.id.btn_search).setVisibility(View.VISIBLE);
                 break;
             case G.MODE_API_SEARCH_RESULT:
-                sendGoogleAnalyticsEvent(GAEvent.Category.USER_ACTION, GAEvent.Action.LIST_ACTIVITY, GAEvent.Label.SHOW_MODE_API_SEARCH_RESULT);
-                findViewById(R.id.header_area_mode_view).setVisibility(View.VISIBLE);
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_API_SEARCH_RESULT);
+                findViewById(R.id.header_area_mode_view).setVisibility(View.GONE);
                 findViewById(R.id.header_area_mode_search).setVisibility(View.GONE);
+                findViewById(R.id.header_area_mode_api_search).setVisibility(View.VISIBLE);
                 findViewById(R.id.btn_search).setVisibility(View.GONE);
                 break;
     	}

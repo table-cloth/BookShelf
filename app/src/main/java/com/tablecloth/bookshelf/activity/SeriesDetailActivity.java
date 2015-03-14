@@ -150,9 +150,29 @@ public class SeriesDetailActivity extends BaseActivity {
     private void initLayout() {
     	if(mSeriesData != null) {
 	        ((TextView)findViewById(R.id.title)).setText(mSeriesData.mTitle);
+            if(!Util.isEmpty(mSeriesData.mTitlePronunciation)) {
+                ((TextView) findViewById(R.id.title_pronuncitation)).setText("（" + mSeriesData.mTitlePronunciation + "）");
+                findViewById(R.id.title_pronuncitation).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.title_pronuncitation).setVisibility(View.GONE);
+            }
+
 	        ((TextView)findViewById(R.id.author)).setText(mSeriesData.mAuthor);
-	        ((TextView)findViewById(R.id.company)).setText(mSeriesData.mCompany);
+            if(!Util.isEmpty(mSeriesData.mAuthorPronunciation)) {
+                ((TextView) findViewById(R.id.author_pronunciation)).setText("（" + mSeriesData.mAuthorPronunciation + "）");
+                findViewById(R.id.author_pronunciation).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.author_pronunciation).setVisibility(View.GONE);
+            }
+
 	        ((TextView)findViewById(R.id.magazine)).setText(mSeriesData.mMagazine);
+            if(!Util.isEmpty(mSeriesData.mMagazinePronunciation)) {
+                ((TextView)findViewById(R.id.magazine_pronunciation)).setText("（" + mSeriesData.mMagazinePronunciation+"）");
+                findViewById(R.id.magazine_pronunciation).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.magazine_pronunciation).setVisibility(View.GONE);
+            }
+            ((TextView)findViewById(R.id.company)).setText(mSeriesData.mCompany);
 	        ((TextView)findViewById(R.id.memo)).setText(mSeriesData.mMemo);
 	        ((TextView)findViewById(R.id.volume)).setText(mSeriesData.getVolumeString());
             final View plus = findViewById(R.id.plus);

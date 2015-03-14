@@ -33,7 +33,7 @@ public class VersionUtil {
     public boolean showUpdateDialog() {
         // 最後に起動した記録のあるバージョンが、現在のバージョンより古い場合はアップデートダイアログを表示可能
         if(getCurrentVersionCode(mAppContext) > loadLastShownVersionCode()) {
-            Intent intent = SimpleDialogActivity.getIntent(mAppContext, "お知らせ", "■検索機能を追加しました！\n\n■設定した一覧画面にて設定した写真が正常に表示されない不具合を修正しました。\n\n■また、その他要望等ございましたらレビューにて記載をお願いいたします。", "レビューする", "しない");
+            Intent intent = SimpleDialogActivity.getIntent(mAppContext, "お知らせ", "■作品の登録機能を改善しました！\n画面下の「作品を追加」から「キーワードから検索」を選択出来るようになりました。\nこれにより書籍情報をインターネット上で検索、取得することが出来ます♪\n是非お試しください(｀･ω･´)ゞ\n\n■また、その他ご意見ご要望等ございましたらレビューにて記載をお願いいたします。", "レビューする", "しない");
             mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
 
             // バージョン情報を更新
