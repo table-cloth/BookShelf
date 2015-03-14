@@ -35,6 +35,9 @@ public class Rakuten {
         final public static String IMAGE_URL_MEDIUM = "mediumImageUrl";
         final public static String IMAGE_URL_LARGE = "largeImageUrl";
         final public static String ISBN = "isbnjan";
+        final public static String SEARCH_RESULT_PAGE_COUNT = "pageCount"; // 検索結果が何ページ分あるか
+        final public static String SEARCH_RESULT_PAGE_CURRENT = "page"; // 今現在検索結果の何ページ目にいるか
+        final public static String SEARCH_RESULT_COUNT = "count"; // 検索結果が何件あるか
     }
 
     // 楽天API用の検索対象一覧
@@ -89,6 +92,7 @@ public class Rakuten {
         uri += apiName;
         uri += "/Search/20130522?format=json";
         uri += "&" + key + "=" + value;
+        uri += "&sort=%2BreleaseDate"; // 古い順にソートする
         uri += "&applicationId=" + context.getString(R.string.id_rakuten_app_id);
         return uri;
     }

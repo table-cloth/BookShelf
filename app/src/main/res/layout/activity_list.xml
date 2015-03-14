@@ -91,7 +91,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="3dp"
         android:background="@drawable/btn_positive"
-        android:text="追加" />
+        android:text="作品を検索／追加" />
     <!-- footer -->
 
     <RelativeLayout
