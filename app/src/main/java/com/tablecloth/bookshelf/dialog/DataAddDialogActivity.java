@@ -88,7 +88,7 @@ public class DataAddDialogActivity extends DialogBaseActivity {
     }
 
     @Override
-    protected int getLayoutId() {
+    protected int getContentViewID() {
         return R.layout.activity_data_add_dialog;
     }
 //

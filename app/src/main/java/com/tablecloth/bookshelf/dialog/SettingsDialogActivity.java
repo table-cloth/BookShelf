@@ -74,7 +74,7 @@ public class SettingsDialogActivity extends DialogBaseActivity {
     }
 
     @Override
-    protected int getLayoutId() {
+    protected int getContentViewID() {
         return R.layout.activity_setting_dialog;
     }
 

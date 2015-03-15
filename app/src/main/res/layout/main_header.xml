@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
+
+    <!-- ヘッダー（通常） -->
+    <include
+        android:id="@+id/header_area_mode_view"
+        layout="@layout/main_header_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        />
+
+
+    <!-- ヘッダー（検索） -->
+    <include
+        android:id="@+id/header_area_mode_search"
+        layout="@layout/main_header_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <!-- ヘッダー（検索） -->
+    <include
+        android:id="@+id/header_area_mode_api_search"
+        layout="@layout/main_header_api_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+</RelativeLayout>
