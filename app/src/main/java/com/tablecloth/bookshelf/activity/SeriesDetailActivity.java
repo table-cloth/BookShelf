@@ -30,6 +30,7 @@ import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ImageUtil;
+import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 
@@ -37,7 +38,7 @@ import com.tablecloth.bookshelf.util.Util;
  * Created by minami on 14/09/07.
  * １作品の詳細表示画面
  */
-public class SeriesDetailActivity extends Activity {
+public class SeriesDetailActivity extends BaseActivity {
 
     SeriesData mSeriesData = null;
     int mSeriesId = -1;
@@ -149,18 +150,49 @@ public class SeriesDetailActivity extends Activity {
     private void initLayout() {
     	if(mSeriesData != null) {
 	        ((TextView)findViewById(R.id.title)).setText(mSeriesData.mTitle);
+            if(!Util.isEmpty(mSeriesData.mTitlePronunciation)) {
+                ((TextView) findViewById(R.id.title_pronuncitation)).setText("（" + mSeriesData.mTitlePronunciation + "）");
+                findViewById(R.id.title_pronuncitation).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.title_pronuncitation).setVisibility(View.GONE);
+            }
+
 	        ((TextView)findViewById(R.id.author)).setText(mSeriesData.mAuthor);
-	        ((TextView)findViewById(R.id.company)).setText(mSeriesData.mCompany);
+            if(!Util.isEmpty(mSeriesData.mAuthorPronunciation)) {
+                ((TextView) findViewById(R.id.author_pronunciation)).setText("（" + mSeriesData.mAuthorPronunciation + "）");
+                findViewById(R.id.author_pronunciation).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.author_pronunciation).setVisibility(View.GONE);
+            }
+
 	        ((TextView)findViewById(R.id.magazine)).setText(mSeriesData.mMagazine);
+            if(!Util.isEmpty(mSeriesData.mMagazinePronunciation)) {
+                ((TextView)findViewById(R.id.magazine_pronunciation)).setText("（" + mSeriesData.mMagazinePronunciation+"）");
+                findViewById(R.id.magazine_pronunciation).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.magazine_pronunciation).setVisibility(View.GONE);
+            }
+            ((TextView)findViewById(R.id.company)).setText(mSeriesData.mCompany);
 	        ((TextView)findViewById(R.id.memo)).setText(mSeriesData.mMemo);
 	        ((TextView)findViewById(R.id.volume)).setText(mSeriesData.getVolumeString());
-	        Bitmap bitmap = mSeriesData.getImage(SeriesDetailActivity.this);
-	        if(bitmap != null) {
-	        	mImageView.setImageBitmap(bitmap);
-	        	findViewById(R.id.plus).setVisibility(View.GONE);
-	        } else {
-	        	findViewById(R.id.plus).setVisibility(View.VISIBLE);
-	        }
+            final View plus = findViewById(R.id.plus);
+	        mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                @Override
+                public void onFinish(Bitmap bitmap) {
+                    if(bitmap != null) {
+                        mImageView.setImageBitmap(bitmap);
+                        plus.setVisibility(View.GONE);
+                    } else {
+                        plus.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    plus.setVisibility(View.VISIBLE);
+                }
+            });
+
     	}
     }
     
@@ -208,13 +240,23 @@ public class SeriesDetailActivity extends Activity {
                  	   e.printStackTrace();
                     }
             		FilterDao.saveSeries(mSeriesData);
-					Bitmap bitmap = mSeriesData.getImage(SeriesDetailActivity.this);
-			        if(bitmap != null) {
-			        	mImageView.setImageBitmap(bitmap);
-			        	findViewById(R.id.plus).setVisibility(View.GONE);
-			        } else {
-			        	findViewById(R.id.plus).setVisibility(View.VISIBLE);
-			        }
+                    final View plus = findViewById(R.id.plus);
+					mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                        @Override
+                        public void onFinish(Bitmap bitmap) {
+                            if(bitmap != null) {
+                                mImageView.setImageBitmap(bitmap);
+                                plus.setVisibility(View.GONE);
+                            } else {
+                                plus.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                        @Override
+                        public void onError() {
+                            plus.setVisibility(View.VISIBLE);
+                        }
+                    });
             	}
             	break;
             case G.REQUEST_CODE_IMAGE_GALLERYS:
@@ -243,13 +285,23 @@ public class SeriesDetailActivity extends Activity {
 					}
 				}
 				FilterDao.saveSeries(mSeriesData);
-				Bitmap bitmap = mSeriesData.getImage(SeriesDetailActivity.this);
-				if (bitmap != null) {
-					mImageView.setImageBitmap(bitmap);
-					findViewById(R.id.plus).setVisibility(View.GONE);
-				} else {
-					findViewById(R.id.plus).setVisibility(View.VISIBLE);
-				}
+                final View plus = findViewById(R.id.plus);
+				mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                    @Override
+                    public void onFinish(Bitmap bitmap) {
+                        if (bitmap != null) {
+                            mImageView.setImageBitmap(bitmap);
+                            findViewById(R.id.plus).setVisibility(View.GONE);
+                        } else {
+                            findViewById(R.id.plus).setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onError() {
+                        findViewById(R.id.plus).setVisibility(View.VISIBLE);
+                    }
+                });
 			}
 			break;
         }

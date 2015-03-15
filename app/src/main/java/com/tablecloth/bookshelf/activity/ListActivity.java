@@ -1,14 +1,13 @@
 package com.tablecloth.bookshelf.activity;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,52 +18,53 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import com.google.android.gms.actions.ReserveIntents;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
+import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
 import com.tablecloth.bookshelf.util.CustomListView;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.FilterDao;
-import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
-import com.tablecloth.bookshelf.dialog.SettingsDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
-import com.tablecloth.bookshelf.util.CustomListView;
-import com.tablecloth.bookshelf.util.DBUtil;
-import com.tablecloth.bookshelf.util.FileUtil;
+import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
+import com.tablecloth.bookshelf.util.JsonUtil;
+import com.tablecloth.bookshelf.util.ListenerUtil;
+import com.tablecloth.bookshelf.util.ProgressUtil;
+import com.tablecloth.bookshelf.util.Rakuten;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.VersionUtil;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * Created by shnomura on 2014/08/16.
  */
-public class ListActivity extends Activity{
+public class ListActivity extends BaseActivity {
 
     private CustomListView mListView;
     ArrayList<SeriesData> mDataArrayList = new ArrayList<SeriesData>();
     ListAdapter mListAdapter;
     Spinner spinnerView;
-    
+
+    // 楽天WebAPIでの検索結果の保持用変数
+    ArrayList<SeriesData> mApiSearchResultArrayList = new ArrayList<SeriesData>();
+    JSONObject mAPISearchResultJsonObject = null;
+
+    ProgressUtil mProgress;
     
     
     // http://shogogg.hatenablog.jp/entry/20110118/1295326773
     int mDraggingPosition = -1;
-
-//    String filterInfo = null;
 
     // データ編集時用のID情報一時保管庫
     // 使い終わったらnullにする
@@ -83,6 +83,8 @@ public class ListActivity extends Activity{
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_list);
+
+        mProgress = new ProgressUtil(ListActivity.this);
 
         //mMode = MODE_VIEW;
         switchMode(G.MODE_VIEW);
@@ -121,25 +123,39 @@ public class ListActivity extends Activity{
         mDataArrayList.clear();
         SeriesData[] series = null;
 
-        if(mMode == G.MODE_SEARCH) {
-        	series = FilterDao.loadSeries(ListActivity.this, mSearchMode, mSearchContent);
-        } else {
-        	series = FilterDao.loadSeries(ListActivity.this);
-        }
-        if(series != null) {
-            for(int i = 0 ; i < series.length ; i ++) {
-                SeriesData data = series[i];
-                if(data != null) {
-                    mDataArrayList.add(data);
+        switch (mMode) {
+            case G.MODE_VIEW:
+                series = FilterDao.loadSeries(ListActivity.this);
+                if(series != null) {
+                    for(int i = 0 ; i < series.length ; i ++) {
+                        SeriesData data = series[i];
+                        if(data != null) {
+                            mDataArrayList.add(data);
+                        }
+                    }
                 }
-            }
+                break;
+            case G.MODE_SEARCH:
+                series = FilterDao.loadSeries(ListActivity.this, mSearchMode, mSearchContent);
+                if(series != null) {
+                    for(int i = 0 ; i < series.length ; i ++) {
+                        SeriesData data = series[i];
+                        if(data != null) {
+                            mDataArrayList.add(data);
+                        }
+                    }
+                }
+                break;
+            // 検索結果を表示する。
+            case G.MODE_API_SEARCH_RESULT:
+                if(mApiSearchResultArrayList != null) {
+                    for(int i = 0 ; i < mApiSearchResultArrayList.size() ; i ++) {
+                        mDataArrayList.add(mApiSearchResultArrayList.get(i));
+                    }
+                }
+                break;
         }
-//        if(filterInfo == null) {
-//            // とりあえず全ての情報を取得する
-//
-//        } else {
-//            // 指定のデータのみ読み込む
-//        }
+
 
         mListAdapter.notifyDataSetChanged();
     }
@@ -166,7 +182,6 @@ public class ListActivity extends Activity{
             TextView title;
             TextView author;
             TextView volume;
-            ImageView image;
             View v = convertView;
 
             if(v==null){
@@ -180,36 +195,68 @@ public class ListActivity extends Activity{
                     title = (TextView) v.findViewById(R.id.title);
                     author = (TextView) v.findViewById(R.id.author);
                     volume = (TextView) v.findViewById(R.id.volume);
-                    image = (ImageView) v.findViewById(R.id.image);
+                    final ImageView image = (ImageView) v.findViewById(R.id.image);
 
                     title.setText(series.mTitle);
                     author.setText(series.mAuthor);
-                    volume.setText(series.getVolumeString());
-                    Bitmap bitmap = series.getImage(ListActivity.this);
-                    if(bitmap != null) {
-                        image.setImageBitmap(bitmap);
+                    if(mMode == G.MODE_API_SEARCH_RESULT) {
+                        volume.setVisibility(View.GONE);
+                    } else {
+                        volume.setText(series.getVolumeString());
+                        volume.setVisibility(View.VISIBLE);
                     }
-                    else {
-                    	image.setImageResource(R.drawable.no_image);
-                    }
-
-                    // リストの各要素のタッチイベント
-                    v.findViewById(R.id.delete_btn).setOnClickListener(new View.OnClickListener() {
+                    image.setImageResource(R.drawable.no_image);
+                    series.getImage(mHandler, ListActivity.this, new ListenerUtil.LoadBitmapListener() {
                         @Override
-                        public void onClick(View v) {
-                            mSelectSeriesIds = new int[]{series.mSeriesId};
-                            Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "削除しますか？", "登録された作品の情報を削除しますか？\n\n復元は出来ませんのでご注意ください", "はい", "いいえ");
-                            startActivityForResult(intent, G.REQUEST_CODE_LIST_ROW_DELETE_SERIES);
+                        public void onFinish(Bitmap bitmap) {
+                            if(bitmap != null) {
+                                image.setImageBitmap(bitmap);
+                            }
+                            else {
+                                image.setImageResource(R.drawable.no_image);
+                            }
+                        }
+
+                        @Override
+                        public void onError() {
+                            image.setImageResource(R.drawable.no_image);
                         }
                     });
 
-                    v.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // リストのセルをタップで
-                            startActivity(IntentUtil.getSeriesDetailIntent(ListActivity.this, series.mSeriesId));
-                        }
-                    });
+                    // WebAPIの検索結果時以外は先品詳細画面へ
+                    if(mMode != G.MODE_API_SEARCH_RESULT) {
+                        // リストの各要素のタッチイベント
+                        v.findViewById(R.id.delete_btn).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mSelectSeriesIds = new int[]{series.mSeriesId};
+                                Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "削除しますか？", "登録された作品の情報を削除しますか？\n\n復元は出来ませんのでご注意ください", "はい", "いいえ");
+                                startActivityForResult(intent, G.REQUEST_CODE_LIST_ROW_DELETE_SERIES);
+                            }
+                        });
+                        v.findViewById(R.id.delete_btn).setVisibility(View.VISIBLE);
+
+                        v.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                // リストのセルをタップで
+                                startActivity(IntentUtil.getSeriesDetailIntent(ListActivity.this, series.mSeriesId));
+                            }
+                        });
+                    // WebAPIの検索結果表示時の場合は一部処理をかえる
+                    } else {
+                        // リストの各要素のタッチイベント
+                        v.findViewById(R.id.delete_btn).setVisibility(View.GONE);
+
+                        v.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "この作品を追加しますか？", "追加", series);
+//                                Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "確認", "この作品を本棚に追加しますか？", "はい", "いいえ");
+                                ListActivity.this.startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
+                            }
+                        });
+                    }
                 }
             }
             return v;
@@ -224,13 +271,10 @@ public class ListActivity extends Activity{
         findViewById(R.id.add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "作品情報を追加", "追加", -1);
-                startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
-//                long unix = Calendar.getInstance().getTimeInMillis() / 1000L;
-//                SeriesData data = new SeriesData("タイトル"+unix);
-//                data.mAuthor = "作者" + unix;
-//                FilterDao.saveSeries(data);
-//                refreshData();
+                // 登録種類を詮索
+                Intent intent = BtnListDialogActivity.getIntent(ListActivity.this, "作品登録方法を選択", "作品を登録する方法を選択してください", "決定", "キャンセル");
+                startActivityForResult(intent, G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE);
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
             }
         });
         
@@ -238,9 +282,9 @@ public class ListActivity extends Activity{
         findViewById(R.id.btn_search).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SEARCH_BTN);
 				switchMode(G.MODE_SEARCH);
 		    	refreshData();
-//				mMode = MODE_SEARCH;
 			}
 		});
         
@@ -260,6 +304,13 @@ public class ListActivity extends Activity{
 		    	refreshData();
 			}
 		});
+        findViewById(R.id.btn_api_cancel).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchMode(G.MODE_VIEW);
+                refreshData();
+            }
+        });
 
         // 検索対象選択スピナーボタン
         spinnerView = ((Spinner)findViewById(R.id.spinner_search_content));
@@ -325,6 +376,7 @@ public class ListActivity extends Activity{
             // 基本的な保存処理は「作品情報追加画面」に任せる
             case G.REQUEST_CODE_LIST_ADD_SERIES:
             	if(resultCode == G.RESULT_POSITIVE) {
+                    switchMode(G.MODE_VIEW);
             		refreshData();
             		ToastUtil.show(ListActivity.this, "作品を追加しました");
             	}
@@ -340,8 +392,150 @@ public class ListActivity extends Activity{
                     }
                 }
                 break;
+            // 作品の登録方法を選択
+            case G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE:
+                if(resultCode == G.RESULT_POSITIVE) {
+                    Intent intent;
+                    int selectedId = data.getIntExtra(G.RESULT_DATA_SELECTED_ID, G.RESULT_DATA_SELECTED_BTN_SEARCH);
+                    switch (selectedId) {
+                        // 検索結果からの登録画面
+                        case G.RESULT_DATA_SELECTED_BTN_SEARCH:
+                        default:
+                            intent = SearchDialogActivity.getIntent(ListActivity.this, "作品を検索", "作品を検索する項目を選択してください", "検索", "キャンセル");
+                            startActivityForResult(intent, G.REQUEST_CODE_LIST_SEARCH_RAKUTEN);
+                            break;
+                        // 作品手動登録画面
+                        case G.RESULT_DATA_SELECTED_BTN_MANUAL:
+                            intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "作品情報を追加", "追加", -1);
+                            startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
+                            break;
+                    }
+                }
+                break;
+            // 楽天APIを使用して検索
+            case G.REQUEST_CODE_LIST_SEARCH_RAKUTEN:
+                if(resultCode == G.RESULT_POSITIVE) {
+                    mProgress.start("検索中…", null);
+
+                    // 検索対象、及び検索内容を取得
+                    final String key = data.getStringExtra(G.RESULT_DATA_SELECTED_KEY);
+                    final String value = data.getStringExtra(G.RESULT_DATA_SELECTED_VALUE);
+
+                    // HTTPアクセスが入るので別スレッドで回す
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            // 楽天APIを利用してJSONを取得する。
+                            String url = Rakuten.getRakutenBooksBookURI(ListActivity.this, key, value);
+                            Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(ListActivity.this, url);
+
+                            final String jsonStr = loader.loadInBackground();
+
+                            // JSONを取得後に検索結果一覧・または補完済みの作品登録画面を表示
+                            // 検索結果が0件の場合：「取得できる作品がありませんでした。内容を変更しもう一度お試しください。」という通知を表示
+                            // 検索結果が1件の場合：作品登録画面を開き、取得できている全ての情報を入力済みの状態で表示する
+                            // 検索結果が2件以上の場合：作品一覧画面を開き、求めている作品を選んでもらう。選択後は「検索結果が1件の場合」と同じ流れになる
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    if(Util.isEmpty(jsonStr)) {
+                                        // 取得失敗した場合は書籍全般として再建策するする
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                // 楽天APIを利用してJSONを取得する。
+                                                String url = Rakuten.getRakutenBooksTotalUri(ListActivity.this, key, value);
+                                                Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(ListActivity.this, url);
+
+                                                final String jsonRetryStr = loader.loadInBackground();
+
+                                                mHandler.post(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        if(Util.isEmpty(jsonRetryStr)) {
+                                                            mProgress.close();
+                                                            // 検索結果が空の場合はトースト通知でお知らせ
+                                                            ToastUtil.show(ListActivity.this, "取得できる作品がありませんでした。内容を変更しもう一度お試しください。");
+                                                        } else {
+                                                            convertJsonStr2JsonArrayObject(jsonStr);
+                                                            mProgress.close();
+                                                            switchMode(G.MODE_API_SEARCH_RESULT);
+                                                            refreshData();
+                                                        }
+                                                    }
+                                                });
+
+                                            }
+                                        }).start();
+                                    } else {
+                                        convertJsonStr2JsonArrayObject(jsonStr);
+                                        mProgress.close();
+                                        switchMode(G.MODE_API_SEARCH_RESULT);
+                                        refreshData();
+                                    }
+                                }
+                            });
+                        }
+                    }).start();
+
+                }
+                break;
         }
     }
+
+    /**
+     * Json文字列から検索結果一覧情報を取得・メンバ変数に保持する
+     * @param jsonStr
+     */
+    private void convertJsonStr2JsonArrayObject(String jsonStr) {
+        mApiSearchResultArrayList = new ArrayList<SeriesData>();
+
+        // JSON情報を分析する
+        mAPISearchResultJsonObject = JsonUtil.getJsonObject(jsonStr);
+        JSONArray jsonArray = JsonUtil.getJsonArray(mAPISearchResultJsonObject, Rakuten.Key.ITEM_LIST);
+        List<JSONObject> jsonObjList = JsonUtil.getJsonObjectsList(jsonArray);
+
+        String count = JsonUtil.getJsonObjectData(mAPISearchResultJsonObject, Rakuten.Key.SEARCH_RESULT_COUNT);
+        int countVal = -1;
+        try {
+            countVal = Integer.valueOf(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(countVal > 30) {
+            ToastUtil.show(ListActivity.this, "30件以上の作品がヒットしました");
+        } else {
+            ToastUtil.show(ListActivity.this, count+"件の作品がヒットしました");
+        }
+
+        // 取得した結果を作品情報一覧へと分解する
+        for(int i = 0 ; i < jsonObjList.size() ; i ++ ) {
+            JSONObject detailData = JsonUtil.getJsonObject(jsonObjList.get(i), Rakuten.Key.ITEM_DETAIL);
+            SeriesData data = new SeriesData();
+
+            data.mTitle = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME);
+            data.mTitlePronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME_KANA);
+            data.mAuthor = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME);
+            data.mAuthorPronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME_KANA);
+            data.mMagazine = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME);
+            data.mMagazinePronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME_KANA);
+            data.mCompany = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.COMPANY_NAME);
+            // 画像は現在未対応（そのうち対応入れる）
+            // URLを保持できる用に機能の変更が必要
+            String imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_LARGE);
+            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_MEDIUM);
+            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_SMALL);
+            // URLの取得に成功した場合は登録する
+            if(!Util.isEmpty(imageUrl)) {
+                data.mImagePath = imageUrl;
+            }
+
+            mApiSearchResultArrayList.add(data);
+        }
+    }
+
     
 //    class DragListener extends CustomListView.SimpleDragListener {
 //        @Override
@@ -412,16 +606,40 @@ public class ListActivity extends Activity{
     	switch(newMode) {
     		case G.MODE_VIEW:
     		default:
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_VIEW);
     			findViewById(R.id.header_area_mode_view).setVisibility(View.VISIBLE);
-    			findViewById(R.id.header_area_mode_search).setVisibility(View.GONE); 
-    			break;
+    			findViewById(R.id.header_area_mode_search).setVisibility(View.GONE);
+                findViewById(R.id.header_area_mode_api_search).setVisibility(View.GONE);
+                findViewById(R.id.btn_search).setVisibility(View.VISIBLE);
+                break;
     			
     		case G.MODE_SEARCH:
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_SEARCH);
     			findViewById(R.id.header_area_mode_view).setVisibility(View.GONE);
-    			findViewById(R.id.header_area_mode_search).setVisibility(View.VISIBLE); 
+    			findViewById(R.id.header_area_mode_search).setVisibility(View.VISIBLE);
+                findViewById(R.id.header_area_mode_api_search).setVisibility(View.GONE);
     			findViewById(R.id.search_content).requestFocus();
-    			break;
+                findViewById(R.id.btn_search).setVisibility(View.VISIBLE);
+                break;
+            case G.MODE_API_SEARCH_RESULT:
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_API_SEARCH_RESULT);
+                findViewById(R.id.header_area_mode_view).setVisibility(View.GONE);
+                findViewById(R.id.header_area_mode_search).setVisibility(View.GONE);
+                findViewById(R.id.header_area_mode_api_search).setVisibility(View.VISIBLE);
+                findViewById(R.id.btn_search).setVisibility(View.GONE);
+                break;
     	}
     	mMode = newMode;
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            if (mMode != G.MODE_VIEW) {
+                switchMode(G.MODE_VIEW);
+            } else {
+                return super.onKeyDown(keyCode, event);
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

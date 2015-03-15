@@ -14,6 +14,13 @@ public class G {
     final public static int RESULT_POSITIVE = 1;
     final public static int RESULT_NEGATIVE = 2;
 
+    final public static String RESULT_DATA_SELECTED_ID = "selected_id"; // intを返す
+    final public static int RESULT_DATA_SELECTED_BTN_SEARCH = 0;
+    final public static int RESULT_DATA_SELECTED_BTN_MANUAL = 1;
+    final public static String RESULT_DATA_SELECTED_KEY = "selected_key"; // Stringを返す
+    final public static String RESULT_DATA_SELECTED_VALUE = "selected_value"; // Stringを返す
+
+
     final public static int REQUEST_CODE_LIST_ROW_DELETE_SERIES = 1;
     final public static int REQUEST_CODE_LIST_ADD_SERIES = 2;
 //    final public static int REQUEST_CODE_NEW_SERIES_DETAIL = 3;
@@ -22,6 +29,10 @@ public class G {
     final public static int REQUEST_CODE_IMAGE_CHANGE_CONFIRM_2 = 5;
     final public static int REQUEST_CODE_IMAGE_GALLERYS = 6;
     final public static int REQUEST_CODE_IMAGE_CAMERA = 7;
+    final public static int REQUEST_CODE_SELECT_ADD_SERIES_TYPE = 8;
+    final public static int REQUEST_CODE_LIST_SEARCH_RAKUTEN = 9;
+
+
 
     final public static int REQUEST_CODE_UPDATE_DIALOG = 100;
 
@@ -54,10 +65,11 @@ public class G {
             "掲載誌名", // SEARCH_MODE_ALL
     };
 
-
     final public static int MODE_VIEW = 0; // デフォルトの閲覧モード
 //  final public static int MODE_DELETE = 1; // 削除モード
     final public static int MODE_SEARCH = 2; // 検索モード
+    final public static int MODE_API_SEARCH_RESULT = 3; // 楽天APIでの検索結果を表示
+
     // intentの情報
     final public static String INTENT_SERIES_ID = "series_id";
 }
