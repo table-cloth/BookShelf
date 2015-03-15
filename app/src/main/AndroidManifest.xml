@@ -7,6 +7,7 @@
 
     <application
         android:allowBackup="true"
+        android:name=".BookShelfApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
@@ -54,7 +55,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CustomDialog"
             />
-        
+        <activity
+            android:name="com.tablecloth.bookshelf.dialog.BtnListDialogActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CustomDialog"
+            />
+        <activity
+            android:name="com.tablecloth.bookshelf.dialog.SearchDialogActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CustomDialog"
+            />
     </application>
 
 </manifest>

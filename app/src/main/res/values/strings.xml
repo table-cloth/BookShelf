@@ -7,4 +7,10 @@
 
     <string name="add_detail"><u>情報を追加する</u></string>
 
+    <string name="id_google_analytics_tracking">UA-44238770-2</string>
+    <string name="id_rakuten_app_id">1019452313987815323</string>
+<!--    <string name="id_rakuten_app_secret">82c322af10ed48b6929af1c2ad76434d5994cfe3</string>
+-->
+    <string name="rakuten_api_name_books">BooksBook</string>
+    <string name="rakuten_api_name_all">BooksTotal</string>
 </resources>

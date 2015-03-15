@@ -134,6 +134,14 @@
                             android:layout_height="wrap_content"
                             layout="@layout/data_detail_row" />
 
+                        <!-- タイトル（カナ） -->
+
+                        <include
+                            android:id="@+id/data_detail_row_title_pronunciation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
+
                         <!-- 作者 -->
 
                         <include
@@ -142,10 +150,26 @@
                             android:layout_height="wrap_content"
                             layout="@layout/data_detail_row" />
 
+                        <!-- 作者（カナ） -->
+
+                        <include
+                            android:id="@+id/data_detail_row_author_pronunciation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
+
                         <!-- 掲載誌 -->
 
                         <include
                             android:id="@+id/data_detail_row_magazine"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
+
+                        <!-- 掲載誌（カナ） -->
+
+                        <include
+                            android:id="@+id/data_detail_row_magazine_pronunctaion"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             layout="@layout/data_detail_row" />

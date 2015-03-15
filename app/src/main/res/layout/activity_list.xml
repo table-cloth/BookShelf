@@ -45,7 +45,7 @@
                 android:textStyle="bold" />
         </RelativeLayout>
 
-        <!-- ヘッダー（通常） -->
+        <!-- ヘッダー（検索） -->
 
         <RelativeLayout
             android:id="@+id/header_area_mode_search"
@@ -80,6 +80,30 @@
                 android:layout_toRightOf="@id/btn_cancel"
                 android:maxLines="1" />
         </RelativeLayout>
+
+        <!-- ヘッダー（検索） -->
+
+        <RelativeLayout
+            android:id="@+id/header_area_mode_api_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btn_api_cancel"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/btn_close" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="5dp"
+                android:text="検索結果一覧"
+                android:textStyle="bold" />
+        </RelativeLayout>
     </RelativeLayout>
 
     <!-- 追加ボタン -->
@@ -91,7 +115,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="3dp"
         android:background="@drawable/btn_positive"
-        android:text="追加" />
+        android:text="作品を追加" />
     <!-- footer -->
 
     <RelativeLayout

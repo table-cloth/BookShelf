@@ -8,7 +8,7 @@ import android.view.Window;
 import com.tablecloth.bookshelf.R;
 
 
-public class SplashActivity extends Activity {
+public class SplashActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
