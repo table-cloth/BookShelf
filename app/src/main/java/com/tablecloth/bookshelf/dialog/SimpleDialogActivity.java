@@ -43,7 +43,7 @@ public class SimpleDialogActivity extends DialogBaseActivity {
     }
 
     @Override
-    protected int getLayoutId() {
+    protected int getContentViewID() {
         return R.layout.activity_simple_dialog;
     }
 

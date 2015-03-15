@@ -43,14 +43,17 @@ public class SeriesDetailActivity extends BaseActivity {
     SeriesData mSeriesData = null;
     int mSeriesId = -1;
     NumberPicker mPicker;
-    
+
     ImageView mImageView = null;
-    
+
+    @Override
+    protected int getContentViewID() {
+        return R.layout.activity_series_detail;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_series_detail);
 
         mSeriesId = getIntent().getIntExtra(G.INTENT_SERIES_ID, -1);
         if(mSeriesId == -1) {

@@ -145,7 +145,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
     }
 
     @Override
-    protected int getLayoutId() {
+    protected int getContentViewID() {
         return R.layout.activity_edit_series_dialog;
     }
 

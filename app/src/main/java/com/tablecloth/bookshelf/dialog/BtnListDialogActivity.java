@@ -67,7 +67,7 @@ public class BtnListDialogActivity extends DialogBaseActivity {
     }
 
     @Override
-    protected int getLayoutId() {
+    protected int getContentViewID() {
         return R.layout.activity_btn_list_dialog;
     }
 

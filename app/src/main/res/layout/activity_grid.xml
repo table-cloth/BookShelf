@@ -11,7 +11,15 @@
         android:id="@+id/header"
         layout="@layout/main_header"
         android:layout_width="match_parent"
-        android:layout_height="50dp" />
+        android:layout_height="wrap_content" />
+
+
+    <include
+        android:id="@+id/header"
+        layout="@layout/main_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 
     <include
         android:id="@+id/footer"
@@ -22,13 +30,16 @@
 
     <!-- main view -->
 
-    <com.tablecloth.bookshelf.util.CustomListView
-        android:id="@+id/list_view"
+    <GridView
+        android:id="@+id/grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/footer"
-        android:layout_below="@id/header"
-        android:divider="#99444444"
-        android:dividerHeight="1dp" />
+        android:columnWidth="100dp"
+        android:minHeight="100dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="8dp"
+        android:horizontalSpacing="8dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"/>
 
 </RelativeLayout>
