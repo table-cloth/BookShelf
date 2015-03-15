@@ -21,7 +21,7 @@ public class SplashActivity extends BaseActivity {
 
 
         // 次のActivityを開始
-        startActivity(new Intent(this, ListActivity.class));
+        startActivity(new Intent(this, GridActivity.class));
         SplashActivity.this.finish();
     }
 

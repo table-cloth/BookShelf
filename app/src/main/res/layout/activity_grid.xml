@@ -34,11 +34,9 @@
         android:id="@+id/grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="100dp"
-        android:minHeight="100dp"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="8dp"
-        android:horizontalSpacing="8dp"
+        android:layout_below="@id/header"
+        android:layout_above="@id/footer"
+        android:numColumns="4"
         android:stretchMode="columnWidth"
         android:gravity="center"/>
 

@@ -39,6 +39,8 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:layout_weight="1"
             android:text="tile" />
 
@@ -46,6 +48,8 @@
             android:id="@+id/author"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:layout_weight="1"
             android:text="author" />
 
@@ -54,6 +58,8 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:text="volume" />
     </LinearLayout>
 
