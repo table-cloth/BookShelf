@@ -431,7 +431,7 @@ public abstract class MainBaseActivity extends BaseActivity {
             }
         });
 
-        mHeaderApiSearch.findViewById(R.id.btn_api_cancel).setOnClickListener(new View.OnClickListener() {
+        mHeaderApiSearch.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switchMode(G.MODE_VIEW);
@@ -439,13 +439,13 @@ public abstract class MainBaseActivity extends BaseActivity {
             }
         });
 
-//        // 設定ボタン
-//        findViewById(R.id.btn_settings).setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				startActivity(new Intent(ListActivity.this, SettingsDialogActivity.class));
-//			}
-//		});
+        // 設定ボタン
+        findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainBaseActivity.this, SettingsActivity.class));
+            }
+        });
 
 
 

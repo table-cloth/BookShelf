@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_main">
+
+    <include
+        android:id="@+id/header"
+        layout="@layout/settings_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#44000000"
+        android:gravity="center" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/banner"
+        android:layout_below="@id/header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="表示設定"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="@dimen/text_large" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/cell_drawable">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="表示形式"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_normal" />
+
+                <Button
+                    android:id="@+id/settings_btn_show_style_grid"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/btn_positive"
+                    android:text="グリッド"
+                    android:textSize="@dimen/text_normal" />
+                <Button
+                    android:id="@+id/settings_btn_show_style_list"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:layout_toLeftOf="@id/settings_btn_show_style_grid"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/btn_gray"
+                    android:text="リスト"
+                    android:textSize="@dimen/text_normal" />
+            </RelativeLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</RelativeLayout>
