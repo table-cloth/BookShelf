@@ -27,6 +27,7 @@ public class GridActivity extends MainBaseActivity {
 
     private GridView mGridView;
     private GridAdapter mGridAdapter;
+    final private int COLUMNS_PER_ROW = 4; // 1行に何セルあるか
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,26 @@ public class GridActivity extends MainBaseActivity {
                 v = inflater.inflate(R.layout.book_grid_item, null);
             }
 
+            // 上のボーダ
+            if(position < 4) {
+                v.findViewById(R.id.border_top).setVisibility(View.VISIBLE);
+            } else {
+                v.findViewById(R.id.border_top).setVisibility(View.GONE);
+            }
+            // 下のボーダー
+            v.findViewById(R.id.border_bottom).setVisibility(View.VISIBLE);
+            // 左のボーダー
+            if(position % 4 == 0) {
+                v.findViewById(R.id.border_left).setVisibility(View.VISIBLE);
+            } else {
+                v.findViewById(R.id.border_left).setVisibility(View.GONE);
+            }
+            // 右のボーダー
+            v.findViewById(R.id.border_right).setVisibility(View.VISIBLE);
+
+            final ImageView image = (ImageView) v.findViewById(R.id.image);
+            image.setImageResource(R.drawable.no_image);
+
             if(mDataArrayList != null) {
                 final SeriesData series = (SeriesData) mDataArrayList.get(position);
                 if (series != null) {
@@ -75,7 +96,6 @@ public class GridActivity extends MainBaseActivity {
                     title = (TextView) v.findViewById(R.id.title);
                     author = (TextView) v.findViewById(R.id.author);
                     volume = (TextView) v.findViewById(R.id.volume);
-                    final ImageView image = (ImageView) v.findViewById(R.id.image);
 
                     title.setText(series.mTitle);
                     author.setText(series.mAuthor);
@@ -85,7 +105,6 @@ public class GridActivity extends MainBaseActivity {
                         volume.setText(series.getVolumeString());
                         volume.setVisibility(View.VISIBLE);
                     }
-                    image.setImageResource(R.drawable.no_image);
                     series.getImage(mHandler, GridActivity.this, new ListenerUtil.LoadBitmapListener() {
                         @Override
                         public void onFinish(Bitmap bitmap) {
@@ -115,8 +134,6 @@ public class GridActivity extends MainBaseActivity {
                         });
                         // WebAPIの検索結果表示時の場合は一部処理をかえる
                     } else {
-                        // リストの各要素のタッチイベント
-                        v.findViewById(R.id.delete_btn).setVisibility(View.GONE);
 
                         v.setOnClickListener(new View.OnClickListener() {
                             @Override
