@@ -11,6 +11,8 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.tablecloth.bookshelf.BookShelfApplication;
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.db.DB;
+import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.util.Util;
 
 
@@ -21,6 +23,7 @@ public abstract class BaseActivity extends Activity {
 
     protected Handler mHandler;
     final protected int CONTENT_VIEW_ID_NONE = -1;
+    protected SettingsDao mSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +33,6 @@ public abstract class BaseActivity extends Activity {
         int contentViewID = getContentViewID();
         if(contentViewID != CONTENT_VIEW_ID_NONE) setContentView(contentViewID);
 
-
         Looper looper = getMainLooper();
         mHandler = new Handler(looper);
 
@@ -38,6 +40,8 @@ public abstract class BaseActivity extends Activity {
         if(!Util.isDebuggable(BaseActivity.this)) {
             getGoogleAnalyticsTracker();
         }
+
+        mSettings = new SettingsDao(BaseActivity.this);
     }
 
     @Override

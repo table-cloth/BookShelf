@@ -13,6 +13,7 @@ public class G {
     final public static int RESULT_NONE = 0;
     final public static int RESULT_POSITIVE = 1;
     final public static int RESULT_NEGATIVE = 2;
+    final public static int RESULT_SPECIAL = 3; // 特殊な導線用
 
     final public static String RESULT_DATA_SELECTED_ID = "selected_id"; // intを返す
     final public static int RESULT_DATA_SELECTED_BTN_SEARCH = 0;
@@ -21,7 +22,7 @@ public class G {
     final public static String RESULT_DATA_SELECTED_VALUE = "selected_value"; // Stringを返す
 
 
-    final public static int REQUEST_CODE_LIST_ROW_DELETE_SERIES = 1;
+//    final public static int REQUEST_CODE_LIST_ROW_DELETE_SERIES = 1;
     final public static int REQUEST_CODE_LIST_ADD_SERIES = 2;
 //    final public static int REQUEST_CODE_NEW_SERIES_DETAIL = 3;
     final public static int REQUEST_CODE_EDIT_SERIES_DETAIL = 3;
@@ -31,10 +32,12 @@ public class G {
     final public static int REQUEST_CODE_IMAGE_CAMERA = 7;
     final public static int REQUEST_CODE_SELECT_ADD_SERIES_TYPE = 8;
     final public static int REQUEST_CODE_LIST_SEARCH_RAKUTEN = 9;
+    final public static int REQUEST_CODE_SIMPLE_CHECK = 10; // 簡易的な確認用
 
 
 
-    final public static int REQUEST_CODE_UPDATE_DIALOG = 100;
+
+    final public static int REQUEST_CODE_UPDATE_DIALOG = 100; // アップデートダイアログ用
 
 
     final public static int DATA_TYPE_SERIES = 0;

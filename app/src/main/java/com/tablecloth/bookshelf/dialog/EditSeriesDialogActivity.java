@@ -41,7 +41,13 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
             sSeriesData = sTmpSeriesData;
         } else {
             // 作品IDが取得できれば、情報をDBから読み取る
-            if(mSeriesId >= 0) sSeriesData = FilterDao.loadSeries(EditSeriesDialogActivity.this, mSeriesId);
+            if(mSeriesId >= 0) {
+                sSeriesData = FilterDao.loadSeries(EditSeriesDialogActivity.this, mSeriesId);
+                if(sSeriesData != null) {
+                    // 削除ボタンを表示する
+                    findViewById(R.id.btn_delete).setVisibility(View.VISIBLE);
+                }
+            }
         }
         // 取得に失敗した場合、新規登録の場合は空のデータを作成
         if(sSeriesData == null) sSeriesData = new SeriesData();
@@ -119,12 +125,15 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
                 EditSeriesDialogActivity.this.finish();
             }
         });
-//        ((TextView)findViewById(R.id.btn_delete)).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                EditSeriesDialogActivity.this.finish();
-//            }
-//        });
+
+        ((TextView)findViewById(R.id.btn_delete)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 削除確認ダイアログ
+                Intent intent = SimpleDialogActivity.getIntent(EditSeriesDialogActivity.this, "作品を削除します", "削除した作品は復元することが出来ません。\n本当に削除してもよろしいでしょうか？", "削除", "キャンセル");
+                startActivityForResult(intent, G.REQUEST_CODE_SIMPLE_CHECK);
+            }
+        });
 
 //        // 追加ボタン
 //        findViewById(R.id.btn_more).setOnClickListener(new View.OnClickListener() {
@@ -252,5 +261,23 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
     
     private String getRowContents(View rowView) {
     	return ((TextView)rowView.findViewById(R.id.data_content)).getText().toString();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case G.REQUEST_CODE_SIMPLE_CHECK:
+                if(resultCode == G.RESULT_POSITIVE) {
+                    if(FilterDao.deleteSeries(mSeriesId)) {
+                        ToastUtil.show(EditSeriesDialogActivity.this, "作品の情報を削除しました");
+                        EditSeriesDialogActivity.this.setResult(G.RESULT_SPECIAL);
+                        EditSeriesDialogActivity.this.finish();
+                    } else {
+                        ToastUtil.show(EditSeriesDialogActivity.this, "作品の情報の削除に失敗しました");
+                    }
+                }
+                break;
+        }
     }
 }

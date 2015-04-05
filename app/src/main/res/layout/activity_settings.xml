@@ -35,44 +35,49 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="表示設定"
+                android:text="@string/settings_key_view_type_grid"
                 android:textColor="@color/black"
-                android:textStyle="bold"
-                android:textSize="@dimen/text_large" />
+                android:textSize="@dimen/text_large"
+                android:textStyle="bold" />
 
             <RelativeLayout
+                android:id="@+id/settings_view_type"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:background="@drawable/cell_drawable">
+                android:background="@drawable/settings_column">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"
-                    android:text="表示形式"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_normal" />
+                <Spinner
+                    android:id="@+id/settings_view_type_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-                <Button
-                    android:id="@+id/settings_btn_show_style_grid"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="10dp"
-                    android:background="@drawable/btn_positive"
-                    android:text="グリッド"
-                    android:textSize="@dimen/text_normal" />
-                <Button
-                    android:id="@+id/settings_btn_show_style_list"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
-                    android:layout_toLeftOf="@id/settings_btn_show_style_grid"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/btn_gray"
-                    android:text="リスト"
-                    android:textSize="@dimen/text_normal" />
+                <!--<LinearLayout-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:orientation="vertical">-->
+
+                    <!--<TextView-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_centerVertical="true"-->
+                        <!--android:layout_marginLeft="10dp"-->
+                        <!--android:textStyle="bold"-->
+                        <!--android:text="表示形式"-->
+                        <!--android:textColor="@color/black"-->
+                        <!--android:textSize="@dimen/text_normal" />-->
+
+                    <!--&lt;!&ndash; 現在の設定がグリッドかリスト形式かを表記する &ndash;&gt;-->
+                    <!--<TextView-->
+                        <!--android:id="@+id/settings_current_view_type"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_marginLeft="20dp"-->
+                        <!--android:textColor="@color/black"-->
+                        <!--android:textSize="@dimen/text_small"/>-->
+                <!--</LinearLayout>-->
+
+
             </RelativeLayout>
 
         </LinearLayout>

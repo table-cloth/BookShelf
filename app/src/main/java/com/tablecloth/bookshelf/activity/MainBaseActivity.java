@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.FilterDao;
 import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
@@ -178,10 +179,32 @@ public abstract class MainBaseActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-
-        // DBから情報取得＋ビュー更新
-        refreshData();
+        if(!isShowTypeCorrect()) {
+            // 設定に合っている画面を開き、この画面を閉じる
+            String value = mSettings.load(SettingsDao.KEY.SERIES_SHOW_TYPE, getShowType());
+            if(SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
+                startActivity(new Intent(this, ListActivity.class));
+                MainBaseActivity.this.finish();
+            } else {
+                startActivity(new Intent(this, GridActivity.class));
+                MainBaseActivity.this.finish();
+            }
+        } else {
+            // DBから情報取得＋ビュー更新
+            refreshData();
+        }
     }
+
+    /**
+     * 現在の表示形式設定と、表示されている画面が一致するかを確認
+     * @return
+     */
+    protected abstract boolean isShowTypeCorrect();
+
+    /**
+     * 現在表示している画面の種類を返す
+     */
+    protected abstract String getShowType();
 
     /**
      * Viewモード以外の時はViewモードに戻す
@@ -207,18 +230,18 @@ public abstract class MainBaseActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            // リストのアイテム内の削除ボタン押下
-            case G.REQUEST_CODE_LIST_ROW_DELETE_SERIES:
-                if(resultCode == G.RESULT_POSITIVE) {
-                    if (mSelectSeriesIds != null) {
-                        for (int i = 0; i < mSelectSeriesIds.length; i++) {
-                            FilterDao.deleteSeries(mSelectSeriesIds[i]);
-                            ToastUtil.show(MainBaseActivity.this, "作品を削除しました");
-                        }
-                    }
-                    refreshData();
-                }
-                break;
+//            // リストのアイテム内の削除ボタン押下
+//            case G.REQUEST_CODE_LIST_ROW_DELETE_SERIES:
+//                if(resultCode == G.RESULT_POSITIVE) {
+//                    if (mSelectSeriesIds != null) {
+//                        for (int i = 0; i < mSelectSeriesIds.length; i++) {
+//                            FilterDao.deleteSeries(mSelectSeriesIds[i]);
+//                            ToastUtil.show(MainBaseActivity.this, "作品を削除しました");
+//                        }
+//                    }
+//                    refreshData();
+//                }
+//                break;
             // 作品情報追加画面から戻ったとき
             // 基本的な保存処理は「作品情報追加画面」に任せる
             case G.REQUEST_CODE_LIST_ADD_SERIES:

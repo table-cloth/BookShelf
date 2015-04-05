@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
 import com.tablecloth.bookshelf.util.CustomListView;
@@ -142,15 +143,15 @@ public class ListActivity extends MainBaseActivity {
                     // WebAPIの検索結果時以外は先品詳細画面へ
                     if(mMode != G.MODE_API_SEARCH_RESULT) {
                         // リストの各要素のタッチイベント
-                        v.findViewById(R.id.delete_btn).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                mSelectSeriesIds = new int[]{series.mSeriesId};
-                                Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "削除しますか？", "登録された作品の情報を削除しますか？\n\n復元は出来ませんのでご注意ください", "はい", "いいえ");
-                                startActivityForResult(intent, G.REQUEST_CODE_LIST_ROW_DELETE_SERIES);
-                            }
-                        });
-                        v.findViewById(R.id.delete_btn).setVisibility(View.VISIBLE);
+//                        v.findViewById(R.id.delete_btn).setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                mSelectSeriesIds = new int[]{series.mSeriesId};
+//                                Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "削除しますか？", "登録された作品の情報を削除しますか？\n\n復元は出来ませんのでご注意ください", "はい", "いいえ");
+//                                startActivityForResult(intent, G.REQUEST_CODE_LIST_ROW_DELETE_SERIES);
+//                            }
+//                        });
+//                        v.findViewById(R.id.delete_btn).setVisibility(View.VISIBLE);
 
                         v.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -258,6 +259,25 @@ public class ListActivity extends MainBaseActivity {
     @Override
     protected void notifyDataSetChanged() {
         mListAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 現在の表示形式設定と、表示されている画面が一致するかを確認
+     * @return
+     */
+    protected boolean isShowTypeCorrect() {
+        String value = mSettings.load(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID);
+        if(SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 現在表示している画面の種類を返す
+     */
+    protected String getShowType() {
+        return SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID;
     }
 
 }

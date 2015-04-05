@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.G;
@@ -176,6 +177,25 @@ public class GridActivity extends MainBaseActivity {
     @Override
     protected void notifyDataSetChanged() {
         mGridAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 現在の表示形式設定と、表示されている画面が一致するかを確認
+     * @return
+     */
+    protected boolean isShowTypeCorrect() {
+        String value = mSettings.load(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID);
+        if(SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID.equals(value)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 現在表示している画面の種類を返す
+     */
+    protected String getShowType() {
+        return SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID;
     }
 
 }
