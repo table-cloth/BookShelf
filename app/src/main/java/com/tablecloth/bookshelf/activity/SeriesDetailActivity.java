@@ -313,14 +313,9 @@ public class SeriesDetailActivity extends BaseActivity {
     }
     
     private Bitmap getImage(Intent data) {
-//    	InputStream inputStream = getContentResolver().openInputStream(data.getData());
     	BitmapFactory.Options imageOptions = new BitmapFactory.Options();
     	imageOptions.inJustDecodeBounds = true;
     	imageOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-//    	BitmapFactory.decodeStream(inputStream, null, imageOptions);
-//    	Log.v("image", "Original Image Size: " + imageOptions.outWidth + " x " + imageOptions.outHeight);
-//
-//    	inputStream.close();
 
     	// もし、画像が大きかったら縮小して読み込む
     	//  今回はimageSizeMaxの大きさに合わせる

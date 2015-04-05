@@ -134,23 +134,6 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
                 startActivityForResult(intent, G.REQUEST_CODE_SIMPLE_CHECK);
             }
         });
-
-//        // 追加ボタン
-//        findViewById(R.id.btn_more).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // 要素を追加するためのダイアログを更に開く
-//                Intent intent = DataAddDialogActivity.getIntent(EditSeriesDialogActivity.this, "追加する情報を設定", "設定", "キャンセル");
-//                startActivityForResult(intent, G.REQUEST_CODE_NEW_SERIES_DETAIL);
-//
-//                View view = findViewById(R.id.data_detail_row_title);
-//                try {
-//                    sSeriesData.mTitle = ((EditText) view.findViewById(R.id.data_content)).getText().toString();
-//                } catch (NullPointerException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
     }
 
     @Override
@@ -164,8 +147,6 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         intent.putExtra(KEY_TITLE, title);
         intent.putExtra(KEY_BTN_POSITIVE, btnPositive);
         intent.putExtra(KEY_ID, seriesId);
-        
-//        intent.putExtra(KEY_BTN_NEGATIVE, "キャンセル");
 
         return intent;
     }
@@ -177,81 +158,9 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         intent.putExtra(KEY_BTN_POSITIVE, btnPositive);
         sTmpSeriesData = seriesData;
 
-//        intent.putExtra(KEY_BTN_NEGATIVE, "キャンセル");
-
         return intent;
 
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        switch (requestCode) {
-//                refreshData();
-//                break;
-//        }
-//    }
-//
-//    private void refreshData() {
-//        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.data_container);
-//        linearLayout.removeAllViews();
-//
-//        LayoutInflater inflater = getLayoutInflater();
-//        
-//        
-//
-//        if(!Util.isEmpty(sSeriesData.mTitle)) {
-//            RelativeLayout relativeLayout = (RelativeLayout)inflater.inflate(R.layout.data_detail_row, null);
-//            ((TextView)relativeLayout.findViewById(R.id.data_name)).setText("タイトル");
-//            ((EditText)relativeLayout.findViewById(R.id.data_content)).setText(sSeriesData.mTitle);
-//            linearLayout.addView(relativeLayout);
-//        }
-//        if(!Util.isEmpty(sSeriesData.mTitlePronunciation)) {
-//            RelativeLayout relativeLayout = (RelativeLayout)inflater.inflate(R.layout.data_detail_row, null);
-//            ((TextView)relativeLayout.findViewById(R.id.data_name)).setText("タイトル（読み）");
-//            ((EditText)relativeLayout.findViewById(R.id.data_content)).setText(sSeriesData.mTitlePronunciation);
-//            linearLayout.addView(relativeLayout);
-//        }
-//        if(!Util.isEmpty(sSeriesData.mAuthor)) {
-//            RelativeLayout relativeLayout = (RelativeLayout)inflater.inflate(R.layout.data_detail_row, null);
-//            ((TextView)relativeLayout.findViewById(R.id.data_name)).setText("作者");
-//            ((EditText)relativeLayout.findViewById(R.id.data_content)).setText(sSeriesData.mAuthor);
-//            linearLayout.addView(relativeLayout);
-//        }
-//        if(!Util.isEmpty(sSeriesData.mTitlePronunciation)) {
-//            RelativeLayout relativeLayout = (RelativeLayout)inflater.inflate(R.layout.data_detail_row, null);
-//            ((TextView)relativeLayout.findViewById(R.id.data_name)).setText("作者（読み）");
-//            ((EditText)relativeLayout.findViewById(R.id.data_content)).setText(sSeriesData.mAuthorPronunciation);
-//            linearLayout.addView(relativeLayout);
-//        }
-//        if(!Util.isEmpty(sSeriesData.mCompany)) {
-//            RelativeLayout relativeLayout = (RelativeLayout)inflater.inflate(R.layout.data_detail_row, null);
-//            ((TextView)relativeLayout.findViewById(R.id.data_name)).setText("出版社");
-//            ((EditText)relativeLayout.findViewById(R.id.data_content)).setText(sSeriesData.mCompany);
-//            linearLayout.addView(relativeLayout);
-//        }
-//        if(!Util.isEmpty(sSeriesData.mCompanyPronunciation)) {
-//            RelativeLayout relativeLayout = (RelativeLayout)inflater.inflate(R.layout.data_detail_row, null);
-//            ((TextView)relativeLayout.findViewById(R.id.data_name)).setText("出版社（読み）");
-//            ((EditText)relativeLayout.findViewById(R.id.data_content)).setText(sSeriesData.mCompanyPronunciation);
-//            linearLayout.addView(relativeLayout);
-//        }
-//        if(sSeriesData.mVolumeList != null && sSeriesData.mVolumeList.size() > 0) {
-//            RelativeLayout relativeLayout = (RelativeLayout)inflater.inflate(R.layout.data_detail_row, null);
-//            ((TextView)relativeLayout.findViewById(R.id.data_name)).setText("所持巻数");
-//            ((EditText)relativeLayout.findViewById(R.id.data_content)).setText(sSeriesData.getVolumeString());
-//            linearLayout.addView(relativeLayout);
-//        }
-//        if(sSeriesData.mTagsList != null && sSeriesData.mTagsList.size() > 0) {
-//            for(int i = 0 ; i < sSeriesData.mTagsList.size() ; i ++) {
-//                RelativeLayout relativeLayout = (RelativeLayout)inflater.inflate(R.layout.data_detail_row, null);
-//                ((TextView)relativeLayout.findViewById(R.id.data_name)).setText("タグ");
-//                ((EditText)relativeLayout.findViewById(R.id.data_content)).setText(sSeriesData.mTagsList.get(i));
-//                linearLayout.addView(relativeLayout);
-//            }
-//        }
-//    }
 
     private void setRowContents(View rowView, String dataName, String dataContent) {
     	// 内容設定
