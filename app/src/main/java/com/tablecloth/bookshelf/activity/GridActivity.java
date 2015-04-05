@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.db.FilterDao;
 import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
@@ -20,6 +21,7 @@ import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
+import com.tablecloth.bookshelf.util.ViewUtil;
 
 /**
  * Created by shnomura on 2015/03/15.
@@ -64,6 +66,8 @@ public class GridActivity extends MainBaseActivity {
             TextView author;
             TextView volume;
             View v = convertView;
+            ViewGroup tagContainer;
+
 
             if(v==null){
                 LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -122,6 +126,11 @@ public class GridActivity extends MainBaseActivity {
                             image.setImageResource(R.drawable.no_image);
                         }
                     });
+                    tagContainer = (ViewGroup) v.findViewById(R.id.tag_container);
+
+                    // タグ
+                    tagContainer = ViewUtil.setTagInfoSmall(GridActivity.this, series.mTagsList, tagContainer);
+                    tagContainer.invalidate();
 
                     // WebAPIの検索結果時以外は先品詳細画面へ
                     if(mMode != G.MODE_API_SEARCH_RESULT) {

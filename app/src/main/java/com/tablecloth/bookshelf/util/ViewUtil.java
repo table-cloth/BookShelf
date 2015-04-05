@@ -7,18 +7,32 @@ import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
 
+import java.util.ArrayList;
+
 /**
  * Created by shnomura on 2015/04/05.
  */
 public class ViewUtil {
 
-    public static ViewGroup setTagInfo(Context context, String[] tags, ViewGroup tagContainerView) {
-        if(tags == null || tags.length <= 0) return tagContainerView;
+    public static ViewGroup setTagInfoNormal(Context context, ArrayList<String> tags, ViewGroup tagContainerView) {
+        if(tags == null || tags.size() <= 0) return tagContainerView;
 
-        LayoutInflater layoutnflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        for(int i = 0 ; i < tags.length ; i ++) {
-            ViewGroup tagView = (ViewGroup) layoutnflater.inflate(R.layout.tag_layout, null);
-            ((TextView) tagView.findViewById(R.id.tag_name)).setText(tags[i]);
+        LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for(int i = 0 ; i < tags.size() ; i ++) {
+            ViewGroup tagView = (ViewGroup) layoutInflater.inflate(R.layout.tag_layout_normal, null);
+            ((TextView) tagView.findViewById(R.id.tag_name)).setText(tags.get(i));
+            tagContainerView.addView(tagView);
+        }
+
+        return tagContainerView;
+    }
+    public static ViewGroup setTagInfoSmall(Context context, ArrayList<String> tags, ViewGroup tagContainerView) {
+        if(tags == null || tags.size() <= 0) return tagContainerView;
+
+        LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for(int i = 0 ; i < tags.size() ; i ++) {
+            ViewGroup tagView = (ViewGroup) layoutInflater.inflate(R.layout.tag_layout_small, null);
+            ((TextView) tagView.findViewById(R.id.tag_name)).setText(tags.get(i));
             tagContainerView.addView(tagView);
         }
 

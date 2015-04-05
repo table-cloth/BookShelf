@@ -35,6 +35,7 @@ import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
+import com.tablecloth.bookshelf.util.ViewUtil;
 
 /**
  * Created by minami on 14/09/07.
@@ -203,14 +204,7 @@ public class SeriesDetailActivity extends BaseActivity {
 
             // タグ情報の設定
             ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
-            // サンプルでタグを20個入れる
-            String tagName = "A";
-            for(int i = 0 ; i < 20 ; i ++) {
-                ViewGroup tagView = (ViewGroup) mLayoutnflater.inflate(R.layout.tag_layout, null);
-                ((TextView) tagView.findViewById(R.id.tag_name)).setText(tagName);
-                tagName += "■□";
-                tagContainer.addView(tagView);
-            }
+            ViewUtil.setTagInfoNormal(SeriesDetailActivity.this, mSeriesData.mTagsList, tagContainer);
             tagContainer.invalidate();
     	}
     }
