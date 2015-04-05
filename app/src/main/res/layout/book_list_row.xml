@@ -21,6 +21,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
+        android:visibility="gone"
         android:background="@drawable/btn_gray"
         android:text="削除"
         android:textAlignment="center"

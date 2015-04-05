@@ -84,7 +84,7 @@ public class DB {
             + BookSeriesTable.TAGS
             + " text, "
             + BookSeriesTable.MEMO
-            + " memo, "
+            + " text, "
             + BookSeriesTable.SERIES_IS_FINISH
             + " integer, "
             + BookSeriesTable.INIT_UPDATE_UNIX
@@ -123,6 +123,26 @@ public class DB {
             + " integer "
             + ")";
 
+    // 各種設定
+    public static class Settings {
+        // テーブル名
+        public static final String TABLE_NAME = "settings";
+        // 項目はkeyとvalueだけとする
+        // 各種設定項目を入れるため、型はString限定としておく
+        public static final String KEY = "key";
+        public static final String VALUE = "value";
+    }
+
+    // BookDetail作成SQL
+    private final static String CREATE_SETTINGS_SQL = "create table "
+            + Settings.TABLE_NAME
+            + " ( "
+            + Settings.KEY
+            + " text not null,"
+            + Settings.VALUE
+            + " text "
+            + ")";
+
 
     /**
      * DB生成処理など
@@ -136,7 +156,7 @@ public class DB {
 
     private static class OpenHelper extends SQLiteOpenHelper {
 
-        private static final int NEWEST_VERSION = 1;
+        private static final int NEWEST_VERSION = 2;
 
         public OpenHelper(Context context) {
             super(context, DB_NAME, null, NEWEST_VERSION);
@@ -146,10 +166,14 @@ public class DB {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(CREATE_SERIES_TABLE_SQL);
             db.execSQL(CREATE_BOOK_DETAIL_SQL);
+            db.execSQL(CREATE_SETTINGS_SQL);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if(oldVersion < 2) {
+                db.execSQL(CREATE_SETTINGS_SQL);
+            }
         }
     }
 

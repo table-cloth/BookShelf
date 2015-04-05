@@ -3,14 +3,9 @@ package com.tablecloth.bookshelf.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Calendar;
-
-import com.tablecloth.bookshelf.activity.ListActivity;
 import com.tablecloth.bookshelf.util.G;
-import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
@@ -56,8 +51,10 @@ public class FilterDao {
      * @param seriesId
      * @return
      */
-    public static void deleteSeries(int seriesId) {
-        mDb.getSQLiteDatabase().delete(DB.BookSeriesTable.TABLE_NAME, DB.BookSeriesTable.SERIES_ID + " = ?", new String[]{Integer.toString(seriesId)});
+    public static boolean deleteSeries(int seriesId) {
+        int rows = mDb.getSQLiteDatabase().delete(DB.BookSeriesTable.TABLE_NAME, DB.BookSeriesTable.SERIES_ID + " = ?", new String[]{Integer.toString(seriesId)});
+        if(rows <= 0) return false;
+        return true;
     }
 
     /**
@@ -371,8 +368,8 @@ public class FilterDao {
             mDb.getSQLiteDatabase().update(DB.BookDetail.TABLE_NAME, contentValues, DB.BookDetail.SERIES_ID + " = ? AND " + DB.BookDetail.SERIES_VOLUME + " = ? ", new String[]{Integer.toString(seriesId), Integer.toString(volume)});
         } else {
             ContentValues contentValues = convertSeriesVolume2ContentValues(seriesId, volume, false);
-            long log = mDb.getSQLiteDatabase().insert(DB.BookDetail.TABLE_NAME, null, contentValues);
-            Log.e("newROW", "newROW = " + log);
+            mDb.getSQLiteDatabase().insert(DB.BookDetail.TABLE_NAME, null, contentValues);
+
         }
 
 //        long nowUnix = Calendar.getInstance().getTimeInMillis() / 1000L;

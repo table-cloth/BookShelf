@@ -209,6 +209,8 @@ public class SeriesDetailActivity extends BaseActivity {
                 if(resultCode == G.RESULT_POSITIVE) {
                     refreshData();
                     initLayout();
+                } else if(resultCode == G.RESULT_SPECIAL) {
+                    SeriesDetailActivity.this.finish();
                 }
                 break;
              // 画像編集確認ダイアログから戻ったとき
