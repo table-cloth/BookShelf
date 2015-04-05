@@ -1,14 +1,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" >
 
     <!-- ダイアログの最大の高さを設定しておく用 -->
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:layout_centerInParent="true">
+        android:layout_centerInParent="true" >
 
         <!-- ダイアログの枠組み -->
 
@@ -18,13 +18,13 @@
             android:layout_centerInParent="true"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:background="@drawable/dialog_bg">
+            android:background="@drawable/dialog_bg" >
 
             <RelativeLayout
                 android:id="@+id/header"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="5dp" >
 
                 <Button
                     android:id="@+id/btn_back"
@@ -43,12 +43,12 @@
                     android:id="@+id/btn_delete"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="10dp"
                     android:layout_marginTop="5dp"
-                    android:background="@drawable/btn_gray"
+                    android:layout_marginRight="10dp"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/btn_gray"
                     android:text="削除"
                     android:visibility="gone" />
 
@@ -88,14 +88,14 @@
                 android:orientation="horizontal"
                 android:paddingBottom="10dp"
                 android:paddingLeft="5dp"
-                android:paddingRight="5dp">
+                android:paddingRight="5dp" >
 
                 <Button
                     android:id="@+id/btn_positive"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
                     android:layout_weight="1"
-                    android:background="@drawable/btn_gray" />
+                    android:background="@drawable/btn_gray"/>
             </LinearLayout>
 
             <ImageView
@@ -112,12 +112,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@id/separator_bottom"
-                android:layout_below="@id/separator_top">
+                android:layout_below="@id/separator_top" >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical" >
 
                     <!-- データ領域 -->
 
@@ -128,121 +128,79 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:layout_marginTop="5dp"
-                        android:orientation="vertical">
+                        android:orientation="vertical" >
 
                         <!-- タイトル -->
 
                         <include
                             android:id="@+id/data_detail_row_title"
-                            layout="@layout/data_detail_row"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
 
                         <!-- タイトル（カナ） -->
 
                         <include
                             android:id="@+id/data_detail_row_title_pronunciation"
-                            layout="@layout/data_detail_row"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
 
                         <!-- 作者 -->
 
                         <include
                             android:id="@+id/data_detail_row_author"
-                            layout="@layout/data_detail_row"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
 
                         <!-- 作者（カナ） -->
 
                         <include
                             android:id="@+id/data_detail_row_author_pronunciation"
-                            layout="@layout/data_detail_row"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
 
                         <!-- 掲載誌 -->
 
                         <include
                             android:id="@+id/data_detail_row_magazine"
-                            layout="@layout/data_detail_row"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
 
                         <!-- 掲載誌（カナ） -->
 
                         <include
                             android:id="@+id/data_detail_row_magazine_pronunctaion"
-                            layout="@layout/data_detail_row"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
 
                         <!-- 出版社 -->
 
                         <include
                             android:id="@+id/data_detail_row_company"
-                            layout="@layout/data_detail_row"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <!-- タグ -->
-                        <RelativeLayout
-                            android:id="@+id/data_detail_tag"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="3dp"
-                            android:layout_marginTop="3dp">
-
-                            <TextView
-                                android:id="@+id/tag_title"
-                                android:layout_width="100dp"
-                                android:layout_height="40dp"
-                                android:layout_alignParentLeft="true"
-                                android:layout_centerVertical="true"
-                                android:gravity="center"
-                                android:text="タグ"
-                                android:textColor="@color/black"
-                                android:textSize="14sp" />
-
-                            <Button
-                                android:id="@+id/btn_tag_edit"
-                                android:layout_width="wrap_content"
-                                android:layout_height="40dp"
-                                android:layout_alignParentRight="true"
-                                android:layout_marginRight="10dp"
-                                android:layout_marginTop="5dp"
-                                android:background="@drawable/btn_gray"
-                                android:paddingLeft="5dp"
-                                android:paddingRight="5dp"
-                                android:text="タグ編集"/>
-
-                            <HorizontalScrollView
-                                android:layout_marginRight="5dp"
-                                android:layout_marginLeft="5dp"
-                                android:layout_centerVertical="true"
-                                android:layout_toRightOf="@id/tag_title"
-                                android:layout_toLeftOf="@id/btn_tag_edit"
-                                android:layout_width="wrap_content"
-                                android:scrollbarStyle="outsideInset"
-                                android:layout_height="wrap_content">
-
-                                <LinearLayout
-                                    android:id="@+id/tag_container"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal"/>
-
-                            </HorizontalScrollView>
-                        </RelativeLayout>
+                            layout="@layout/data_detail_row" />
 
                         <!-- メモ -->
 
                         <include
                             android:id="@+id/data_detail_row_memo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            layout="@layout/data_detail_row" />
+                        <!-- タグ -->
+                        <!--
+                        <include
+                            android:id="@+id/data_detail_row_tags"
                             layout="@layout/data_detail_row"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
+                        -->
                     </LinearLayout>
                 </LinearLayout>
             </ScrollView>
