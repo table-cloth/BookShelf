@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -45,6 +47,7 @@ public class SeriesDetailActivity extends BaseActivity {
     NumberPicker mPicker;
 
     ImageView mImageView = null;
+    LayoutInflater mLayoutnflater;
 
     @Override
     protected int getContentViewID() {
@@ -60,7 +63,9 @@ public class SeriesDetailActivity extends BaseActivity {
             ToastUtil.show(SeriesDetailActivity.this, "本の情報の取得に失敗しました");
             SeriesDetailActivity.this.finish();
         }
-        
+
+        mLayoutnflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         mImageView = (ImageView) findViewById(R.id.image);
 
         mPicker = (NumberPicker) findViewById(R.id.number_picker);
@@ -196,6 +201,17 @@ public class SeriesDetailActivity extends BaseActivity {
                 }
             });
 
+            // タグ情報の設定
+            ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
+            // サンプルでタグを20個入れる
+            String tagName = "A";
+            for(int i = 0 ; i < 20 ; i ++) {
+                ViewGroup tagView = (ViewGroup) mLayoutnflater.inflate(R.layout.tag_layout, null);
+                ((TextView) tagView.findViewById(R.id.tag_name)).setText(tagName);
+                tagName += "■□";
+                tagContainer.addView(tagView);
+            }
+            tagContainer.invalidate();
     	}
     }
     

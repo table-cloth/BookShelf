@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -16,6 +17,7 @@ import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
+import com.tablecloth.bookshelf.util.ViewUtil;
 
 /**
  * タイトル・メッセージ・YES/NOボタンの要素を持ったダイアログ拡張クラス
@@ -76,48 +78,64 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         setRowContents(findViewById(R.id.data_detail_row_company), "出版社", sSeriesData.mCompany);
         // メモ
         setRowContents(findViewById(R.id.data_detail_row_memo), "メモ", sSeriesData.mMemo);
-        // タグ（初期は実装しない）
-//        setRowContents(findViewById(R.id.data_detail_row_title), "タイトル", sSeriesData.);
+        // タグ
+        ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
+        LayoutInflater layoutnflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        // サンプルでタグを20個入れる
+        String tagName = "A";
+        for(int i = 0 ; i < 20 ; i ++) {
+            ViewGroup tagView = (ViewGroup) layoutnflater.inflate(R.layout.tag_layout, null);
+            ((TextView) tagView.findViewById(R.id.tag_name)).setText(tagName);
+            tagName += "■□";
+            tagContainer.addView(tagView);
+        }
+        tagContainer.invalidate();
 
+        findViewById(R.id.btn_tag_edit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToastUtil.show(EditSeriesDialogActivity.this, "タグ編集画面を起動");
+            }
+        });
         
 
         // 保存ボタン
-        ((TextView)findViewById(R.id.btn_positive)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                View view = findViewById(R.id.data_detail_row_title);
-                // タイトル
-                String title = getRowContents(findViewById(R.id.data_detail_row_title));
-                // タイトルは必須情報なので、無い場合は登録させない
-                if (title == null || title.length() <= 0) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ToastUtil.show(EditSeriesDialogActivity.this, "タイトルが未入力です");
+                ((TextView) findViewById(R.id.btn_positive)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        View view = findViewById(R.id.data_detail_row_title);
+                        // タイトル
+                        String title = getRowContents(findViewById(R.id.data_detail_row_title));
+                        // タイトルは必須情報なので、無い場合は登録させない
+                        if (title == null || title.length() <= 0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ToastUtil.show(EditSeriesDialogActivity.this, "タイトルが未入力です");
+                                }
+                            });
+                            return;
                         }
-                    });
-                    return;
-                }
-                sSeriesData.mTitle = title;
-                sSeriesData.mTitlePronunciation = getRowContents(findViewById(R.id.data_detail_row_title_pronunciation));
-                // 作者
-                sSeriesData.mAuthor = getRowContents(findViewById(R.id.data_detail_row_author));
-                sSeriesData.mAuthorPronunciation = getRowContents(findViewById(R.id.data_detail_row_author_pronunciation));
-                // 掲載誌
-                sSeriesData.mMagazine = getRowContents(findViewById(R.id.data_detail_row_magazine));
-                sSeriesData.mMagazinePronunciation = getRowContents(findViewById(R.id.data_detail_row_magazine_pronunctaion));
-                // 出版社
-                sSeriesData.mCompany = getRowContents(findViewById(R.id.data_detail_row_company));
-                // メモ
-                sSeriesData.mMemo = getRowContents(findViewById(R.id.data_detail_row_memo));
-                // タグ（初期は実装しない）
+                        sSeriesData.mTitle = title;
+                        sSeriesData.mTitlePronunciation = getRowContents(findViewById(R.id.data_detail_row_title_pronunciation));
+                        // 作者
+                        sSeriesData.mAuthor = getRowContents(findViewById(R.id.data_detail_row_author));
+                        sSeriesData.mAuthorPronunciation = getRowContents(findViewById(R.id.data_detail_row_author_pronunciation));
+                        // 掲載誌
+                        sSeriesData.mMagazine = getRowContents(findViewById(R.id.data_detail_row_magazine));
+                        sSeriesData.mMagazinePronunciation = getRowContents(findViewById(R.id.data_detail_row_magazine_pronunctaion));
+                        // 出版社
+                        sSeriesData.mCompany = getRowContents(findViewById(R.id.data_detail_row_company));
+                        // メモ
+                        sSeriesData.mMemo = getRowContents(findViewById(R.id.data_detail_row_memo));
+                        // タグ（初期は実装しない）
 //                setRowContents(findViewById(R.id.data_detail_row_title), "タイトル", sSeriesData.);
 
-                FilterDao.saveSeries(sSeriesData);
-                setResult(G.RESULT_POSITIVE);
-                EditSeriesDialogActivity.this.finish();
-            }
-        });
+                        FilterDao.saveSeries(sSeriesData);
+                        setResult(G.RESULT_POSITIVE);
+                        EditSeriesDialogActivity.this.finish();
+                    }
+                });
         ((TextView)findViewById(R.id.btn_back)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
