@@ -199,55 +199,6 @@ public class ListActivity extends MainBaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-//    class DragListener extends CustomListView.SimpleDragListener {
-//        @Override
-//        public int onStartDrag(int position) {
-//            mDraggingPosition = position;
-//            mListView.invalidateViews();
-//            return position;
-//        }
-//        
-//        @Override
-//        public int onDuringDrag(int positionFrom, int positionTo) {
-//            if (positionFrom < 0 || positionTo < 0
-//                    || positionFrom == positionTo) {
-//                return positionFrom;
-//            }
-//            int i;
-//            if (positionFrom < positionTo) {
-//                final int min = positionFrom;
-//                final int max = positionTo;
-//                final String data = PREFS[min];
-//                i = min;
-//                while (i < max) {
-//                    PREFS[i] = PREFS[++i];
-//                }
-//                PREFS[max] = data;
-//            } else if (positionFrom > positionTo) {
-//                final int min = positionTo;
-//                final int max = positionFrom;
-//                final String data = PREFS[max];
-//                i = max;
-//                while (i > min) {
-//                    PREFS[i] = PREFS[--i];
-//                }
-//                PREFS[min] = data;
-//            }
-//            mDraggingPosition = positionTo;
-//            mListView.invalidateViews();
-//            return positionTo;
-//        }
-//        
-//        @Override
-//        public boolean onStopDrag(int positionFrom, int positionTo) {
-//            mDraggingPosition = -1;
-//            mListView.invalidateViews();
-//            return super.onStopDrag(positionFrom, positionTo);
-//        }
-//    }
-
-
-
     @Override
     protected int getContentViewID() {
         return R.layout.activity_list;
