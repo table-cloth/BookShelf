@@ -43,6 +43,7 @@ import com.tablecloth.bookshelf.util.Rakuten;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.VersionUtil;
+import com.tablecloth.bookshelf.util.ViewUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -100,6 +101,7 @@ public class ListActivity extends MainBaseActivity {
             TextView author;
             TextView volume;
             View v = convertView;
+            ViewGroup tagContainer;
 
             if(v==null){
                 LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -112,6 +114,8 @@ public class ListActivity extends MainBaseActivity {
                     title = (TextView) v.findViewById(R.id.title);
                     author = (TextView) v.findViewById(R.id.author);
                     volume = (TextView) v.findViewById(R.id.volume);
+                    tagContainer = (ViewGroup) v.findViewById(R.id.tag_container);
+
                     final ImageView image = (ImageView) v.findViewById(R.id.image);
 
                     title.setText(series.mTitle);
@@ -139,6 +143,10 @@ public class ListActivity extends MainBaseActivity {
                             image.setImageResource(R.drawable.no_image);
                         }
                     });
+
+                    // タグ
+                    tagContainer = ViewUtil.setTagInfoNormal(ListActivity.this, series.mTagsList, tagContainer);
+                    tagContainer.invalidate();
 
                     // WebAPIの検索結果時以外は先品詳細画面へ
                     if(mMode != G.MODE_API_SEARCH_RESULT) {

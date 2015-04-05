@@ -313,7 +313,7 @@ public class FilterDao {
     private static String[] getTagsData(String tagsStr) {
         String[] ret = null;
         if(tagsStr != null && tagsStr.length() > 0) {
-            ret = tagsStr.split("|||");
+            ret = tagsStr.split("\n");
         }
         return ret;
     }
@@ -323,7 +323,7 @@ public class FilterDao {
         if(tagsStr != null) {
             for(int i = 0 ; i < tagsStr.size() ; i ++) {
                 if(i != 0) {
-                    ret += "|||";
+                    ret += "\n";
                 }
                 ret += tagsStr.get(i);
             }

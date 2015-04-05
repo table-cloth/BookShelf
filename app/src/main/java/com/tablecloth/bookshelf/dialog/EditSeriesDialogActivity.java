@@ -80,15 +80,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         setRowContents(findViewById(R.id.data_detail_row_memo), "メモ", sSeriesData.mMemo);
         // タグ
         ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
-        LayoutInflater layoutnflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        // サンプルでタグを20個入れる
-        String tagName = "A";
-        for(int i = 0 ; i < 20 ; i ++) {
-            ViewGroup tagView = (ViewGroup) layoutnflater.inflate(R.layout.tag_layout, null);
-            ((TextView) tagView.findViewById(R.id.tag_name)).setText(tagName);
-            tagName += "■□";
-            tagContainer.addView(tagView);
-        }
+        tagContainer = ViewUtil.setTagInfoNormal(EditSeriesDialogActivity.this, sSeriesData.mTagsList, tagContainer);
         tagContainer.invalidate();
 
         findViewById(R.id.btn_tag_edit).setOnClickListener(new View.OnClickListener() {
