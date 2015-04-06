@@ -129,6 +129,7 @@ public class GridActivity extends MainBaseActivity {
                     tagContainer = (ViewGroup) v.findViewById(R.id.tag_container);
 
                     // タグ
+                    tagContainer.removeAllViews();
                     tagContainer = ViewUtil.setTagInfoSmall(GridActivity.this, series.mTagsList, tagContainer);
                     tagContainer.invalidate();
 

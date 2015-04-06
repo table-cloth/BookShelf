@@ -204,6 +204,7 @@ public class SeriesDetailActivity extends BaseActivity {
 
             // タグ情報の設定
             ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
+            tagContainer.removeAllViews();
             ViewUtil.setTagInfoNormal(SeriesDetailActivity.this, mSeriesData.mTagsList, tagContainer);
             tagContainer.invalidate();
     	}
