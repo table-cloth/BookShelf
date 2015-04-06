@@ -33,6 +33,7 @@ public class G {
     final public static int REQUEST_CODE_SELECT_ADD_SERIES_TYPE = 8;
     final public static int REQUEST_CODE_LIST_SEARCH_RAKUTEN = 9;
     final public static int REQUEST_CODE_SIMPLE_CHECK = 10; // 簡易的な確認用
+    final public static int REQUEST_CODE_TAGS_EDIT = 11;
 
 
 

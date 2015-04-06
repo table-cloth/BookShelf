@@ -54,12 +54,7 @@
             android:theme="@style/Theme.CustomDialog"
             />
         <activity
-            android:name="com.tablecloth.bookshelf.dialog.DataAddDialogActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.CustomDialog"
-            />
-        <activity
-            android:name="com.tablecloth.bookshelf.dialog.SettingsDialogActivity"
+            android:name=".dialog.TagsEditDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CustomDialog"
             />

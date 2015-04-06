@@ -123,6 +123,23 @@ public class DB {
             + " integer "
             + ")";
 
+    // タグ履歴
+    public static class Tags {
+        // テーブル名
+        public static final String TABLE_NAME = "tags";
+        public static final String TAG_NAME = "tags_name";
+        public static final String LAST_UPDATE = "last_update";
+    }
+    // タグ履歴テーブル作成SQL
+    private static final String CREATE_TAGS_SQL = "create table "
+            + Tags.TABLE_NAME
+            + " ( "
+            + Tags.TAG_NAME
+            + " text not null primary key, "
+            + Tags.LAST_UPDATE
+            + " integer not null "
+            + " ) ";
+
     // 各種設定
     public static class Settings {
         // テーブル名
@@ -167,12 +184,14 @@ public class DB {
             db.execSQL(CREATE_SERIES_TABLE_SQL);
             db.execSQL(CREATE_BOOK_DETAIL_SQL);
             db.execSQL(CREATE_SETTINGS_SQL);
+            db.execSQL(CREATE_TAGS_SQL);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if(oldVersion < 2) {
                 db.execSQL(CREATE_SETTINGS_SQL);
+                db.execSQL(CREATE_TAGS_SQL);
             }
         }
     }

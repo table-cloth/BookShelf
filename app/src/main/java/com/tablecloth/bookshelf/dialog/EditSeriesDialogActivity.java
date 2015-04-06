@@ -28,6 +28,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
     private SeriesData sSeriesData = null;
     private int mSeriesId = -1;
     private static SeriesData sTmpSeriesData = null;
+    ViewGroup tagContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,9 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         if(sSeriesData == null) sSeriesData = new SeriesData();
         sTmpSeriesData = null;
 
+        tagContainer = (ViewGroup)findViewById(R.id.tag_container);
+
+
         // テキスト設定
         ((TextView)findViewById(R.id.title)).setText(intent.getStringExtra(KEY_TITLE));
         ((TextView)findViewById(R.id.btn_positive)).setText(intent.getStringExtra(KEY_BTN_POSITIVE));
@@ -79,13 +83,13 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         // メモ
         setRowContents(findViewById(R.id.data_detail_row_memo), "メモ", sSeriesData.mMemo);
         // タグ
-        ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
-        tagContainer = ViewUtil.setTagInfoNormal(EditSeriesDialogActivity.this, sSeriesData.mTagsList, tagContainer);
-        tagContainer.invalidate();
+        updateTags();
 
         findViewById(R.id.btn_tag_edit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = TagsEditDialogActivity.getIntent(EditSeriesDialogActivity.this, "タグを編集", sSeriesData.mTagsList, "完了");
+                if(intent != null) startActivityForResult(intent, G.REQUEST_CODE_TAGS_EDIT);
                 ToastUtil.show(EditSeriesDialogActivity.this, "タグ編集画面を起動");
             }
         });
@@ -197,6 +201,18 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
                     }
                 }
                 break;
+            case G.REQUEST_CODE_TAGS_EDIT:
+                String tagsStr = data.getStringExtra(TagsEditDialogActivity.KEY_TAGS);
+                sSeriesData.mTagsList = FilterDao.getTagsData(tagsStr);
+                updateTags();
+                break;
         }
+    }
+
+    private void updateTags() {
+        // タグ
+        tagContainer.removeAllViews();
+        tagContainer = ViewUtil.setTagInfoNormal(EditSeriesDialogActivity.this, sSeriesData.mTagsList, tagContainer);
+        tagContainer.invalidate();
     }
 }

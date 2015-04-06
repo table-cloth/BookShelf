@@ -145,6 +145,7 @@ public class ListActivity extends MainBaseActivity {
                     });
 
                     // タグ
+                    tagContainer.removeAllViews();
                     tagContainer = ViewUtil.setTagInfoNormal(ListActivity.this, series.mTagsList, tagContainer);
                     tagContainer.invalidate();
 

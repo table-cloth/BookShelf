@@ -183,13 +183,8 @@ public class FilterDao {
                         retData[i].mCompanyPronunciation = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.COMPANY_PRONUNCIATION));
                         retData[i].mImagePath = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.IMAGE_PATH));
                         retData[i].mMemo = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.MEMO));
+                        retData[i].mTagsList = getTagsData(cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TAGS)));
 
-                        String[] tagsStr = getTagsData(cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TAGS)));
-                        if(tagsStr != null) {
-                            for(int k = 0 ; k < tagsStr.length ; k ++) {
-                                retData[i].mTagsList.add(tagsStr[i]);
-                            }
-                        }
                         int isSeriesEnd = cursor.getInt(cursor.getColumnIndex(DB.BookSeriesTable.SERIES_IS_FINISH));
                         if(isSeriesEnd == 0) {
                             retData[i].mIsSeriesEnd = false;
@@ -261,13 +256,8 @@ public class FilterDao {
                         retData.mCompanyPronunciation = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.COMPANY_PRONUNCIATION));
                         retData.mImagePath = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.IMAGE_PATH));
                         retData.mMemo = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.MEMO));
+                        retData.mTagsList = getTagsData(cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TAGS)));
 
-                        String[] tagsStr = getTagsData(cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TAGS)));
-                        if(tagsStr != null) {
-                            for(int k = 0 ; k < tagsStr.length ; k ++) {
-                                retData.mTagsList.add(tagsStr[i]);
-                            }
-                        }
                         int isSeriesEnd = cursor.getInt(cursor.getColumnIndex(DB.BookSeriesTable.SERIES_IS_FINISH));
                         if(isSeriesEnd == 0) {
                             retData.mIsSeriesEnd = false;
@@ -310,16 +300,26 @@ public class FilterDao {
         }
     }
 
-    private static String[] getTagsData(String tagsStr) {
-        String[] ret = null;
+    public static ArrayList<String> getTagsData(String tagsStr) {
+        ArrayList<String> ret = new ArrayList<>();
+        String[] tagsData = null;
         if(tagsStr != null && tagsStr.length() > 0) {
-            ret = tagsStr.split("\n");
+            if (tagsStr.contains("\n")) {
+                tagsData = tagsStr.split("\n");
+            } else {
+                tagsData = new String[]{tagsStr};
+            }
+        }
+        if(tagsData != null) {
+            for(int i = 0 ; i < tagsData.length ; i ++) {
+                ret.add(tagsData[i]);
+            }
         }
         return ret;
     }
 
-    private static String getTagsStr(ArrayList<String> tagsStr) {
-        String ret = null;
+    public static String getTagsStr(ArrayList<String> tagsStr) {
+        String ret = "";
         if(tagsStr != null) {
             for(int i = 0 ; i < tagsStr.size() ; i ++) {
                 if(i != 0) {
@@ -442,6 +442,79 @@ public class FilterDao {
             }
         }
         return retData;
+    }
+
+    public static boolean saveTags(Context context, String tag) {
+        instantiateDB(context);
+
+        long result = 0;
+        if (isTagExist(tag)) {
+            ContentValues contentValues = getTagContentValues(tag);
+            result = mDb.getSQLiteDatabase().update(DB.Tags.TABLE_NAME, contentValues, DB.Tags.TAG_NAME + " = ? ", new String[]{ tag });
+        } else {
+            ContentValues contentValues = getTagContentValues(tag);
+            result = mDb.getSQLiteDatabase().insert(DB.Tags.TABLE_NAME, null, contentValues);
+        }
+        if(result <= 0) return false;
+        return true;
+    }
+
+    public static ArrayList<String> loadTags(Context context) {
+        instantiateDB(context);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT * FROM ");
+        sql.append(DB.Tags.TABLE_NAME);
+        sql.append(" ORDER BY " + DB.Tags.LAST_UPDATE + " DESC ");
+
+        Cursor cursor = mDb.getSQLiteDatabase().rawQuery(sql.toString(), null);
+        ArrayList<String> tags = new ArrayList<>();
+
+        // cursorからSeriesDataを生成
+        if(cursor != null) {
+            try {
+                int max = cursor.getCount();
+                for(int i = 0 ; i < max ; i ++) {
+                    if(cursor.moveToNext()) {
+                        String tag = cursor.getString(cursor.getColumnIndex(DB.Tags.TAG_NAME));
+                        if(!Util.isEmpty(tag)) {
+                            tags.add(tag);
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        return tags;
+    }
+
+    /**
+     * 指定のタグ
+     * @param tag
+     * @return
+     */
+    private static boolean isTagExist(String tag) {
+        if(Util.isEmpty(tag)) return false;
+        Cursor cursor = mDb.getSQLiteDatabase().rawQuery("SELECT * FROM " + DB.Tags.TABLE_NAME + " WHERE " + DB.Tags.TAG_NAME + " = '" + tag + "'", null);
+        if(cursor.moveToFirst()) {
+            // データが存在する
+            return true;
+        } else {
+            // データが存在しない
+            return false;
+        }
+    }
+
+    private static ContentValues getTagContentValues(String tag) {
+        ContentValues cv = new ContentValues();
+        if(Util.isEmpty(tag)) return cv;
+        cv.put(DB.Tags.TAG_NAME, tag);
+        Calendar now = Calendar.getInstance();
+        cv.put(DB.Tags.LAST_UPDATE, now.getTimeInMillis());
+        return cv;
     }
 
 }
