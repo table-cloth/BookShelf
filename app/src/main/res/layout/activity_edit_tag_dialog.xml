@@ -117,14 +117,14 @@
                             android:id="@+id/btn_add_tag"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:layout_marginRight="10dp"
                             android:layout_alignParentRight="true"
+                            android:layout_marginRight="10dp"
                             android:layout_weight="1"
-                            android:text="追加"
-                            android:textSize="@dimen/text_normal"
                             android:background="@drawable/btn_gray"
                             android:paddingLeft="3dp"
-                            android:paddingRight="3dp" />
+                            android:paddingRight="3dp"
+                            android:text="追加"
+                            android:textSize="@dimen/text_normal" />
 
                         <EditText
                             android:id="@+id/data_content"
@@ -159,9 +159,9 @@
                             android:textSize="@dimen/text_normal" />
 
                         <HorizontalScrollView
-                            android:layout_gravity="center_vertical"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical">
 
                             <LinearLayout
                                 android:id="@+id/tag_container"
@@ -196,19 +196,19 @@
                             android:textColor="@color/black"
                             android:textSize="@dimen/text_normal" />
 
-                        <HorizontalScrollView
-                            android:layout_gravity="center_vertical"
+                        <ScrollView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
 
                             <LinearLayout
                                 android:id="@+id/tag_recent_container"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
                                 android:layout_marginLeft="5dp"
-                                android:orientation="horizontal" />
-                        </HorizontalScrollView>
+                                android:layout_marginRight="5dp"
+                                android:layout_marginTop="10dp"
+                                android:orientation="vertical"/>
+                        </ScrollView>
                     </LinearLayout>
 
                 </LinearLayout>
