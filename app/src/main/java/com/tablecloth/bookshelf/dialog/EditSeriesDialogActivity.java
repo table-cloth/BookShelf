@@ -202,9 +202,11 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
                 }
                 break;
             case G.REQUEST_CODE_TAGS_EDIT:
-                String tagsStr = data.getStringExtra(TagsEditDialogActivity.KEY_TAGS);
-                sSeriesData.mTagsList = FilterDao.getTagsData(tagsStr);
-                updateTags();
+                if(data != null) {
+                    String tagsStr = data.getStringExtra(TagsEditDialogActivity.KEY_TAGS);
+                    sSeriesData.mTagsList = FilterDao.getTagsData(tagsStr);
+                    updateTags();
+                }
                 break;
         }
     }

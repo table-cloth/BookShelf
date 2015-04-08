@@ -38,4 +38,17 @@ public class ViewUtil {
 
         return tagContainerView;
     }
+
+    public static ArrayList<ViewGroup> getTagViewNormal(Context context, ArrayList<String> tags, ViewGroup tagContainerView) {
+        ArrayList<ViewGroup> ret = new ArrayList<>();
+        if(tags == null || tags.size() <= 0) return ret;
+
+        LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for(int i = 0 ; i < tags.size() ; i ++) {
+            ViewGroup tagView = (ViewGroup) layoutInflater.inflate(R.layout.tag_layout_normal, null);
+            ((TextView) tagView.findViewById(R.id.tag_name)).setText(tags.get(i));
+            ret.add(tagView);
+        }
+        return ret;
+    }
 }
