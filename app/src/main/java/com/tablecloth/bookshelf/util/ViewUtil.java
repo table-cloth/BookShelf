@@ -39,6 +39,33 @@ public class ViewUtil {
         return tagContainerView;
     }
 
+    public static ViewGroup setTagInfoLarge(Context context, ArrayList<String> tags, ViewGroup tagContainerView, int visibility) {
+        if(tags == null || tags.size() <= 0) return tagContainerView;
+
+        LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for(int i = 0 ; i < tags.size() ; i ++) {
+            ViewGroup tagView = (ViewGroup) layoutInflater.inflate(R.layout.tag_layout_large, null);
+            tagView.setVisibility(visibility);
+            ((TextView) tagView.findViewById(R.id.tag_name)).setText(tags.get(i));
+            tagContainerView.addView(tagView);
+        }
+
+        return tagContainerView;
+    }
+    public static ViewGroup setTagInfoLargeDelete(Context context, ArrayList<String> tags, ViewGroup tagContainerView, int visibility) {
+        if(tags == null || tags.size() <= 0) return tagContainerView;
+
+        LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for(int i = 0 ; i < tags.size() ; i ++) {
+            ViewGroup tagView = (ViewGroup) layoutInflater.inflate(R.layout.tag_layout_large_delete, null);
+            tagView.setVisibility(visibility);
+            ((TextView) tagView.findViewById(R.id.tag_name)).setText(tags.get(i));
+            tagContainerView.addView(tagView);
+        }
+
+        return tagContainerView;
+    }
+
     public static ArrayList<ViewGroup> getTagViewNormal(Context context, ArrayList<String> tags, ViewGroup tagContainerView) {
         ArrayList<ViewGroup> ret = new ArrayList<>();
         if(tags == null || tags.size() <= 0) return ret;

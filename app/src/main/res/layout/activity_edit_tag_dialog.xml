@@ -81,138 +81,154 @@
                 android:layout_marginRight="10dp"
                 android:background="@color/black" />
 
-            <ScrollView
-                android:id="@+id/scroll"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@id/separator_bottom"
-                android:layout_below="@id/separator_top">
+                android:layout_below="@id/separator_top"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
+
+                <!-- データ領域 -->
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="3dp">
+
+                    <TextView
+                        android:id="@+id/tag_add_name"
+                        android:layout_width="100dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:gravity="center"
+                        android:text="タグ追加"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btn_add_tag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_gray"
+                        android:paddingLeft="3dp"
+                        android:paddingRight="3dp"
+                        android:text="追加"
+                        android:textSize="@dimen/text_normal" />
+
+                    <EditText
+                        android:id="@+id/data_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_toLeftOf="@id/btn_add_tag"
+                        android:layout_toRightOf="@id/tag_add_name"
+                        android:background="@drawable/edittext_blue"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
+
+                </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:orientation="vertical">
+                    android:layout_marginRight="10dp"
+                    android:orientation="horizontal">
 
-                    <!-- データ領域 -->
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:text="登録中タグ"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_normal" />
 
-                    <RelativeLayout
+                    <ScrollView
+                        android:id="@+id/tag_scroll_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="3dp"
-                        android:layout_marginTop="3dp">
+                        android:fillViewport="true">
 
-                        <TextView
-                            android:id="@+id/tag_add_name"
-                            android:layout_width="100dp"
-                            android:layout_height="40dp"
-                            android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true"
-                            android:gravity="center"
-                            android:text="タグ追加"
-                            android:textColor="@color/black"
-                            android:textSize="14sp" />
-
-                        <Button
-                            android:id="@+id/btn_add_tag"
-                            android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/btn_gray"
-                            android:paddingLeft="3dp"
-                            android:paddingRight="3dp"
-                            android:text="追加"
-                            android:textSize="@dimen/text_normal" />
-
-                        <EditText
-                            android:id="@+id/data_content"
+                        <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"
-                            android:layout_toLeftOf="@id/btn_add_tag"
-                            android:layout_toRightOf="@id/tag_add_name"
-                            android:background="@drawable/edittext_blue"
-                            android:gravity="center_vertical"
+                            android:layout_height="wrap_content"
+                            android:paddingBottom="10dp"
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp"
-                            android:textColor="@color/black"
-                            android:textSize="14sp" />
+                            android:paddingTop="10dp">
 
-                    </RelativeLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="100dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:gravity="center"
-                            android:text="登録中タグ"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/text_normal" />
-
-                        <HorizontalScrollView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical">
-
-                            <LinearLayout
+                            <RelativeLayout
                                 android:id="@+id/tag_container"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:layout_marginLeft="5dp"
-                                android:orientation="horizontal" />
-                        </HorizontalScrollView>
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/separator_middle"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_above="@id/btn_area"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/black" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="100dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:gravity="center"
-                            android:text="履歴"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/text_normal" />
-
-                        <ScrollView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <LinearLayout
-                                android:id="@+id/tag_recent_container"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginRight="5dp"
-                                android:layout_marginTop="10dp"
-                                android:orientation="vertical"/>
-                        </ScrollView>
-                    </LinearLayout>
-
+                                android:layout_height="wrap_content" />
+                        </RelativeLayout>
+                    </ScrollView>
                 </LinearLayout>
-            </ScrollView>
+
+                <ImageView
+                    android:id="@+id/separator_middle"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_above="@id/btn_area"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:text="履歴"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_normal" />
+
+                    <ScrollView
+                        android:id="@+id/tag_recent_scroll_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fillViewport="true">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingBottom="10dp"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:paddingTop="10dp">
+
+                        <RelativeLayout
+                            android:id="@+id/tag_recent_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginTop="10dp"
+                            android:orientation="vertical" />
+
+                        </RelativeLayout>
+                    </ScrollView>
+                </LinearLayout>
+
+            </LinearLayout>
         </RelativeLayout>
     </RelativeLayout>
 
