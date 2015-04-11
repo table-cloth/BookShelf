@@ -85,6 +85,13 @@ public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
             parentParams.height = currentHeight + tagChild.getHeight() + Util.convertDp2Px(mContext, 10);
         }
         this.setLayoutParams(parentParams);
+        if(parentParams.height > Util.convertDp2Px(mContext, 100)) {
+            ViewGroup ScrollParent = (ViewGroup)((ViewGroup)getParent()).getParent();
+            ViewGroup.LayoutParams param = ScrollParent.getLayoutParams();
+            param.height = Util.convertDp2Px(mContext, 100);
+            ScrollParent.setLayoutParams(param);
+            ScrollParent.invalidate();
+        }
 
         mNeedsReLayout = false;
 
