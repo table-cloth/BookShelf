@@ -168,7 +168,7 @@
                             android:paddingRight="5dp"
                             android:paddingTop="10dp">
 
-                            <RelativeLayout
+                            <com.tablecloth.bookshelf.view.CurrentTagRelativeLayout
                                 android:id="@+id/tag_container"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" />
@@ -214,7 +214,7 @@
                             android:paddingRight="5dp"
                             android:paddingTop="10dp">
 
-                        <RelativeLayout
+                        <com.tablecloth.bookshelf.view.RecentTagRelativeLayout
                             android:id="@+id/tag_recent_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
