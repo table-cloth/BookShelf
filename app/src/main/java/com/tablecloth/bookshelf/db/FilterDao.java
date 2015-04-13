@@ -151,6 +151,8 @@ public class FilterDao {
                     case G.SEARCH_MODE_MAGAZINES:
                         whereClause += DB.BookSeriesTable.MAGAZINE_NAME;
                         break;
+                    case G.SEARCH_MODE_TAG:
+                        whereClause += DB.BookSeriesTable.TAGS;
                 }
                 whereClause += " LIKE  '%";
                 whereClause += searchContent;

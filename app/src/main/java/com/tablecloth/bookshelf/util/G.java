@@ -60,6 +60,8 @@ public class G {
     final public static int SEARCH_MODE_AUTHOR = 2; // 検索対象＝作者の場合にしてい
     final public static int SEARCH_MODE_COMPANY = 3; // 検索対象＝出版社の場合にしてい
     final public static int SEARCH_MODE_MAGAZINES = 4; // 検索対象＝掲載誌の場合にしてい
+    final public static int SEARCH_MODE_TAG = 5; // 検索対象＝掲載誌の場合にしてい
+
     // 各種検索条件一覧
     final public static String[] SEARCH_MODE_LIST = {
             "全て", // SEARCH_MODE_ALL
@@ -67,6 +69,7 @@ public class G {
             "作者名", // SEARCH_MODE_ALL
             "出版社名", // SEARCH_MODE_ALL
             "掲載誌名", // SEARCH_MODE_ALL
+            "タグ", // SEARCH_MODE_ALL
     };
 
     final public static int MODE_VIEW = 0; // デフォルトの閲覧モード
