@@ -3,15 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <!-- 追加ボタン -->
-
-    <Button
-        android:id="@+id/add_button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="3dp"
-        android:background="@drawable/btn_positive"
-        android:text="作品を追加" />
     <!-- footer -->
 
     <RelativeLayout
@@ -19,7 +10,18 @@
         android:layout_width="match_parent"
         android:gravity="center"
         android:layout_height="50dp"
-        android:layout_above="@id/add_button"
         android:background="#44000000"/>
+
+    <!-- 追加ボタン -->
+
+    <Button
+        android:id="@+id/add_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="3dp"
+        android:layout_below="@id/banner"
+        android:background="@drawable/btn_positive"
+        android:text="作品を追加" />
+
 
 </RelativeLayout>

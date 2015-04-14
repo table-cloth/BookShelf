@@ -120,43 +120,60 @@ public class FilterDao {
         if(searchContent == null || searchContent.length() <= 0) {
         	searchContent = "";
         }
+        // 半角スペース・全角スペースで分割
+        String[] content = searchContent.split("[ 　]");
+        if(content == null || content.length <= 0) {
+            content = new String[] { searchContent };
+        }
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT * FROM ");
         sql.append(DB.BookSeriesTable.TABLE_NAME);
-        if(searchContent != null && searchContent.length() > 0) {
+        if(content != null && content.length > 0) {
             // 検索モードによってWhere文を変える
             int[] modes;
             if(searchMode == G.SEARCH_MODE_ALL) {
-                modes = new int[]{ G.SEARCH_MODE_TITLE, G.SEARCH_MODE_AUTHOR, G.SEARCH_MODE_COMPANY, G.SEARCH_MODE_MAGAZINES };
+                modes = new int[]{ G.SEARCH_MODE_TITLE, G.SEARCH_MODE_AUTHOR, G.SEARCH_MODE_COMPANY, G.SEARCH_MODE_MAGAZINES , G.SEARCH_MODE_TAG};
             } else {
                 modes = new int[] { searchMode };
             }
             String whereClause = " WHERE "; // 検索条件文字列
-            for(int i = 0 ; i < modes.length ; i ++) {
+            for(int x = 0 ; x < content.length ; x ++) {
+
                 // ２件目以降の検索条件時はORをつける
-                if(i > 0 && !Util.isEmpty(whereClause)) {
-                    whereClause += " OR ";
+                if (x > 0 && !Util.isEmpty(whereClause)) {
+                    whereClause += " AND ";
                 }
-                switch (modes[i]) {
-                    case G.SEARCH_MODE_TITLE:
-                        whereClause += DB.BookSeriesTable.TITLE_NAME;
-                        break;
-                    case G.SEARCH_MODE_AUTHOR:
-                        whereClause += DB.BookSeriesTable.AUTHOR_NAME;
-                        break;
-                    case G.SEARCH_MODE_COMPANY:
-                        whereClause += DB.BookSeriesTable.COMPANY_NAME;
-                        break;
-                    case G.SEARCH_MODE_MAGAZINES:
-                        whereClause += DB.BookSeriesTable.MAGAZINE_NAME;
-                        break;
-                    case G.SEARCH_MODE_TAG:
-                        whereClause += DB.BookSeriesTable.TAGS;
+
+                whereClause += " ( ";
+
+                for (int i = 0; i < modes.length; i++) {
+                    // ２件目以降の検索条件時はORをつける
+                    if (i > 0 && !Util.isEmpty(whereClause)) {
+                        whereClause += " OR ";
+                    }
+                    switch (modes[i]) {
+                        case G.SEARCH_MODE_TITLE:
+                            whereClause += DB.BookSeriesTable.TITLE_NAME;
+                            break;
+                        case G.SEARCH_MODE_AUTHOR:
+                            whereClause += DB.BookSeriesTable.AUTHOR_NAME;
+                            break;
+                        case G.SEARCH_MODE_COMPANY:
+                            whereClause += DB.BookSeriesTable.COMPANY_NAME;
+                            break;
+                        case G.SEARCH_MODE_MAGAZINES:
+                            whereClause += DB.BookSeriesTable.MAGAZINE_NAME;
+                            break;
+                        case G.SEARCH_MODE_TAG:
+                            whereClause += DB.BookSeriesTable.TAGS;
+                    }
+                    whereClause += " LIKE  '%";
+                    whereClause += content[x];
+                    whereClause += "%' ";
                 }
-                whereClause += " LIKE  '%";
-                whereClause += searchContent;
-                whereClause += "%' ";
+
+                whereClause += " ) ";
             }
             sql.append(whereClause);
         }
