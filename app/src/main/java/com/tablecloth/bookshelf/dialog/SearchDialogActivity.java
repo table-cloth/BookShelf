@@ -112,7 +112,7 @@ public class SearchDialogActivity extends DialogBaseActivity {
     }
 
     @Override
-    protected int getLayoutId() {
+    protected int getContentViewID() {
         return R.layout.activity_search_dialog;
     }
 
