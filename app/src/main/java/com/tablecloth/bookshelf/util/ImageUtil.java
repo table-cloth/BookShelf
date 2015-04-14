@@ -64,7 +64,6 @@ public class ImageUtil {
 
     private static String createFileNameString() {
     	return (String) DateFormat.format("yyyyMMddkkmmss", Calendar.getInstance()) + ".jpg";
-//    	return DateFormat.format("yyyyMMddkkmmss", Calendar.getInstance());
     }
     
     public static Bitmap rotateBitmap(Bitmap bitmap, int angle) {

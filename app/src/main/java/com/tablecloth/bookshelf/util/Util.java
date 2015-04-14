@@ -69,4 +69,13 @@ public class Util {
         return "market://details?id=" + packageName + "&referrer=" + referrer;
     }
 
+    public static int convertDp2Px(Context context, int dp) {
+        // density (比率)を取得する
+        float density = context.getResources().getDisplayMetrics().density;
+
+        // dpをpixelに変換する ( dp × density + 0.5f（四捨五入) )
+        return (int) ((float)dp * density + 0.5f);
+    }
+
+
 }

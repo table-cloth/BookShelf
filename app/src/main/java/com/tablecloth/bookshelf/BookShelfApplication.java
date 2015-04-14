@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.tablecloth.bookshelf.util.Util;
 
 /**
  * Created by shnomura on 2015/02/19.

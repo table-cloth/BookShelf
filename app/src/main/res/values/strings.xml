@@ -13,4 +13,8 @@
 -->
     <string name="rakuten_api_name_books">BooksBook</string>
     <string name="rakuten_api_name_all">BooksTotal</string>
+
+    <string name="settings_key_view_type_grid">表示形式</string>
+    <string name="settings_value_grid">グリッド形式で作品一覧を表示</string>
+    <string name="settings_value_list">リスト形式で作品一覧を表示</string>
 </resources>
