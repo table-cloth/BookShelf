@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <color name="cell_background">#55444444</color>
     <color name="light_gray">#ffeeeeee</color>
     <color name="gray">#ff999999</color>
     <color name="dark_gray">#ff555555</color>

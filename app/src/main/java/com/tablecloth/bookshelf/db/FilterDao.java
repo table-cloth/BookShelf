@@ -3,14 +3,9 @@ package com.tablecloth.bookshelf.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Calendar;
-
-import com.tablecloth.bookshelf.activity.ListActivity;
 import com.tablecloth.bookshelf.util.G;
-import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
@@ -56,8 +51,10 @@ public class FilterDao {
      * @param seriesId
      * @return
      */
-    public static void deleteSeries(int seriesId) {
-        mDb.getSQLiteDatabase().delete(DB.BookSeriesTable.TABLE_NAME, DB.BookSeriesTable.SERIES_ID + " = ?", new String[]{Integer.toString(seriesId)});
+    public static boolean deleteSeries(int seriesId) {
+        int rows = mDb.getSQLiteDatabase().delete(DB.BookSeriesTable.TABLE_NAME, DB.BookSeriesTable.SERIES_ID + " = ?", new String[]{Integer.toString(seriesId)});
+        if(rows <= 0) return false;
+        return true;
     }
 
     /**
@@ -123,41 +120,60 @@ public class FilterDao {
         if(searchContent == null || searchContent.length() <= 0) {
         	searchContent = "";
         }
+        // 半角スペース・全角スペースで分割
+        String[] content = searchContent.split("[ 　]");
+        if(content == null || content.length <= 0) {
+            content = new String[] { searchContent };
+        }
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT * FROM ");
         sql.append(DB.BookSeriesTable.TABLE_NAME);
-        if(searchContent != null && searchContent.length() > 0) {
+        if(content != null && content.length > 0) {
             // 検索モードによってWhere文を変える
             int[] modes;
             if(searchMode == G.SEARCH_MODE_ALL) {
-                modes = new int[]{ G.SEARCH_MODE_TITLE, G.SEARCH_MODE_AUTHOR, G.SEARCH_MODE_COMPANY, G.SEARCH_MODE_MAGAZINES };
+                modes = new int[]{ G.SEARCH_MODE_TITLE, G.SEARCH_MODE_AUTHOR, G.SEARCH_MODE_COMPANY, G.SEARCH_MODE_MAGAZINES , G.SEARCH_MODE_TAG};
             } else {
                 modes = new int[] { searchMode };
             }
             String whereClause = " WHERE "; // 検索条件文字列
-            for(int i = 0 ; i < modes.length ; i ++) {
+            for(int x = 0 ; x < content.length ; x ++) {
+
                 // ２件目以降の検索条件時はORをつける
-                if(i > 0 && !Util.isEmpty(whereClause)) {
-                    whereClause += " OR ";
+                if (x > 0 && !Util.isEmpty(whereClause)) {
+                    whereClause += " AND ";
                 }
-                switch (modes[i]) {
-                    case G.SEARCH_MODE_TITLE:
-                        whereClause += DB.BookSeriesTable.TITLE_NAME;
-                        break;
-                    case G.SEARCH_MODE_AUTHOR:
-                        whereClause += DB.BookSeriesTable.AUTHOR_NAME;
-                        break;
-                    case G.SEARCH_MODE_COMPANY:
-                        whereClause += DB.BookSeriesTable.COMPANY_NAME;
-                        break;
-                    case G.SEARCH_MODE_MAGAZINES:
-                        whereClause += DB.BookSeriesTable.MAGAZINE_NAME;
-                        break;
+
+                whereClause += " ( ";
+
+                for (int i = 0; i < modes.length; i++) {
+                    // ２件目以降の検索条件時はORをつける
+                    if (i > 0 && !Util.isEmpty(whereClause)) {
+                        whereClause += " OR ";
+                    }
+                    switch (modes[i]) {
+                        case G.SEARCH_MODE_TITLE:
+                            whereClause += DB.BookSeriesTable.TITLE_NAME;
+                            break;
+                        case G.SEARCH_MODE_AUTHOR:
+                            whereClause += DB.BookSeriesTable.AUTHOR_NAME;
+                            break;
+                        case G.SEARCH_MODE_COMPANY:
+                            whereClause += DB.BookSeriesTable.COMPANY_NAME;
+                            break;
+                        case G.SEARCH_MODE_MAGAZINES:
+                            whereClause += DB.BookSeriesTable.MAGAZINE_NAME;
+                            break;
+                        case G.SEARCH_MODE_TAG:
+                            whereClause += DB.BookSeriesTable.TAGS;
+                    }
+                    whereClause += " LIKE  '%";
+                    whereClause += content[x];
+                    whereClause += "%' ";
                 }
-                whereClause += " LIKE  '%";
-                whereClause += searchContent;
-                whereClause += "%' ";
+
+                whereClause += " ) ";
             }
             sql.append(whereClause);
         }
@@ -186,13 +202,8 @@ public class FilterDao {
                         retData[i].mCompanyPronunciation = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.COMPANY_PRONUNCIATION));
                         retData[i].mImagePath = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.IMAGE_PATH));
                         retData[i].mMemo = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.MEMO));
+                        retData[i].mTagsList = getTagsData(cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TAGS)));
 
-                        String[] tagsStr = getTagsData(cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TAGS)));
-                        if(tagsStr != null) {
-                            for(int k = 0 ; k < tagsStr.length ; k ++) {
-                                retData[i].mTagsList.add(tagsStr[i]);
-                            }
-                        }
                         int isSeriesEnd = cursor.getInt(cursor.getColumnIndex(DB.BookSeriesTable.SERIES_IS_FINISH));
                         if(isSeriesEnd == 0) {
                             retData[i].mIsSeriesEnd = false;
@@ -264,13 +275,8 @@ public class FilterDao {
                         retData.mCompanyPronunciation = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.COMPANY_PRONUNCIATION));
                         retData.mImagePath = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.IMAGE_PATH));
                         retData.mMemo = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.MEMO));
+                        retData.mTagsList = getTagsData(cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TAGS)));
 
-                        String[] tagsStr = getTagsData(cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TAGS)));
-                        if(tagsStr != null) {
-                            for(int k = 0 ; k < tagsStr.length ; k ++) {
-                                retData.mTagsList.add(tagsStr[i]);
-                            }
-                        }
                         int isSeriesEnd = cursor.getInt(cursor.getColumnIndex(DB.BookSeriesTable.SERIES_IS_FINISH));
                         if(isSeriesEnd == 0) {
                             retData.mIsSeriesEnd = false;
@@ -313,20 +319,30 @@ public class FilterDao {
         }
     }
 
-    private static String[] getTagsData(String tagsStr) {
-        String[] ret = null;
+    public static ArrayList<String> getTagsData(String tagsStr) {
+        ArrayList<String> ret = new ArrayList<>();
+        String[] tagsData = null;
         if(tagsStr != null && tagsStr.length() > 0) {
-            ret = tagsStr.split("|||");
+            if (tagsStr.contains("\n")) {
+                tagsData = tagsStr.split("\n");
+            } else {
+                tagsData = new String[]{tagsStr};
+            }
+        }
+        if(tagsData != null) {
+            for(int i = 0 ; i < tagsData.length ; i ++) {
+                ret.add(tagsData[i]);
+            }
         }
         return ret;
     }
 
-    private static String getTagsStr(ArrayList<String> tagsStr) {
-        String ret = null;
+    public static String getTagsStr(ArrayList<String> tagsStr) {
+        String ret = "";
         if(tagsStr != null) {
             for(int i = 0 ; i < tagsStr.size() ; i ++) {
                 if(i != 0) {
-                    ret += "|||";
+                    ret += "\n";
                 }
                 ret += tagsStr.get(i);
             }
@@ -371,8 +387,8 @@ public class FilterDao {
             mDb.getSQLiteDatabase().update(DB.BookDetail.TABLE_NAME, contentValues, DB.BookDetail.SERIES_ID + " = ? AND " + DB.BookDetail.SERIES_VOLUME + " = ? ", new String[]{Integer.toString(seriesId), Integer.toString(volume)});
         } else {
             ContentValues contentValues = convertSeriesVolume2ContentValues(seriesId, volume, false);
-            long log = mDb.getSQLiteDatabase().insert(DB.BookDetail.TABLE_NAME, null, contentValues);
-            Log.e("newROW", "newROW = " + log);
+            mDb.getSQLiteDatabase().insert(DB.BookDetail.TABLE_NAME, null, contentValues);
+
         }
 
 //        long nowUnix = Calendar.getInstance().getTimeInMillis() / 1000L;
@@ -445,6 +461,79 @@ public class FilterDao {
             }
         }
         return retData;
+    }
+
+    public static boolean saveTags(Context context, String tag) {
+        instantiateDB(context);
+
+        long result = 0;
+        if (isTagExist(tag)) {
+            ContentValues contentValues = getTagContentValues(tag);
+            result = mDb.getSQLiteDatabase().update(DB.Tags.TABLE_NAME, contentValues, DB.Tags.TAG_NAME + " = ? ", new String[]{ tag });
+        } else {
+            ContentValues contentValues = getTagContentValues(tag);
+            result = mDb.getSQLiteDatabase().insert(DB.Tags.TABLE_NAME, null, contentValues);
+        }
+        if(result <= 0) return false;
+        return true;
+    }
+
+    public static ArrayList<String> loadTags(Context context) {
+        instantiateDB(context);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT * FROM ");
+        sql.append(DB.Tags.TABLE_NAME);
+        sql.append(" ORDER BY " + DB.Tags.LAST_UPDATE + " DESC ");
+
+        Cursor cursor = mDb.getSQLiteDatabase().rawQuery(sql.toString(), null);
+        ArrayList<String> tags = new ArrayList<>();
+
+        // cursorからSeriesDataを生成
+        if(cursor != null) {
+            try {
+                int max = cursor.getCount();
+                for(int i = 0 ; i < max ; i ++) {
+                    if(cursor.moveToNext()) {
+                        String tag = cursor.getString(cursor.getColumnIndex(DB.Tags.TAG_NAME));
+                        if(!Util.isEmpty(tag)) {
+                            tags.add(tag);
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        return tags;
+    }
+
+    /**
+     * 指定のタグ
+     * @param tag
+     * @return
+     */
+    private static boolean isTagExist(String tag) {
+        if(Util.isEmpty(tag)) return false;
+        Cursor cursor = mDb.getSQLiteDatabase().rawQuery("SELECT * FROM " + DB.Tags.TABLE_NAME + " WHERE " + DB.Tags.TAG_NAME + " = '" + tag + "'", null);
+        if(cursor.moveToFirst()) {
+            // データが存在する
+            return true;
+        } else {
+            // データが存在しない
+            return false;
+        }
+    }
+
+    private static ContentValues getTagContentValues(String tag) {
+        ContentValues cv = new ContentValues();
+        if(Util.isEmpty(tag)) return cv;
+        cv.put(DB.Tags.TAG_NAME, tag);
+        Calendar now = Calendar.getInstance();
+        cv.put(DB.Tags.LAST_UPDATE, now.getTimeInMillis());
+        return cv;
     }
 
 }

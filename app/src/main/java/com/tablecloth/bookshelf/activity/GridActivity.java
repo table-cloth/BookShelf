@@ -8,46 +8,40 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.db.SettingsDao;
-import com.tablecloth.bookshelf.util.CustomListView;
-import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ViewUtil;
+
 /**
- * Created by shnomura on 2014/08/16.
+ * Created by shnomura on 2015/03/15.
  */
-public class ListActivity extends MainBaseActivity {
+public class GridActivity extends MainBaseActivity {
 
-    private CustomListView mListView;
-    ListAdapter mListAdapter;
-
-    // http://shogogg.hatenablog.jp/entry/20110118/1295326773
-    int mDraggingPosition = -1;
+    private GridView mGridView;
+    private GridAdapter mGridAdapter;
+    final private int COLUMNS_PER_ROW = 4; // 1行に何セルあるか
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // リスト部分の生成・設定処理
-        mListView = (CustomListView)findViewById(R.id.list_view);
-        mListAdapter = new ListAdapter();
-        mListView.setAdapter(mListAdapter);
-        mListView.setSortable(true);
+        // グリッド部分の生成・設定処理
+        mGridView = (GridView)findViewById(R.id.grid_view);
+        mGridAdapter = new GridAdapter();
+        mGridView.setAdapter(mGridAdapter);
 
     }
 
-
-    /**
-     * ListView用のAdapterクラス
-     */
-    private class ListAdapter extends BaseAdapter {
+    private class GridAdapter extends BaseAdapter {
         @Override
         public int getCount() {
             return mDataArrayList.size();
@@ -72,10 +66,32 @@ public class ListActivity extends MainBaseActivity {
             View v = convertView;
             ViewGroup tagContainer;
 
+
             if(v==null){
                 LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = inflater.inflate(R.layout.book_list_row, null);
+                v = inflater.inflate(R.layout.book_grid_item, null);
             }
+
+            // 上のボーダ
+            if(position < 4) {
+                v.findViewById(R.id.border_top).setVisibility(View.VISIBLE);
+            } else {
+                v.findViewById(R.id.border_top).setVisibility(View.GONE);
+            }
+            // 下のボーダー
+            v.findViewById(R.id.border_bottom).setVisibility(View.VISIBLE);
+            // 左のボーダー
+            if(position % 4 == 0) {
+                v.findViewById(R.id.border_left).setVisibility(View.VISIBLE);
+            } else {
+                v.findViewById(R.id.border_left).setVisibility(View.GONE);
+            }
+            // 右のボーダー
+            v.findViewById(R.id.border_right).setVisibility(View.VISIBLE);
+
+            final ImageView image = (ImageView) v.findViewById(R.id.image);
+            image.setImageResource(R.drawable.no_image);
+
             if(mDataArrayList != null) {
                 final SeriesData series = (SeriesData) mDataArrayList.get(position);
                 if (series != null) {
@@ -83,9 +99,6 @@ public class ListActivity extends MainBaseActivity {
                     title = (TextView) v.findViewById(R.id.title);
                     author = (TextView) v.findViewById(R.id.author);
                     volume = (TextView) v.findViewById(R.id.volume);
-                    tagContainer = (ViewGroup) v.findViewById(R.id.tag_container);
-
-                    final ImageView image = (ImageView) v.findViewById(R.id.image);
 
                     title.setText(series.mTitle);
                     author.setText(series.mAuthor);
@@ -95,8 +108,7 @@ public class ListActivity extends MainBaseActivity {
                         volume.setText(series.getVolumeString());
                         volume.setVisibility(View.VISIBLE);
                     }
-                    image.setImageResource(R.drawable.no_image);
-                    series.getImage(mHandler, ListActivity.this, new ListenerUtil.LoadBitmapListener() {
+                    series.getImage(mHandler, GridActivity.this, new ListenerUtil.LoadBitmapListener() {
                         @Override
                         public void onFinish(Bitmap bitmap) {
                             if(bitmap != null) {
@@ -112,10 +124,11 @@ public class ListActivity extends MainBaseActivity {
                             image.setImageResource(R.drawable.no_image);
                         }
                     });
+                    tagContainer = (ViewGroup) v.findViewById(R.id.tag_container);
 
                     // タグ
                     tagContainer.removeAllViews();
-                    tagContainer = ViewUtil.setTagInfoNormal(ListActivity.this, series.mTagsList, tagContainer);
+                    tagContainer = ViewUtil.setTagInfoSmall(GridActivity.this, series.mTagsList, tagContainer);
                     tagContainer.invalidate();
 
                     // WebAPIの検索結果時以外は先品詳細画面へ
@@ -125,19 +138,18 @@ public class ListActivity extends MainBaseActivity {
                             @Override
                             public void onClick(View view) {
                                 // リストのセルをタップで
-                                startActivity(IntentUtil.getSeriesDetailIntent(ListActivity.this, series.mSeriesId));
+                                startActivity(IntentUtil.getSeriesDetailIntent(GridActivity.this, series.mSeriesId));
                             }
                         });
-                    // WebAPIの検索結果表示時の場合は一部処理をかえる
+                        // WebAPIの検索結果表示時の場合は一部処理をかえる
                     } else {
-                        // リストの各要素のタッチイベント
-                        v.findViewById(R.id.delete_btn).setVisibility(View.GONE);
 
                         v.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "この作品を追加しますか？", "追加", series);
-                                ListActivity.this.startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
+                                Intent intent = EditSeriesDialogActivity.getIntent(GridActivity.this, "この作品を追加しますか？", "追加", series);
+//                                Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "確認", "この作品を本棚に追加しますか？", "はい", "いいえ");
+                                GridActivity.this.startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
                             }
                         });
                     }
@@ -153,7 +165,7 @@ public class ListActivity extends MainBaseActivity {
     protected void setClickListener() {
         super.setClickListener();
     }
-    
+
     /**
      * その他各種リスナー登録
      */
@@ -161,22 +173,14 @@ public class ListActivity extends MainBaseActivity {
         super.setOtherListener();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 
-    @Override
     protected int getContentViewID() {
-        return R.layout.activity_list;
+        return R.layout.activity_grid;
     }
 
-    /**
-     * データに変動があり、notifyDataSetChanged()が呼び出される必要があるときに呼ばれる
-     */
     @Override
     protected void notifyDataSetChanged() {
-        mListAdapter.notifyDataSetChanged();
+        mGridAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -185,7 +189,7 @@ public class ListActivity extends MainBaseActivity {
      */
     protected boolean isShowTypeCorrect() {
         String value = mSettings.load(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID);
-        if(SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
+        if(SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID.equals(value)) {
             return true;
         }
         return false;
@@ -195,7 +199,7 @@ public class ListActivity extends MainBaseActivity {
      * 現在表示している画面の種類を返す
      */
     protected String getShowType() {
-        return SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST;
+        return SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID;
     }
 
 }

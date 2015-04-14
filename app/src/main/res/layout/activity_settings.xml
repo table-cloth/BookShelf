@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_main">
+
+    <include
+        android:id="@+id/header"
+        layout="@layout/settings_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#44000000"
+        android:gravity="center" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/banner"
+        android:layout_below="@id/header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/settings_key_view_type_grid"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_large"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:id="@+id/settings_view_type"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/settings_column">
+
+                <Spinner
+                    android:id="@+id/settings_view_type_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+
+                <!--<LinearLayout-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:orientation="vertical">-->
+
+                    <!--<TextView-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_centerVertical="true"-->
+                        <!--android:layout_marginLeft="10dp"-->
+                        <!--android:textStyle="bold"-->
+                        <!--android:text="表示形式"-->
+                        <!--android:textColor="@color/black"-->
+                        <!--android:textSize="@dimen/text_normal" />-->
+
+                    <!--&lt;!&ndash; 現在の設定がグリッドかリスト形式かを表記する &ndash;&gt;-->
+                    <!--<TextView-->
+                        <!--android:id="@+id/settings_current_view_type"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_marginLeft="20dp"-->
+                        <!--android:textColor="@color/black"-->
+                        <!--android:textSize="@dimen/text_small"/>-->
+                <!--</LinearLayout>-->
+
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</RelativeLayout>
