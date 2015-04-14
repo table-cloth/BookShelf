@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -33,6 +35,7 @@ import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
+import com.tablecloth.bookshelf.util.ViewUtil;
 
 /**
  * Created by minami on 14/09/07.
@@ -43,21 +46,27 @@ public class SeriesDetailActivity extends BaseActivity {
     SeriesData mSeriesData = null;
     int mSeriesId = -1;
     NumberPicker mPicker;
-    
+
     ImageView mImageView = null;
-    
+    LayoutInflater mLayoutnflater;
+
+    @Override
+    protected int getContentViewID() {
+        return R.layout.activity_series_detail;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_series_detail);
 
         mSeriesId = getIntent().getIntExtra(G.INTENT_SERIES_ID, -1);
         if(mSeriesId == -1) {
             ToastUtil.show(SeriesDetailActivity.this, "本の情報の取得に失敗しました");
             SeriesDetailActivity.this.finish();
         }
-        
+
+        mLayoutnflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         mImageView = (ImageView) findViewById(R.id.image);
 
         mPicker = (NumberPicker) findViewById(R.id.number_picker);
@@ -193,6 +202,11 @@ public class SeriesDetailActivity extends BaseActivity {
                 }
             });
 
+            // タグ情報の設定
+            ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
+            tagContainer.removeAllViews();
+            ViewUtil.setTagInfoNormal(SeriesDetailActivity.this, mSeriesData.mTagsList, tagContainer);
+            tagContainer.invalidate();
     	}
     }
     
@@ -206,6 +220,8 @@ public class SeriesDetailActivity extends BaseActivity {
                 if(resultCode == G.RESULT_POSITIVE) {
                     refreshData();
                     initLayout();
+                } else if(resultCode == G.RESULT_SPECIAL) {
+                    SeriesDetailActivity.this.finish();
                 }
                 break;
              // 画像編集確認ダイアログから戻ったとき
@@ -308,14 +324,9 @@ public class SeriesDetailActivity extends BaseActivity {
     }
     
     private Bitmap getImage(Intent data) {
-//    	InputStream inputStream = getContentResolver().openInputStream(data.getData());
     	BitmapFactory.Options imageOptions = new BitmapFactory.Options();
     	imageOptions.inJustDecodeBounds = true;
     	imageOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-//    	BitmapFactory.decodeStream(inputStream, null, imageOptions);
-//    	Log.v("image", "Original Image Size: " + imageOptions.outWidth + " x " + imageOptions.outHeight);
-//
-//    	inputStream.close();
 
     	// もし、画像が大きかったら縮小して読み込む
     	//  今回はimageSizeMaxの大きさに合わせる

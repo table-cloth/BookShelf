@@ -248,30 +248,9 @@ public class SeriesData {
             	firstContinueVolume = value;
             	prevVolume = value;
             }
-//            // 最終巻専用
-//            else if(i == mVolumeList.size() - 1) {
-//                if(value != firstVolume) {
-//                    ret += value;
-//                }
-//                ret += "巻";
-//            }
-//            // １つ前の巻が「数値的に１つ前の巻」出なかった場合、表記を変更
-//            // （１冊目以外）
-//            else if(value - 1 != prevVolume && prevVolume != 0) {
-//                // 「連番が始まった巻数」と「連番が終わった巻数」が同じの場合
-//                // 例）１巻、３巻、５巻〜１０巻を所持してい場合の１巻と３巻
-//                if(firstContinueVolume == prevVolume) {
-//                    ret += "、" + value;
-//                } else {
-//                    ret += "〜" + prevVolume + "、" + value;
-//                }
-//            }
-//            ret += String.valueOf(value);
         }
     	
-        if(mVolumeList.size() > 0) {
-//            ret += "巻";
-        } else {
+        if(mVolumeList.size() <= 0) {
             ret += "所持巻なし";
         }
         return ret;
