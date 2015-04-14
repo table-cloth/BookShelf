@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="50dp">
+    android:layout_height="wrap_content">
 
     <Button
         android:id="@+id/btn_cancel"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentLeft="true"
-        android:background="@android:drawable/ic_menu_revert" />
+        android:background="@android:drawable/ic_menu_more" />
 
     <Spinner
         android:id="@+id/spinner_search_content"
@@ -22,11 +22,11 @@
     <EditText
         android:id="@+id/search_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_height="50dp"
         android:layout_toLeftOf="@id/spinner_search_content"
         android:layout_toRightOf="@id/btn_cancel"
         android:gravity="bottom"
         android:maxLines="1"
         android:singleLine="true" />
+
 </RelativeLayout>

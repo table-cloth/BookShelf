@@ -3,51 +3,23 @@ package com.tablecloth.bookshelf.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.db.SettingsDao;
-import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
-import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
 import com.tablecloth.bookshelf.util.CustomListView;
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.db.FilterDao;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
-import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
-import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.IntentUtil;
-import com.tablecloth.bookshelf.util.JsonUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
-import com.tablecloth.bookshelf.util.ProgressUtil;
-import com.tablecloth.bookshelf.util.Rakuten;
-import com.tablecloth.bookshelf.util.ToastUtil;
-import com.tablecloth.bookshelf.util.Util;
-import com.tablecloth.bookshelf.util.VersionUtil;
 import com.tablecloth.bookshelf.util.ViewUtil;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 /**
  * Created by shnomura on 2014/08/16.
  */
@@ -56,11 +28,8 @@ public class ListActivity extends MainBaseActivity {
     private CustomListView mListView;
     ListAdapter mListAdapter;
 
-    
     // http://shogogg.hatenablog.jp/entry/20110118/1295326773
     int mDraggingPosition = -1;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,16 +121,6 @@ public class ListActivity extends MainBaseActivity {
                     // WebAPIの検索結果時以外は先品詳細画面へ
                     if(mMode != G.MODE_API_SEARCH_RESULT) {
                         // リストの各要素のタッチイベント
-//                        v.findViewById(R.id.delete_btn).setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View v) {
-//                                mSelectSeriesIds = new int[]{series.mSeriesId};
-//                                Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "削除しますか？", "登録された作品の情報を削除しますか？\n\n復元は出来ませんのでご注意ください", "はい", "いいえ");
-//                                startActivityForResult(intent, G.REQUEST_CODE_LIST_ROW_DELETE_SERIES);
-//                            }
-//                        });
-//                        v.findViewById(R.id.delete_btn).setVisibility(View.VISIBLE);
-
                         v.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -178,7 +137,6 @@ public class ListActivity extends MainBaseActivity {
                             @Override
                             public void onClick(View view) {
                                 Intent intent = EditSeriesDialogActivity.getIntent(ListActivity.this, "この作品を追加しますか？", "追加", series);
-//                                Intent intent = SimpleDialogActivity.getIntent(ListActivity.this, "確認", "この作品を本棚に追加しますか？", "はい", "いいえ");
                                 ListActivity.this.startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
                             }
                         });
@@ -237,7 +195,7 @@ public class ListActivity extends MainBaseActivity {
      * 現在表示している画面の種類を返す
      */
     protected String getShowType() {
-        return SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID;
+        return SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST;
     }
 
 }

@@ -112,7 +112,8 @@ public abstract class MainBaseActivity extends BaseActivity {
                 mHeaderView.setVisibility(View.GONE);
                 mHeaderSearch.setVisibility(View.VISIBLE);
                 mHeaderApiSearch.setVisibility(View.GONE);
-                findViewById(R.id.search_content).requestFocus();
+                boolean flag = findViewById(R.id.search_content).requestFocus();
+                findViewById(R.id.search_content).setVisibility(View.VISIBLE);
 //                findViewById(R.id.btn_search).setVisibility(View.VISIBLE);
                 break;
             case G.MODE_API_SEARCH_RESULT:
