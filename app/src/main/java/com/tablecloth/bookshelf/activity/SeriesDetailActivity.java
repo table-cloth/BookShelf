@@ -185,23 +185,29 @@ public class SeriesDetailActivity extends BaseActivity {
 	        ((TextView)findViewById(R.id.memo)).setText(mSeriesData.mMemo);
 	        ((TextView)findViewById(R.id.volume)).setText(mSeriesData.getVolumeString());
             final View plus = findViewById(R.id.plus);
-	        mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
-                @Override
-                public void onFinish(Bitmap bitmap) {
-                    if(bitmap != null) {
-                        mImageView.setImageBitmap(bitmap);
-                        plus.setVisibility(View.GONE);
-                    } else {
+            Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
+            if(cacheImage != null) {
+                mImageView.setImageBitmap(cacheImage);
+                plus.setVisibility(View.GONE);
+            } else {
+                mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                    @Override
+                    public void onFinish(Bitmap bitmap) {
+                        if (bitmap != null) {
+                            mImageView.setImageBitmap(bitmap);
+                            ImageUtil.setImageCache(mSeriesId, bitmap);
+                            plus.setVisibility(View.GONE);
+                        } else {
+                            plus.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onError() {
                         plus.setVisibility(View.VISIBLE);
                     }
-                }
-
-                @Override
-                public void onError() {
-                    plus.setVisibility(View.VISIBLE);
-                }
-            });
-
+                });
+            }
             // タグ情報の設定
             ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
             tagContainer.removeAllViews();
@@ -251,28 +257,37 @@ public class SeriesDetailActivity extends BaseActivity {
 	            		Bitmap bitmap = (Bitmap)data.getExtras().get("data");
 	            		String filePath = ImageUtil.saveBitmap2LocalStorage(SeriesDetailActivity.this, bitmap);
 	                    mSeriesData.setImage(filePath, bitmap);
+                        ImageUtil.setImageCache(mSeriesId, bitmap);
             		} catch(OutOfMemoryError e) {
                  	   ToastUtil.show(SeriesDetailActivity.this, "メモリ不足のため画像の取得に失敗しました");
+                       ImageUtil.clearCache();
                  	   e.printStackTrace();
                     }
             		FilterDao.saveSeries(mSeriesData);
                     final View plus = findViewById(R.id.plus);
-					mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
-                        @Override
-                        public void onFinish(Bitmap bitmap) {
-                            if(bitmap != null) {
-                                mImageView.setImageBitmap(bitmap);
-                                plus.setVisibility(View.GONE);
-                            } else {
+
+                    Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
+                    if(cacheImage != null) {
+                        mImageView.setImageBitmap(cacheImage);
+                        plus.setVisibility(View.GONE);
+                    } else {
+                        mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                            @Override
+                            public void onFinish(Bitmap bitmap) {
+                                if (bitmap != null) {
+                                    mImageView.setImageBitmap(bitmap);
+                                    plus.setVisibility(View.GONE);
+                                } else {
+                                    plus.setVisibility(View.VISIBLE);
+                                }
+                            }
+
+                            @Override
+                            public void onError() {
                                 plus.setVisibility(View.VISIBLE);
                             }
-                        }
-
-                        @Override
-                        public void onError() {
-                            plus.setVisibility(View.VISIBLE);
-                        }
-                    });
+                        });
+                    }
             	}
             	break;
             case G.REQUEST_CODE_IMAGE_GALLERYS:
@@ -282,13 +297,15 @@ public class SeriesDetailActivity extends BaseActivity {
 					Bitmap bitmap = getImage(data);
 					String filePath = ImageUtil.saveBitmap2LocalStorage(SeriesDetailActivity.this, bitmap);
 					mSeriesData.setImage(filePath, bitmap);
-					// bitmap.recycle();
+                    ImageUtil.setImageCache(mSeriesId, bitmap);
+                    // bitmap.recycle();
 					// bitmap = null;
 				} catch (NullPointerException e) {
 					ToastUtil.show(SeriesDetailActivity.this, "画像の取得に失敗しました");
 					e.printStackTrace();
 				} catch (OutOfMemoryError e) {
 					ToastUtil.show(SeriesDetailActivity.this, "メモリ不足のため画像の取得に失敗しました");
+                    ImageUtil.clearCache();
 					e.printStackTrace();
 				} finally {
 					if (is != null) {
@@ -302,22 +319,28 @@ public class SeriesDetailActivity extends BaseActivity {
 				}
 				FilterDao.saveSeries(mSeriesData);
                 final View plus = findViewById(R.id.plus);
-				mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
-                    @Override
-                    public void onFinish(Bitmap bitmap) {
-                        if (bitmap != null) {
-                            mImageView.setImageBitmap(bitmap);
-                            findViewById(R.id.plus).setVisibility(View.GONE);
-                        } else {
+                Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
+                if(cacheImage != null) {
+                    mImageView.setImageBitmap(cacheImage);
+                    plus.setVisibility(View.GONE);
+                } else {
+                    mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                        @Override
+                        public void onFinish(Bitmap bitmap) {
+                            if (bitmap != null) {
+                                mImageView.setImageBitmap(bitmap);
+                                findViewById(R.id.plus).setVisibility(View.GONE);
+                            } else {
+                                findViewById(R.id.plus).setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                        @Override
+                        public void onError() {
                             findViewById(R.id.plus).setVisibility(View.VISIBLE);
                         }
-                    }
-
-                    @Override
-                    public void onError() {
-                        findViewById(R.id.plus).setVisibility(View.VISIBLE);
-                    }
-                });
+                    });
+                }
 			}
 			break;
         }

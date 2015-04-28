@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,6 +19,8 @@ import android.text.format.DateFormat;
  * Created by shnomura on 2014/08/17.
  */
 public class ImageUtil {
+
+    private static HashMap<Integer, Bitmap> mImageCache;
 
     public static Bitmap convertByte2Bitmap(byte[] byteData) {
     	if(byteData != null) {
@@ -73,6 +76,40 @@ public class ImageUtil {
           //bitmap.recycle();
           //bitmap = null;
           //return ret;
+    }
+
+    /**
+     * 作品IDを元にキャッシュから画像を取得
+     * 存在しない場合はnullを返す
+     * @param seriesId
+     * @return
+     */
+    public static Bitmap getImageCache(int seriesId) {
+        if(mImageCache == null) mImageCache = new HashMap<>();
+        if(mImageCache.containsKey(seriesId)) {
+            return mImageCache.get(seriesId);
+        }
+        return null;
+    }
+
+    /**
+     * 作品IDを元にキャッシュ画像を保存
+     * @param seriesId
+     * @param image
+     */
+    public static void setImageCache(int seriesId, Bitmap image) {
+        if(mImageCache == null) mImageCache = new HashMap<>();
+        if(mImageCache.containsKey(seriesId)) {
+            mImageCache.remove(seriesId);
+        }
+        mImageCache.put(seriesId, image);
+    }
+
+    /**
+     * キャッシュを破棄
+     */
+    public static void clearCache() {
+        if(mImageCache != null) mImageCache.clear();
     }
     
 }
