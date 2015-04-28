@@ -17,6 +17,7 @@ import com.tablecloth.bookshelf.util.CustomListView;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -96,22 +97,29 @@ public class ListActivity extends MainBaseActivity {
                         volume.setVisibility(View.VISIBLE);
                     }
                     image.setImageResource(R.drawable.no_image);
-                    series.getImage(mHandler, ListActivity.this, new ListenerUtil.LoadBitmapListener() {
-                        @Override
-                        public void onFinish(Bitmap bitmap) {
-                            if(bitmap != null) {
-                                image.setImageBitmap(bitmap);
+
+                    Bitmap cacheImage = ImageUtil.getImageCache(series.mSeriesId);
+                    if(cacheImage != null) {
+                        image.setImageBitmap(cacheImage);
+                    } else {
+                        final int seriesId = series.mSeriesId;
+                        series.getImage(mHandler, ListActivity.this, new ListenerUtil.LoadBitmapListener() {
+                            @Override
+                            public void onFinish(Bitmap bitmap) {
+                                if (bitmap != null) {
+                                    image.setImageBitmap(bitmap);
+                                    ImageUtil.setImageCache(seriesId, bitmap);
+                                } else {
+                                    image.setImageResource(R.drawable.no_image);
+                                }
                             }
-                            else {
+
+                            @Override
+                            public void onError() {
                                 image.setImageResource(R.drawable.no_image);
                             }
-                        }
-
-                        @Override
-                        public void onError() {
-                            image.setImageResource(R.drawable.no_image);
-                        }
-                    });
+                        });
+                    }
 
                     // タグ
                     tagContainer.removeAllViews();

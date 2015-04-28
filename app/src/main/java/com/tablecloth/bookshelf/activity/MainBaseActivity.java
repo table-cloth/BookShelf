@@ -250,6 +250,8 @@ public abstract class MainBaseActivity extends BaseActivity {
                     switchMode(G.MODE_VIEW);
                     refreshData();
                     ToastUtil.show(MainBaseActivity.this, "作品を追加しました");
+                    sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.ADD_SERIES);
+
                 }
                 break;
 
@@ -274,11 +276,13 @@ public abstract class MainBaseActivity extends BaseActivity {
                         default:
                             intent = SearchDialogActivity.getIntent(MainBaseActivity.this, "作品を検索", "作品を検索する項目を選択してください", "検索", "キャンセル");
                             startActivityForResult(intent, G.REQUEST_CODE_LIST_SEARCH_RAKUTEN);
+                            sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_SEARCH_BTN);
                             break;
                         // 作品手動登録画面
                         case G.RESULT_DATA_SELECTED_BTN_MANUAL:
                             intent = EditSeriesDialogActivity.getIntent(MainBaseActivity.this, "作品情報を追加", "追加", -1);
                             startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
+                            sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_MANUAL_BTN);
                             break;
                     }
                 }
@@ -468,6 +472,8 @@ public abstract class MainBaseActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainBaseActivity.this, SettingsActivity.class));
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SETTINGS_BTN);
+
             }
         });
 

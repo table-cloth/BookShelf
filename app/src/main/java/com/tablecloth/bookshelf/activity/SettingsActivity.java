@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.DB;
 import com.tablecloth.bookshelf.db.SettingsDao;
+import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.SpinnerUtil;
 import com.tablecloth.bookshelf.util.Util;
 
@@ -55,8 +56,10 @@ public class SettingsActivity extends BaseActivity {
                     // 選択した表示形式がリスト形式かを選択
                     if(getString(R.string.settings_value_list).equals(mViewTypeSelection[position])) {
                         mSettings.save(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST);
+                        sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SETTINGS_SET_SHOW_TYPE, GAEvent.Param.LIST);
                     } else {
                         mSettings.save(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID);
+                        sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SETTINGS_SET_SHOW_TYPE, GAEvent.Param.GRID);
                     }
                 }
                 @Override

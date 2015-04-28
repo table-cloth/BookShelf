@@ -17,6 +17,7 @@ import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -108,22 +109,28 @@ public class GridActivity extends MainBaseActivity {
                         volume.setText(series.getVolumeString());
                         volume.setVisibility(View.VISIBLE);
                     }
-                    series.getImage(mHandler, GridActivity.this, new ListenerUtil.LoadBitmapListener() {
-                        @Override
-                        public void onFinish(Bitmap bitmap) {
-                            if(bitmap != null) {
-                                image.setImageBitmap(bitmap);
+                    Bitmap cacheImage = ImageUtil.getImageCache(series.mSeriesId);
+                    if(cacheImage != null) {
+                        image.setImageBitmap(cacheImage);
+                    } else {
+                        final int seriesId = series.mSeriesId;
+                        series.getImage(mHandler, GridActivity.this, new ListenerUtil.LoadBitmapListener() {
+                            @Override
+                            public void onFinish(Bitmap bitmap) {
+                                if (bitmap != null) {
+                                    image.setImageBitmap(bitmap);
+                                    ImageUtil.setImageCache(seriesId, bitmap);
+                                } else {
+                                    image.setImageResource(R.drawable.no_image);
+                                }
                             }
-                            else {
+
+                            @Override
+                            public void onError() {
                                 image.setImageResource(R.drawable.no_image);
                             }
-                        }
-
-                        @Override
-                        public void onError() {
-                            image.setImageResource(R.drawable.no_image);
-                        }
-                    });
+                        });
+                    }
                     tagContainer = (ViewGroup) v.findViewById(R.id.tag_container);
 
                     // タグ

@@ -90,7 +90,6 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
             public void onClick(View v) {
                 Intent intent = TagsEditDialogActivity.getIntent(EditSeriesDialogActivity.this, "タグを編集", sSeriesData.mTagsList, "完了");
                 if(intent != null) startActivityForResult(intent, G.REQUEST_CODE_TAGS_EDIT);
-                ToastUtil.show(EditSeriesDialogActivity.this, "タグ編集画面を起動");
             }
         });
         
