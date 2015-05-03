@@ -34,15 +34,18 @@ public class VersionUtil {
         // 最後に起動した記録のあるバージョンが、現在のバージョンより古い場合はアップデートダイアログを表示可能
         int versionDiff = getCurrentVersionCode(mAppContext) - loadLastShownVersionCode();
         // １つ以上前のバージョンからアップデートした場合
-        if(versionDiff > 1) {
-            Intent intent = SimpleDialogActivity.getIntent(mAppContext, "機能追加のお知らせ", "■作品の表示形式を追加しました！\n以前のリスト形式の表示に戻したい場合は画面左上の「設定ボタン」から変更をお願いいたします。\n\n■タグ機能を追加しました！\n作品の登録時、編集時にタグの編集ができるようになりました。\nタグによる検索にも対応しておりますので、是非ご利用ください。\n\n■その他ご意見、又はご要望等ございましたらレビューにて記載をお願いいたします。", "レビューする", "しない");
-            mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
+//        if(versionDiff > 1) {
+//            Intent intent = SimpleDialogActivity.getIntent(mAppContext, "機能追加のお知らせ", "■作品の表示形式を追加しました！\n以前のリスト形式の表示に戻したい場合は画面左上の「設定ボタン」から変更をお願いいたします。\n\n■タグ機能を追加しました！\n作品の登録時、編集時にタグの編集ができるようになりました。\nタグによる検索にも対応しておりますので、是非ご利用ください。\n\n■その他ご意見、又はご要望等ございましたらレビューにて記載をお願いいたします。", "レビューする", "しない");
+//            mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
+//
+//            // バージョン情報を更新
+//            updateVersionInfo();
+//            return true;
+//        } else if(versionDiff == 1) {
 
-            // バージョン情報を更新
-            updateVersionInfo();
-            return true;
-        } else if(versionDiff == 1) {
-            Intent intent = SimpleDialogActivity.getIntent(mAppContext, "お知らせ", "設定画面の軽微な不具合を修正しました。", "レビューする", "しない");
+        if(versionDiff > 0) {
+            String suffix = "\n\nーーーーー\n少しでも良いアプリになるよう改善を行っております。\n★5のレビューを頂けますと励みになります！\n宜しくお願い致します (*- -)(*_ _)ペコリ";
+            Intent intent = SimpleDialogActivity.getIntent(mAppContext, "お知らせ", "■作品の画像の読み込み速度を改善しました。\n\n■お問い合わせ・レビューの項目を追加しました。\n　設定画面よりお問い合わせ・レビューをお願い致します。" + suffix, "レビューする", "しない");
             mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
 
             // バージョン情報を更新
