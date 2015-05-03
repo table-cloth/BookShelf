@@ -31,56 +31,95 @@
             android:layout_marginRight="10dp"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/settings_key_view_type_grid"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_large"
-                android:textStyle="bold" />
-
-            <RelativeLayout
-                android:id="@+id/settings_view_type"
+            <!-- 表示形式 -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/settings_column">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <Spinner
-                    android:id="@+id/settings_view_type_spinner"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/settings_key_view_type_grid"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:id="@+id/settings_view_type"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    />
-
-                <!--<LinearLayout-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_centerVertical="true"-->
-                    <!--android:orientation="vertical">-->
+                    android:layout_height="50dp"
+                    android:background="@drawable/settings_column">
 
                     <!--<TextView-->
                         <!--android:layout_width="wrap_content"-->
                         <!--android:layout_height="wrap_content"-->
-                        <!--android:layout_centerVertical="true"-->
+                        <!--android:text="ご意見・ご要望はこちら"-->
                         <!--android:layout_marginLeft="10dp"-->
-                        <!--android:textStyle="bold"-->
-                        <!--android:text="表示形式"-->
                         <!--android:textColor="@color/black"-->
                         <!--android:textSize="@dimen/text_normal" />-->
 
-                    <!--&lt;!&ndash; 現在の設定がグリッドかリスト形式かを表記する &ndash;&gt;-->
-                    <!--<TextView-->
-                        <!--android:id="@+id/settings_current_view_type"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:layout_marginLeft="20dp"-->
-                        <!--android:textColor="@color/black"-->
-                        <!--android:textSize="@dimen/text_small"/>-->
-                <!--</LinearLayout>-->
+                    <Spinner
+                        android:id="@+id/settings_view_type_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- アプリ情報 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="アプリ情報"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:id="@+id/settings_inquiry"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/settings_column_top">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ご意見・ご要望はこちら"
+                        android:layout_marginLeft="10dp"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_large" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settings_review"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:paddingTop="-1dp"
+                    android:background="@drawable/settings_column_bottom">
 
 
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="レビューを書く"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_large" />
 
+                </RelativeLayout>
+
+
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
