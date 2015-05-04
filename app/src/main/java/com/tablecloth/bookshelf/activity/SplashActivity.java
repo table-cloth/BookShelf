@@ -13,8 +13,6 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my);
-
 
         // バージョン情報関連
 
@@ -32,7 +30,7 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected int getContentViewID() {
-        return R.layout.activity_my;
+        return CONTENT_VIEW_ID_NONE;
     }
 
 }

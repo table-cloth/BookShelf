@@ -130,6 +130,7 @@ public class SeriesData {
             }
         } catch(OutOfMemoryError e) {
             ToastUtil.show(activity, "メモリー不足のため、画像の取得に失敗しました");
+            ImageUtil.clearCache();
             e.printStackTrace();
         } catch (IOException e) {
             ToastUtil.show(activity, "予期せぬエラーのため、画像の取得に失敗しました");

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">本棚管理</string> 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">本棚管理</string>
 
     <string name="add_detail"><u>情報を追加する</u></string>
 
@@ -17,4 +15,6 @@
     <string name="settings_key_view_type_grid">表示形式</string>
     <string name="settings_value_grid">グリッド形式で作品一覧を表示</string>
     <string name="settings_value_list">リスト形式で作品一覧を表示</string>
+    <string name="inquiry_subject">【お問い合わせ】本棚管理</string>
+    <string name="error_no_mailer">お問い合わせを送信できるアプリが発見できません。メーラーアプリなどをインストールしてください。</string>
 </resources>
