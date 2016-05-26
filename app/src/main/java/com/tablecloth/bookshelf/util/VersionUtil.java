@@ -43,8 +43,18 @@ public class VersionUtil {
 //            return true;
 //        } else if(versionDiff == 1) {
 
-        if(versionDiff > 0) {
-            String suffix = "\n\nーーーーー\n少しでも良いアプリになるよう改善を行っております。\n★5のレビューを頂けますと励みになります！\n宜しくお願い致します (*- -)(*_ _)ペコリ";
+        // １つ以上前のバージョンからアップデートした場合
+        String suffix = "\n\nーーーーー\n少しでも良いアプリになるよう改善を行っております。\n★5のレビューを頂けますと励みになります！\n宜しくお願い致します (*- -)(*_ _)ペコリ";
+
+        if(versionDiff == 1) {
+            Intent intent = SimpleDialogActivity.getIntent(mAppContext, "お知らせ", "■作品の検索時に、正しくない画像が表示される不具合を修正しました。\n■設定画面の項目の表示を修正しました。\n\nご迷惑をおかけし申し訳ございませんでした。\n今後ともよろしくお願い致します。" + suffix, "レビューする", "しない");
+            mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
+
+            // バージョン情報を更新
+            updateVersionInfo();
+            return true;
+
+        } else if(versionDiff > 1) {
             Intent intent = SimpleDialogActivity.getIntent(mAppContext, "お知らせ", "■作品の画像の読み込み速度を改善しました。\n\n■お問い合わせ・レビューの項目を追加しました。\n　設定画面よりお問い合わせ・レビューをお願い致します。" + suffix, "レビューする", "しない");
             mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
 

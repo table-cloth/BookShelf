@@ -109,7 +109,11 @@ public class GridActivity extends MainBaseActivity {
                         volume.setText(series.getVolumeString());
                         volume.setVisibility(View.VISIBLE);
                     }
-                    Bitmap cacheImage = ImageUtil.getImageCache(series.mSeriesId);
+                    Bitmap cacheImage = null;
+                    // Web検索時はキャッシュを仕様しない
+                    if(mMode != G.MODE_API_SEARCH_RESULT) {
+                        cacheImage = ImageUtil.getImageCache(series.mSeriesId);
+                    }
                     if(cacheImage != null) {
                         image.setImageBitmap(cacheImage);
                     } else {
