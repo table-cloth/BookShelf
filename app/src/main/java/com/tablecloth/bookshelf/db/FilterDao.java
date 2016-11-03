@@ -25,8 +25,6 @@ public class FilterDao extends DaoBase {
         super(context);
     }
 
-
-
     /**
      * シリーズ情報の保存
      * 最終更新日時を返すので、登録直後に本の情報を検索したい場合はそれを使う

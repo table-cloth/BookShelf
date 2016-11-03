@@ -3,95 +3,89 @@ package com.tablecloth.bookshelf.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
+ * Data accessor for Settings within the app
+ *
  * Created by shnomura on 2015/03/29.
- * 各種設定項目用のdao
  */
 public class SettingsDao extends DaoBase {
 
-    // 設定項目はこちらのクラスにて管理する
-    public class KEY {
-        final public static String SERIES_SHOW_TYPE = "series_show_type"; // 作品一覧の表示タイプ
-    }
-    // 設定値ははこちらのクラスにて管理する
-    public class VALUE {
-        final public static String SERIES_SHOW_TYPE_GRID = "grid"; // 作品一覧の表示タイプ
-        final public static String SERIES_SHOW_TYPE_LIST = "list"; // 作品一覧の表示タイプ
-    }
-
-    public SettingsDao(Context context) {
+    /**
+     * Constructor
+     *
+     * @param context context
+     */
+    public SettingsDao(@NonNull Context context) {
         super(context);
     }
 
     /**
-     * 設定値を保存する
-     * @param key
-     * @param value
-     * @return
+     * Save or Update new setting
+     *
+     * @param key Key for setting to be saved
+     * @param value Value for setting to be saved
+     * @return isSaveSuccess
      */
-    public boolean save(String key, String value) {
+    public boolean save(@NonNull String key, @NonNull String value) {
+        // Set save contents
         ContentValues cv = new ContentValues();
-        cv.put(DB.Settings.KEY, key);
-        cv.put(DB.Settings.VALUE, value);
+        cv.put(Const.DB.Settings.SettingsTable.KEY, key);
+        cv.put(Const.DB.Settings.SettingsTable.VALUE, value);
 
-        long result = 0;
-        // 値が存在する場合
+        long affectRowCount = 0;
+        SQLiteDatabase sqLiteDatabase = DB.getDB(mContext).getSQLiteDatabase(mContext);
+
+        // Setting with the given key already exists
         if(!Util.isEmpty(load(key, ""))) {
-            result = mSqlDb.update(DB.Settings.TABLE_NAME, cv, DB.Settings.KEY + " = ? ", new String[]{key});
-        // 値が存在しない場合
+            affectRowCount = sqLiteDatabase.update(Const.DB.Settings.SettingsTable.TABLE_NAME, cv, Const.DB.Settings.SettingsTable.KEY + " = ? ", new String[]{key});
+        // Setting with the given key does not exist
         } else {
-            result = mSqlDb.insert(DB.Settings.TABLE_NAME, null, cv);
+            affectRowCount = sqLiteDatabase.insert(Const.DB.Settings.SettingsTable.TABLE_NAME, null, cv);
         }
-        if(result > 0) return true;
-        return false;
+
+        return affectRowCount > 0;
     }
 
     /**
-     * 設定値を読み込む
-     * 未設定の場合は空文字を返す
-     * @param key
-     * @return
+     * Load setting with given key
+     *
+     * @param key Key for setting to load
+     * @param defValue Default value to be used if setting with given key is not registered
+     * @return Value paired with given key, or defValue
      */
     public String load(String key, String defValue) {
-        initDB(mContext);
+        // Get cursor with given key
+        SQLiteDatabase sqLiteDatabase = DB.getDB(mContext).getSQLiteDatabase(mContext);
+        Cursor cursor = sqLiteDatabase.rawQuery(SqlText.loadSettingsSQL(key), null);
+        // return if cursor not found
+        if(cursor == null) {
+            return defValue;
+        }
 
-        Cursor cursor = mDb.getSQLiteDatabase().rawQuery(getLoadSqlString(key), null);
         String value = defValue;
+        int max = cursor.getCount();
 
-        // cursorからSeriesDataを生成
-        if(cursor != null) {
-            try {
-                int max = cursor.getCount();
-                for (int i = 0; i < max; i++) {
-                    if (cursor.moveToNext()) {
-                        int columnIndex = cursor.getColumnIndex(DB.Settings.VALUE);
-                        value = cursor.getString(columnIndex);
-                        if (!Util.isEmpty(value)) {
-                            break;
-                        }
+        // Read value param from cursor
+        try {
+            for (int i = 0 ; i < max ; i++) {
+                if (cursor.moveToNext()) {
+                    int columnIndex = cursor.getColumnIndex(Const.DB.Settings.SettingsTable.VALUE);
+                    value = cursor.getString(columnIndex);
+                    if (!Util.isEmpty(value)) {
+                        break;
                     }
                 }
-            } finally {
-                cursor.close();
             }
+        } finally {
+            cursor.close();
         }
 
         return value;
-    }
-
-    /**
-     * ロード用のSQL文を取得する
-     * @param key
-     * @return
-     */
-    private String getLoadSqlString(String key) {
-        StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT * FROM ");
-        sql.append(DB.Settings.TABLE_NAME);
-        sql.append(" WHERE " + DB.Settings.KEY + " = " + "'" + key + "'");
-        return sql.toString();
     }
 }

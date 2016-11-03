@@ -3,6 +3,7 @@ package com.tablecloth.bookshelf.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 
 import com.tablecloth.bookshelf.util.Const;
 
@@ -11,7 +12,6 @@ import com.tablecloth.bookshelf.util.Const;
  */
 public class DB {
 
-    private final Context mContext;
     private SQLiteDatabase mSqLiteDatabase;
     private static DB mDb;
 
@@ -22,7 +22,8 @@ public class DB {
      * @param context context
      * @return DB instance
      */
-    static DB getDB(Context context) {
+    @NonNull
+    static DB getDB(@NonNull Context context) {
         if (mDb == null) {
             ensureOpenedDB(context);
         }
@@ -33,26 +34,41 @@ public class DB {
      * Returns SQLiteDatabase instance
      * If SQLiteDatabase is not initialized, it will be initialized
      *
+     * @param context context
      * @return SQLiteDatabase
      */
-    SQLiteDatabase getSQLiteDatabase() {
-        ensureOpenedSQLiteDatabase();
+    @NonNull
+    SQLiteDatabase getSQLiteDatabase(Context context) {
+        ensureOpenedSQLiteDatabase(context);
         return mSqLiteDatabase;
     }
 
     /**
+     * Close SQLiteDatabase & resets all instance in DB class
+     */
+    void close() {
+        if(mSqLiteDatabase != null) {
+            mSqLiteDatabase.close();
+            mSqLiteDatabase = null;
+        }
+        if(mDb != null) {
+            mDb = null;
+        }
+    }
+
+
+    /**
      * Constructor
      */
-    private DB(final Context context) {
-        mContext = context;
-        ensureOpenedSQLiteDatabase();
+    private DB(@NonNull Context context) {
+        ensureOpenedSQLiteDatabase(context);
     }
 
     /**
      * Initialize DB if not initialized
-     * @param context
+     * @param context context
      */
-    private static synchronized void ensureOpenedDB(final Context context) {
+    private static void ensureOpenedDB(@NonNull Context context) {
         // return if DB instance is already set
         if (mDb != null) {
             return;
@@ -61,30 +77,16 @@ public class DB {
     }
 
     /**
-     * Initialize SQLite if not initialized
-     * @return
+     * Initialize SQLiteDatabase if not initialized
      */
-    private void ensureOpenedSQLiteDatabase() {
+    private void ensureOpenedSQLiteDatabase(@NonNull Context context) {
         // return if already open
         if(mSqLiteDatabase != null
                 && mSqLiteDatabase.isOpen()) {
             return;
         }
-        final OpenHelper openHelper = new OpenHelper(mContext);
+        final OpenHelper openHelper = new OpenHelper(context);
         mSqLiteDatabase = openHelper.getWritableDatabase();
-    }
-
-    /**
-     * Close SQLiteDatabase & resets all instance in DB class
-     */
-    private void close() {
-        if(mSqLiteDatabase != null) {
-            mSqLiteDatabase.close();
-            mSqLiteDatabase = null;
-        }
-        if(mDb != null) {
-            mDb = null;
-        }
     }
 
     /**
@@ -108,7 +110,7 @@ public class DB {
          *
          * @param context context
          */
-        OpenHelper(Context context) {
+        OpenHelper(@NonNull Context context) {
             super(context, Const.DB.DB_NAME, null, NEWEST_VERSION);
         }
 

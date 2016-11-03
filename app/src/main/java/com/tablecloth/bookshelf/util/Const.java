@@ -5,22 +5,41 @@ package com.tablecloth.bookshelf.util;
  */
 
 public class Const {
-
-    public static class SettingsTable {
-        // Table name for each settings
-        public static final String TABLE_NAME = "settings";
-        // Available variables for settings table are only "key" & "value"
-        // To be capable with any settings, variable types are to be String
-        public static final String KEY = "key";
-        public static final String VALUE = "value";
-    }
-
     /**
      * DB related constants
      */
     public static class DB {
+
         // DB name for all bool series / details data to be saved
         public static final String DB_NAME = "book_shelf";
+
+        /**
+         * Settings related constants
+         */
+        public static class Settings {
+
+            /**
+             * Column name for Settings Table
+             */
+            public static class SettingsTable {
+                // Table name for each settings
+                public static final String TABLE_NAME = "settings";
+                // Available variables for settings table are only "key" & "value"
+                // To be capable with any settings, variable types are to be String
+                public static final String KEY = "key";
+                public static final String VALUE = "value";
+            }
+
+            // 設定項目はこちらのクラスにて管理する
+            public static class KEY {
+                final public static String SERIES_SHOW_TYPE = "series_show_type"; // 作品一覧の表示タイプ
+            }
+            // 設定値ははこちらのクラスにて管理する
+            public static class VALUE {
+                final public static String SERIES_SHOW_TYPE_GRID = "grid"; // 作品一覧の表示タイプ
+                final public static String SERIES_SHOW_TYPE_LIST = "list"; // 作品一覧の表示タイプ
+            }
+        }
 
         /**
          * Column names for Book Series Table

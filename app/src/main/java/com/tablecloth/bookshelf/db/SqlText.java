@@ -70,11 +70,26 @@ public class SqlText {
 
     // Create SQLite text for Application Settings table
     public final static String CREATE_SETTINGS_SQL = "create table "
-            + Const.SettingsTable.TABLE_NAME
+            + Const.DB.Settings.SettingsTable.TABLE_NAME
             + " ( "
-            + Const.SettingsTable.KEY
+            + Const.DB.Settings.SettingsTable.KEY
             + " text not null,"
-            + Const.SettingsTable.VALUE
+            + Const.DB.Settings.SettingsTable.VALUE
             + " text "
             + ")";
+
+    /**
+     * Create SQLite text for loading application settings
+     *
+     * @param key Key of setting
+     * @return SQLite text
+     */
+    public static String loadSettingsSQL(String key) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT * FROM ");
+        sql.append(Const.DB.Settings.SettingsTable.TABLE_NAME);
+        sql.append(" WHERE " + Const.DB.Settings.SettingsTable.KEY + " = " + "'" + key + "'");
+        return sql.toString();
+    }
+
 }
