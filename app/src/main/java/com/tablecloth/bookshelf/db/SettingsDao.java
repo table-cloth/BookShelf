@@ -3,7 +3,6 @@ package com.tablecloth.bookshelf.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.tablecloth.bookshelf.util.Util;
 
@@ -57,7 +56,7 @@ public class SettingsDao extends DaoBase {
      * @return
      */
     public String load(String key, String defValue) {
-        instantiateDB(mContext);
+        initDB(mContext);
 
         Cursor cursor = mDb.getSQLiteDatabase().rawQuery(getLoadSqlString(key), null);
         String value = defValue;

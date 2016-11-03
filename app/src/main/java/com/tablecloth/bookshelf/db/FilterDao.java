@@ -3,6 +3,8 @@ package com.tablecloth.bookshelf.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import com.tablecloth.bookshelf.util.G;
@@ -12,17 +14,18 @@ import com.tablecloth.bookshelf.util.Util;
  * Created by shnomura on 2014/08/16.
  * 指定のデータにて本情報の検索をかける用のクラス
  */
-public class FilterDao {
-    private static DB mDb = null; // DBクラス
+public class FilterDao extends DaoBase {
 
     /**
-     * シリーズ詳細の取得
-     * @return
+     * Constructor
+     *
+     * @param context context
      */
-//    public static SeriesData loadSeriesDetail(Context context, int series_id) {
-//        instantiateDB(context);
-//        return new SeriesData("sample");
-//    }
+    public FilterDao(@NonNull Context context) {
+        super(context);
+    }
+
+
 
     /**
      * シリーズ情報の保存
@@ -30,8 +33,6 @@ public class FilterDao {
      * @param data
      */
     public static void saveSeries(SeriesData data) {
-//        long nowUnix = Calendar.getInstance().getTimeInMillis() / 1000L;
-//        data.mLastUpdateUnix = nowUnix;
         if(isSeriesExist(data.mSeriesId)) {
             ContentValues contentValues = convertSeries2ContentValues(data, true);
 
@@ -315,7 +316,7 @@ public class FilterDao {
      */
     private static void instantiateDB(Context context) {
         if(mDb == null) {
-            mDb = DB.getInstance(context);
+            mDb = DB.getDB(context);
         }
     }
 
@@ -391,7 +392,7 @@ public class FilterDao {
 
         }
 
-//        long nowUnix = Calendar.getInstance().getTimeInMillis() / 1000L;
+//        long nowUnix = Calendar.getDB().getTimeInMillis() / 1000L;
 //        data.mLastUpdateUnix = nowUnix;
 //        return nowUnix;
     }
