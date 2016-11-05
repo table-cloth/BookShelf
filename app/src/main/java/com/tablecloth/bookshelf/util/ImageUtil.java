@@ -79,6 +79,17 @@ public class ImageUtil {
     }
 
     /**
+     * Checks whether image cache for given seriesId exists
+     *
+     * @param seriesId id for book series. Invalid if < 0.
+     * @return true if cache exists
+     */
+    public static boolean hasImageCache(int seriesId) {
+        if(mImageCache == null) mImageCache = new HashMap<>();
+        return mImageCache.containsKey(seriesId);
+    }
+
+    /**
      * 作品IDを元にキャッシュから画像を取得
      * 存在しない場合はnullを返す
      * @param seriesId

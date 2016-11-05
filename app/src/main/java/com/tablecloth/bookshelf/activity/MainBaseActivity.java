@@ -14,11 +14,13 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.JsonUtil;
@@ -60,6 +62,8 @@ public abstract class MainBaseActivity extends BaseActivity {
     protected int mSearchMode = G.SEARCH_MODE_ALL;
     protected String mSearchContent = "";
 
+    BookSeriesDao mBookSeriesDao;
+
     // 各種ヘッダー
     View mHeader;
     View mHeaderView;
@@ -71,6 +75,7 @@ public abstract class MainBaseActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         mProgress = new ProgressUtil(MainBaseActivity.this);
+        mBookSeriesDao = new BookSeriesDao(MainBaseActivity.this);
 
         mHeader = findViewById(R.id.header);
         mHeaderView = mHeader.findViewById(R.id.header_area_mode_view);
@@ -131,42 +136,22 @@ public abstract class MainBaseActivity extends BaseActivity {
      */
     private void refreshData() {
 
-        mDataArrayList.clear();
-        SeriesData[] series = null;
-
         switch (mMode) {
             case G.MODE_VIEW:
-                series = FilterDao.loadSeries(MainBaseActivity.this);
-                if(series != null) {
-                    for(int i = 0 ; i < series.length ; i ++) {
-                        SeriesData data = series[i];
-                        if(data != null) {
-                            mDataArrayList.add(data);
-                        }
-                    }
-                }
+                mDataArrayList = mBookSeriesDao.loadAllBookSeriesDataList();
                 break;
             case G.MODE_SEARCH:
-                series = FilterDao.loadSeries(MainBaseActivity.this, mSearchMode, mSearchContent);
-                if(series != null) {
-                    for(int i = 0 ; i < series.length ; i ++) {
-                        SeriesData data = series[i];
-                        if(data != null) {
-                            mDataArrayList.add(data);
-                        }
-                    }
-                }
+                mDataArrayList = mBookSeriesDao.loadBookSeriesDataList(mSearchMode, mSearchContent);
                 break;
             // 検索結果を表示する。
             case G.MODE_API_SEARCH_RESULT:
-                if(mApiSearchResultArrayList != null) {
-                    for(int i = 0 ; i < mApiSearchResultArrayList.size() ; i ++) {
-                        mDataArrayList.add(mApiSearchResultArrayList.get(i));
-                    }
-                }
+                mDataArrayList = mApiSearchResultArrayList;
+                break;
+            // Safety net. Show everything if mode is invalid
+            default:
+                mDataArrayList = mBookSeriesDao.loadAllBookSeriesDataList();
                 break;
         }
-
 
         notifyDataSetChanged();
     }
@@ -181,8 +166,8 @@ public abstract class MainBaseActivity extends BaseActivity {
         super.onResume();
         if(!isShowTypeCorrect()) {
             // 設定に合っている画面を開き、この画面を閉じる
-            String value = mSettings.load(SettingsDao.KEY.SERIES_SHOW_TYPE, getShowType());
-            if(SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
+            String value = mSettings.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, getShowType());
+            if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
                 startActivity(new Intent(this, ListActivity.class));
                 MainBaseActivity.this.finish();
             } else {
@@ -387,15 +372,15 @@ public abstract class MainBaseActivity extends BaseActivity {
         // 取得した結果を作品情報一覧へと分解する
         for(int i = 0 ; i < jsonObjList.size() ; i ++ ) {
             JSONObject detailData = JsonUtil.getJsonObject(jsonObjList.get(i), Rakuten.Key.ITEM_DETAIL);
-            SeriesData data = new SeriesData();
+            SeriesData data = new SeriesData(this);
 
-            data.mTitle = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME);
-            data.mTitlePronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME_KANA);
-            data.mAuthor = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME);
-            data.mAuthorPronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME_KANA);
-            data.mMagazine = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME);
-            data.mMagazinePronunciation = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME_KANA);
-            data.mCompany = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.COMPANY_NAME);
+            data.setTitle(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME));
+            data.setTitlePronunciation(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME_KANA));
+            data.setAuthor(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME));
+            data.setAuthorPronunciation(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME_KANA));
+            data.setMagazine(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME));
+            data.setMagazinePronunciation(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME_KANA));
+            data.setCompany(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.COMPANY_NAME));
             // 画像は現在未対応（そのうち対応入れる）
             // URLを保持できる用に機能の変更が必要
             String imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_LARGE);
@@ -403,7 +388,7 @@ public abstract class MainBaseActivity extends BaseActivity {
             if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_SMALL);
             // URLの取得に成功した場合は登録する
             if(!Util.isEmpty(imageUrl)) {
-                data.mImagePath = imageUrl;
+                data.setImagePath(imageUrl);
             }
 
             mApiSearchResultArrayList.add(data);

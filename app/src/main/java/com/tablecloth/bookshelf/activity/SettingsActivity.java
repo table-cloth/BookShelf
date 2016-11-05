@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.DB;
 import com.tablecloth.bookshelf.db.SettingsDao;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.SpinnerUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
@@ -52,7 +53,7 @@ public class SettingsActivity extends BaseActivity {
 
 
         // 表示設定
-        String value = mSettings.load(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID);
+        String value = mSettings.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
         // 検索対象選択スピナーボタン
         Spinner spinnerView = ((Spinner)findViewById(R.id.settings_view_type_spinner));
 
@@ -64,10 +65,10 @@ public class SettingsActivity extends BaseActivity {
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     // 選択した表示形式がリスト形式かを選択
                     if(getString(R.string.settings_value_list).equals(mViewTypeSelection[position])) {
-                        mSettings.save(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST);
+                        mSettings.save(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST);
                         sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SETTINGS_SET_SHOW_TYPE, GAEvent.Param.LIST);
                     } else {
-                        mSettings.save(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID);
+                        mSettings.save(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
                         sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SETTINGS_SET_SHOW_TYPE, GAEvent.Param.GRID);
                     }
                 }
@@ -77,7 +78,7 @@ public class SettingsActivity extends BaseActivity {
             });
         }
 
-        if(SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
+        if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
             spinnerView.setSelection(spinnerAdapter.getPosition(getString(R.string.settings_value_list)));
         } else {
             spinnerView.setSelection(spinnerAdapter.getPosition(getString(R.string.settings_value_grid)));

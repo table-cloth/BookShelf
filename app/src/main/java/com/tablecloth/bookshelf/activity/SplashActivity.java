@@ -7,6 +7,7 @@ import android.view.Window;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.SettingsDao;
+import com.tablecloth.bookshelf.util.Const;
 
 
 public class SplashActivity extends BaseActivity {
@@ -19,8 +20,8 @@ public class SplashActivity extends BaseActivity {
 
         // 次のActivityを開始
         // 設定に合っている画面を開き、この画面を閉じる
-        String value = mSettings.load(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID);
-        if(SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
+        String value = mSettings.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
+        if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
             startActivity(new Intent(this, ListActivity.class));
         } else {
             startActivity(new Intent(this, GridActivity.class));

@@ -14,8 +14,8 @@ import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.SeriesData;
-import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.IntentUtil;
@@ -101,8 +101,8 @@ public class GridActivity extends MainBaseActivity {
                     author = (TextView) v.findViewById(R.id.author);
                     volume = (TextView) v.findViewById(R.id.volume);
 
-                    title.setText(series.mTitle);
-                    author.setText(series.mAuthor);
+                    title.setText(series.getTitle());
+                    author.setText(series.getAuthor());
                     if(mMode == G.MODE_API_SEARCH_RESULT) {
                         volume.setVisibility(View.GONE);
                     } else {
@@ -112,12 +112,12 @@ public class GridActivity extends MainBaseActivity {
                     Bitmap cacheImage = null;
                     // Web検索時はキャッシュを仕様しない
                     if(mMode != G.MODE_API_SEARCH_RESULT) {
-                        cacheImage = ImageUtil.getImageCache(series.mSeriesId);
+                        cacheImage = ImageUtil.getImageCache(series.getSeriesId());
                     }
                     if(cacheImage != null) {
                         image.setImageBitmap(cacheImage);
                     } else {
-                        final int seriesId = series.mSeriesId;
+                        final int seriesId = series.getSeriesId();
                         series.loadImage(mHandler, GridActivity.this, new ListenerUtil.LoadBitmapListener() {
                             @Override
                             public void onFinish(Bitmap bitmap) {
@@ -139,7 +139,7 @@ public class GridActivity extends MainBaseActivity {
 
                     // タグ
                     tagContainer.removeAllViews();
-                    tagContainer = ViewUtil.setTagInfoSmall(GridActivity.this, series.mTagsList, tagContainer);
+                    tagContainer = ViewUtil.setTagInfoSmall(GridActivity.this, series.getTagsAsList(), tagContainer);
                     tagContainer.invalidate();
 
                     // WebAPIの検索結果時以外は先品詳細画面へ
@@ -149,7 +149,7 @@ public class GridActivity extends MainBaseActivity {
                             @Override
                             public void onClick(View view) {
                                 // リストのセルをタップで
-                                startActivity(IntentUtil.getSeriesDetailIntent(GridActivity.this, series.mSeriesId));
+                                startActivity(IntentUtil.getSeriesDetailIntent(GridActivity.this, series.getSeriesId()));
                             }
                         });
                         // WebAPIの検索結果表示時の場合は一部処理をかえる
@@ -199,8 +199,8 @@ public class GridActivity extends MainBaseActivity {
      * @return
      */
     protected boolean isShowTypeCorrect() {
-        String value = mSettings.load(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID);
-        if(SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID.equals(value)) {
+        String value = mSettings.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
+        if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID.equals(value)) {
             return true;
         }
         return false;
@@ -210,7 +210,7 @@ public class GridActivity extends MainBaseActivity {
      * 現在表示している画面の種類を返す
      */
     protected String getShowType() {
-        return SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID;
+        return Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID;
     }
 
 }

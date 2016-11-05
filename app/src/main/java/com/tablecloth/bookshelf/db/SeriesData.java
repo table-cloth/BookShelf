@@ -58,7 +58,6 @@ public class SeriesData {
     private long mLastUpdateUnix;
 
     // Cache
-    private Bitmap mImageCache;
     private String mVolumeTextCache;
 
     /**
@@ -66,10 +65,7 @@ public class SeriesData {
      */
     public SeriesData(@NonNull Context context) {
         mContext = context;
-
         mVolumeList = new ArrayList<>();
-
-        mImageCache = null;
         mVolumeTextCache = null;
     }
 
@@ -254,12 +250,20 @@ public class SeriesData {
     }
 
     /**
-     * Gets rawTags
+     * Gets raw tags in text
      *
      * @return rawTags
      */
     public String getRawTags() {
         return mRawTags;
+    }
+
+    /**
+     * Gets tags as list
+     * @return
+     */
+    public ArrayList<String> getTagsAsList() {
+        return convertTagsRawText2TagsList(mRawTags);
     }
 
     /**
@@ -359,6 +363,15 @@ public class SeriesData {
     }
 
     /**
+     * Gets volumeList
+     *
+     * @return volumeList
+     */
+    public ArrayList<Integer> getVolumeList() {
+        return mVolumeList;
+    }
+
+    /**
      * Set volumeList
      *
      * @param volumeList volumeList
@@ -406,9 +419,12 @@ public class SeriesData {
      * @param listener LoadBitmapListener instance
      */
     public void loadImage(@NonNull final Handler handler, @NonNull Activity activity, @NonNull final ListenerUtil.LoadBitmapListener listener) {
-        if(mImageCache != null) {
-            listener.onFinish(mImageCache);
-            return;
+        if(ImageUtil.hasImageCache(mSeriesId)) {
+            Bitmap bitmap = ImageUtil.getImageCache(mSeriesId);
+            if(bitmap != null) {
+                listener.onFinish(bitmap);
+                return;
+            }
         }
         if(Util.isEmpty(mImagePath)) {
             listener.onError();
@@ -586,24 +602,26 @@ public class SeriesData {
             return;
         }
         try {
-            mImageCache = ImageUtil.getBitmapFromPath(activity, mImagePath);
-            if(mImageCache != null) {
+            Bitmap bitmap = ImageUtil.getBitmapFromPath(activity, mImagePath);
+            if(bitmap != null) {
                 ExifInterface exifInterface = new ExifInterface(mImagePath);
                 int exifR = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
                 switch (exifR) {
                     case ExifInterface.ORIENTATION_ROTATE_90:
-                        mImageCache = ImageUtil.rotateBitmap(mImageCache, 90);
+                        bitmap = ImageUtil.rotateBitmap(bitmap, 90);
                         break;
                     case ExifInterface.ORIENTATION_ROTATE_180:
-                        mImageCache = ImageUtil.rotateBitmap(mImageCache, 180);
+                        bitmap = ImageUtil.rotateBitmap(bitmap, 180);
                         break;
                     case ExifInterface.ORIENTATION_ROTATE_270:
-                        mImageCache = ImageUtil.rotateBitmap(mImageCache, 270);
+                        bitmap = ImageUtil.rotateBitmap(bitmap, 270);
                         break;
                     default:
                         break;
                 }
-                listener.onFinish(mImageCache);
+                // save cache
+                ImageUtil.setImageCache(mSeriesId, bitmap);
+                listener.onFinish(bitmap);
                 return;
             }
         } catch(OutOfMemoryError e) {

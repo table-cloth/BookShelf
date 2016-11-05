@@ -20,6 +20,8 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.db.BookSeriesDao;
+import com.tablecloth.bookshelf.db.BookVolumeDao;
 import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
@@ -43,6 +45,9 @@ public class SeriesDetailActivity extends BaseActivity {
     ImageView mImageView = null;
     LayoutInflater mLayoutnflater;
 
+    BookSeriesDao mBookSeriesDao;
+    BookVolumeDao mBookVolumeDao;
+
     @Override
     protected int getContentViewID() {
         return R.layout.activity_series_detail;
@@ -57,6 +62,9 @@ public class SeriesDetailActivity extends BaseActivity {
             ToastUtil.show(SeriesDetailActivity.this, "本の情報の取得に失敗しました");
             SeriesDetailActivity.this.finish();
         }
+
+        mBookSeriesDao = new BookSeriesDao(this);
+        mBookVolumeDao = new BookVolumeDao(this);
 
         mLayoutnflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -102,11 +110,11 @@ public class SeriesDetailActivity extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				int value = mPicker.getValue();
-				if(mSeriesData.mVolumeList != null && mSeriesData.mVolumeList.contains(value)) {
+				if(mSeriesData.getVolumeList() != null && mSeriesData.getVolumeList().contains(value)) {
 					ToastUtil.show(SeriesDetailActivity.this, value + "巻は既に所持しています");
 				} else {
 					mSeriesData.addVolume(value);
-					FilterDao.saveVolume(mSeriesId, value);
+					mBookVolumeDao.saveBookVolume(mSeriesId, value);
 					initLayout();
 				}
 			}
@@ -118,11 +126,11 @@ public class SeriesDetailActivity extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				int value = mPicker.getValue();
-				if(mSeriesData.mVolumeList != null && !mSeriesData.mVolumeList.contains(value)) {
+				if(mSeriesData.getVolumeList() != null && !mSeriesData.getVolumeList().contains(value)) {
 					ToastUtil.show(SeriesDetailActivity.this, value + "巻は所持していません");
 				} else {
 					mSeriesData.removeVolume(value);
-					FilterDao.deleteVolume(mSeriesId, value);
+					mBookVolumeDao.deleteBookVolume(mSeriesId, value);
 					initLayout();
 				}
 			}
@@ -143,7 +151,7 @@ public class SeriesDetailActivity extends BaseActivity {
      * DBから最新情報を取得
      */
     private void refreshData() {
-        mSeriesData = FilterDao.loadSeries(SeriesDetailActivity.this, mSeriesId);
+        mSeriesData = mBookSeriesDao.loadBookSeriesData(mSeriesId);
     }
 
     /**
@@ -151,31 +159,31 @@ public class SeriesDetailActivity extends BaseActivity {
      */
     private void initLayout() {
     	if(mSeriesData != null) {
-	        ((TextView)findViewById(R.id.title)).setText(mSeriesData.mTitle);
-            if(!Util.isEmpty(mSeriesData.mTitlePronunciation)) {
-                ((TextView) findViewById(R.id.title_pronuncitation)).setText("（" + mSeriesData.mTitlePronunciation + "）");
+	        ((TextView)findViewById(R.id.title)).setText(mSeriesData.getTitle());
+            if(!Util.isEmpty(mSeriesData.getTitlePronunciation())) {
+                ((TextView) findViewById(R.id.title_pronuncitation)).setText("（" + mSeriesData.getTitlePronunciation() + "）");
                 findViewById(R.id.title_pronuncitation).setVisibility(View.VISIBLE);
             } else {
                 findViewById(R.id.title_pronuncitation).setVisibility(View.GONE);
             }
 
-	        ((TextView)findViewById(R.id.author)).setText(mSeriesData.mAuthor);
-            if(!Util.isEmpty(mSeriesData.mAuthorPronunciation)) {
-                ((TextView) findViewById(R.id.author_pronunciation)).setText("（" + mSeriesData.mAuthorPronunciation + "）");
+	        ((TextView)findViewById(R.id.author)).setText(mSeriesData.getAuthor());
+            if(!Util.isEmpty(mSeriesData.getAuthorPronunciation())) {
+                ((TextView) findViewById(R.id.author_pronunciation)).setText("（" + mSeriesData.getAuthorPronunciation() + "）");
                 findViewById(R.id.author_pronunciation).setVisibility(View.VISIBLE);
             } else {
                 findViewById(R.id.author_pronunciation).setVisibility(View.GONE);
             }
 
-	        ((TextView)findViewById(R.id.magazine)).setText(mSeriesData.mMagazine);
-            if(!Util.isEmpty(mSeriesData.mMagazinePronunciation)) {
-                ((TextView)findViewById(R.id.magazine_pronunciation)).setText("（" + mSeriesData.mMagazinePronunciation+"）");
+	        ((TextView)findViewById(R.id.magazine)).setText(mSeriesData.getMagazine());
+            if(!Util.isEmpty(mSeriesData.getMagazinePronunciation())) {
+                ((TextView)findViewById(R.id.magazine_pronunciation)).setText("（" + mSeriesData.getMagazinePronunciation()+"）");
                 findViewById(R.id.magazine_pronunciation).setVisibility(View.VISIBLE);
             } else {
                 findViewById(R.id.magazine_pronunciation).setVisibility(View.GONE);
             }
-            ((TextView)findViewById(R.id.company)).setText(mSeriesData.mCompany);
-	        ((TextView)findViewById(R.id.memo)).setText(mSeriesData.mMemo);
+            ((TextView)findViewById(R.id.company)).setText(mSeriesData.getCompany());
+	        ((TextView)findViewById(R.id.memo)).setText(mSeriesData.getMemo());
 	        ((TextView)findViewById(R.id.volume)).setText(mSeriesData.getVolumeText());
             final View plus = findViewById(R.id.plus);
             Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
@@ -204,7 +212,7 @@ public class SeriesDetailActivity extends BaseActivity {
             // タグ情報の設定
             ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
             tagContainer.removeAllViews();
-            ViewUtil.setTagInfoNormal(SeriesDetailActivity.this, mSeriesData.mTagsList, tagContainer);
+            ViewUtil.setTagInfoNormal(SeriesDetailActivity.this, mSeriesData.getTagsAsList(), tagContainer);
             tagContainer.invalidate();
     	}
     }
@@ -249,14 +257,14 @@ public class SeriesDetailActivity extends BaseActivity {
             		try {
 	            		Bitmap bitmap = (Bitmap)data.getExtras().get("data");
 	            		String filePath = ImageUtil.saveBitmap2LocalStorage(SeriesDetailActivity.this, bitmap);
-	                    mSeriesData.setImage(filePath, bitmap);
+                        mSeriesData.setImagePath(filePath);
                         ImageUtil.setImageCache(mSeriesId, bitmap);
             		} catch(OutOfMemoryError e) {
                  	   ToastUtil.show(SeriesDetailActivity.this, "メモリ不足のため画像の取得に失敗しました");
                        ImageUtil.clearCache();
                  	   e.printStackTrace();
                     }
-            		FilterDao.saveSeries(mSeriesData);
+            		mBookSeriesDao.saveSeries(mSeriesData);
                     final View plus = findViewById(R.id.plus);
 
                     Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
@@ -289,7 +297,7 @@ public class SeriesDetailActivity extends BaseActivity {
 				try {
 					Bitmap bitmap = getImage(data);
 					String filePath = ImageUtil.saveBitmap2LocalStorage(SeriesDetailActivity.this, bitmap);
-					mSeriesData.setImage(filePath, bitmap);
+					mSeriesData.setImagePath(filePath);
                     ImageUtil.setImageCache(mSeriesId, bitmap);
                     // bitmap.recycle();
 					// bitmap = null;
@@ -310,7 +318,7 @@ public class SeriesDetailActivity extends BaseActivity {
 						}
 					}
 				}
-				FilterDao.saveSeries(mSeriesData);
+				mBookSeriesDao.saveSeries(mSeriesData);
                 final View plus = findViewById(R.id.plus);
                 Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
                 if(cacheImage != null) {

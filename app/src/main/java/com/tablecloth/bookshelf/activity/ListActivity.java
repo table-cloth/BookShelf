@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.db.SeriesData;
-import com.tablecloth.bookshelf.db.SettingsDao;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.CustomListView;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
@@ -88,8 +88,8 @@ public class ListActivity extends MainBaseActivity {
 
                     final ImageView image = (ImageView) v.findViewById(R.id.image);
 
-                    title.setText(series.mTitle);
-                    author.setText(series.mAuthor);
+                    title.setText(series.getTitle());
+                    author.setText(series.getAuthor());
                     if(mMode == G.MODE_API_SEARCH_RESULT) {
                         volume.setVisibility(View.GONE);
                     } else {
@@ -98,11 +98,11 @@ public class ListActivity extends MainBaseActivity {
                     }
                     image.setImageResource(R.drawable.no_image);
 
-                    Bitmap cacheImage = ImageUtil.getImageCache(series.mSeriesId);
+                    Bitmap cacheImage = ImageUtil.getImageCache(series.getSeriesId());
                     if(cacheImage != null) {
                         image.setImageBitmap(cacheImage);
                     } else {
-                        final int seriesId = series.mSeriesId;
+                        final int seriesId = series.getSeriesId();
                         series.loadImage(mHandler, ListActivity.this, new ListenerUtil.LoadBitmapListener() {
                             @Override
                             public void onFinish(Bitmap bitmap) {
@@ -123,7 +123,7 @@ public class ListActivity extends MainBaseActivity {
 
                     // タグ
                     tagContainer.removeAllViews();
-                    tagContainer = ViewUtil.setTagInfoNormal(ListActivity.this, series.mTagsList, tagContainer);
+                    tagContainer = ViewUtil.setTagInfoNormal(ListActivity.this, series.getTagsAsList(), tagContainer);
                     tagContainer.invalidate();
 
                     // WebAPIの検索結果時以外は先品詳細画面へ
@@ -133,7 +133,7 @@ public class ListActivity extends MainBaseActivity {
                             @Override
                             public void onClick(View view) {
                                 // リストのセルをタップで
-                                startActivity(IntentUtil.getSeriesDetailIntent(ListActivity.this, series.mSeriesId));
+                                startActivity(IntentUtil.getSeriesDetailIntent(ListActivity.this, series.getSeriesId()));
                             }
                         });
                     // WebAPIの検索結果表示時の場合は一部処理をかえる
@@ -192,8 +192,8 @@ public class ListActivity extends MainBaseActivity {
      * @return
      */
     protected boolean isShowTypeCorrect() {
-        String value = mSettings.load(SettingsDao.KEY.SERIES_SHOW_TYPE, SettingsDao.VALUE.SERIES_SHOW_TYPE_GRID);
-        if(SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
+        String value = mSettings.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
+        if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
             return true;
         }
         return false;
@@ -203,7 +203,7 @@ public class ListActivity extends MainBaseActivity {
      * 現在表示している画面の種類を返す
      */
     protected String getShowType() {
-        return SettingsDao.VALUE.SERIES_SHOW_TYPE_LIST;
+        return Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST;
     }
 
 }

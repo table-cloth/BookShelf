@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;

@@ -90,7 +90,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
             public void onClick(View v) {
                 Intent intent = TagsEditDialogActivity.getIntent(
                         EditSeriesDialogActivity.this, "タグを編集",
-                        SeriesData.convertTagsRawText2TagsList(sSeriesData.getRawTags()), "完了");
+                        SeriesData.convertTagsRawText2TagsList(sSeriesData.getTagsRawText()), "完了");
                 if(intent != null) startActivityForResult(intent, G.REQUEST_CODE_TAGS_EDIT);
             }
         });
@@ -215,7 +215,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
     private void updateTags() {
         // タグ
         tagContainer.removeAllViews();
-        tagContainer = ViewUtil.setTagInfoNormal(EditSeriesDialogActivity.this, SeriesData.convertTagsRawText2TagsList(sSeriesData.getRawTags()), tagContainer);
+        tagContainer = ViewUtil.setTagInfoNormal(EditSeriesDialogActivity.this, SeriesData.convertTagsRawText2TagsList(sSeriesData.getTagsRawText()), tagContainer);
         tagContainer.invalidate();
     }
 }
