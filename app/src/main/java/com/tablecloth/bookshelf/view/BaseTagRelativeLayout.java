@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
+import com.tablecloth.bookshelf.db.TagHistoryDao;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
@@ -15,27 +16,34 @@ public class BaseTagRelativeLayout extends RelativeLayout {
     protected Context mContext = null;
     protected boolean mNeedsReLayout = true;
     protected OnCurrentTagUpdateListener mOnCurrentTagUpdateListener = null;
+    protected TagHistoryDao mTagHistoryDao;
 
     public BaseTagRelativeLayout(Context context) {
         super(context);
-        mContext = context;
+        initialize(context);
         setWillNotDraw(false);
         setWillNotCacheDrawing(false);
     }
 
     public BaseTagRelativeLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
+        initialize(context);
         setWillNotDraw(false);
         setWillNotCacheDrawing(false);
     }
 
     public BaseTagRelativeLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mContext = context;
+        initialize(context);
         setWillNotDraw(false);
         setWillNotCacheDrawing(false);
     }
+
+    private void initialize(Context context) {
+        mContext = context;
+        mTagHistoryDao = new TagHistoryDao(mContext);
+    }
+
 
     public void setTagData(String tagData) {
         mTagData = tagData;
@@ -57,7 +65,7 @@ public class BaseTagRelativeLayout extends RelativeLayout {
     }
 
     public interface OnCurrentTagUpdateListener {
-        public void onUpdate(String currentTags);
+        void onUpdate(String currentTags);
     }
 
     public void setTagUpdateListener(OnCurrentTagUpdateListener listener) {

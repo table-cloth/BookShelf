@@ -11,6 +11,8 @@ import android.content.pm.ApplicationInfo;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 /**
  * 汎用的な処理を格納する
  * Created by shnomura on 2014/08/17.
@@ -31,6 +33,9 @@ public class Util {
     public static boolean isEmpty(String[] str) {
         if(str == null || str.length <= 0) return true;
         return false;
+    }
+    public static boolean isEmpty(ArrayList list) {
+        return list == null || list.isEmpty();
     }
     
     public static void initAdview(Activity activity, ViewGroup parentView) {

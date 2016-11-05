@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 
@@ -20,23 +21,27 @@ import java.util.ArrayList;
  */
 public class RecentTagRelativeLayout extends BaseTagRelativeLayout {
 
-    String mCurrentTagData = null;
-
     public RecentTagRelativeLayout(Context context) {
         super(context);
     }
+
     public RecentTagRelativeLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
+
     public RecentTagRelativeLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
     public void setCurrentTagData(String currentTagData) {
-        mCurrentTagData = currentTagData;
+        setTagData(currentTagData);
     }
 
-    // 描画関数
+    /**
+     * Draw method
+     *
+     * @param canvas canvas to draw
+     */
     @Override
     protected void onDraw(Canvas canvas) {
 
@@ -44,7 +49,6 @@ public class RecentTagRelativeLayout extends BaseTagRelativeLayout {
             super.onDraw(canvas);
             return;
         }
-        Log.e("onDraw::RecemtTag", "onDraw::RecemtTag");
 
         // 描画領域の情報を取得
         int maxWidth = this.getWidth();
@@ -101,24 +105,27 @@ public class RecentTagRelativeLayout extends BaseTagRelativeLayout {
         @Override
         public void onClick(View view) {
             String newTag = ((TextView)view.findViewById(R.id.tag_name)).getText().toString();
-            ArrayList<String> tagsTmp = FilterDao.getTagsData(mCurrentTagData);
-
-            // 登録失敗
+            // invalid tag
             if(Util.isEmpty(newTag)) {
-                ToastUtil.show(mContext, "追加するタグを入力してください");
-                return;
-            } else if(tagsTmp != null && tagsTmp.contains(newTag)) {
-                ToastUtil.show(mContext, "既に登録済みのタグです");
+                ToastUtil.show(mContext, R.string.tag_error_enter_tag_2_add);
                 return;
             }
 
-            // 登録成功
-            if(tagsTmp == null) tagsTmp = new ArrayList<String>();
-            tagsTmp.add(newTag);
-            mCurrentTagData = FilterDao.getTagsStr(tagsTmp);
-            FilterDao.saveTags(mContext, newTag);
+            ArrayList<String> tagInList = SeriesData.convertTagsRawText2TagsList(getTagData());
 
-            if(mOnCurrentTagUpdateListener != null) mOnCurrentTagUpdateListener.onUpdate(mCurrentTagData);
+            // tag is already added
+            if(tagInList.contains(newTag)) {
+                ToastUtil.show(mContext, R.string.tag_error_already_added);
+                return;
+            }
+
+            // add new tag and update view
+            tagInList.add(newTag);
+            setTagData(SeriesData.convertTagsList2TagsRawText(tagInList));
+            if(mOnCurrentTagUpdateListener != null) mOnCurrentTagUpdateListener.onUpdate(getTagData());
+
+            // save in DB
+            mTagHistoryDao.saveTag(newTag);
         }
     };
 }

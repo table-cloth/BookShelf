@@ -462,7 +462,7 @@ public class SeriesData {
      * @return raw text tags data
      */
     @NonNull
-    public String convertTagsList2TagsRawText(@Nullable ArrayList<String> tagsList) {
+    public static String convertTagsList2TagsRawText(@Nullable ArrayList<String> tagsList) {
         StringBuilder rawTagsText = new StringBuilder();
         boolean isFirstValue = true;
 
@@ -486,7 +486,7 @@ public class SeriesData {
      * @return tags list
      */
     @NonNull
-    public ArrayList<String> convertTagsRawText2TagsList(String rawTextTagsData) {
+    public static ArrayList<String> convertTagsRawText2TagsList(String rawTextTagsData) {
         // return if tags is empty
         if(Util.isEmpty(rawTextTagsData)) {
             return new ArrayList<>();

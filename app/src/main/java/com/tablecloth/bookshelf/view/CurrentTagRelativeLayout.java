@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 
@@ -100,16 +101,20 @@ public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
     OnClickListener onClickListener = new OnClickListener() {
         @Override
         public void onClick(View view) {
+            // get tag to delete
             String deleteTag = ((TextView)view.findViewById(R.id.tag_name)).getText().toString();
 
-            // タグの削除処理
-            ArrayList<String> tagsTmp = FilterDao.getTagsData(getTagData());
-            if(tagsTmp == null) {
-                ToastUtil.show(mContext, "タグの削除に失敗しました");
+            ArrayList<String> tagsTmp = SeriesData.convertTagsRawText2TagsList(getTagData());
+            if(!tagsTmp.contains(deleteTag)) {
+                ToastUtil.show(mContext, R.string.tag_error_failed_2_delete);
+                return;
             }
-            tagsTmp.remove(deleteTag);
-            setTagData(FilterDao.getTagsStr(tagsTmp));
 
+            // delete tag
+            tagsTmp.remove(deleteTag);
+            setTagData(SeriesData.convertTagsList2TagsRawText(tagsTmp));
+
+            // update view
             if(mOnCurrentTagUpdateListener != null) mOnCurrentTagUpdateListener.onUpdate(getTagData());
         }
     };
