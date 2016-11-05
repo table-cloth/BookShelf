@@ -34,7 +34,7 @@ public class BookDaoBase extends DaoBase {
     /**
      * Checks whether book volume with  given seriesId is already registered
      *
-     * @param seriesId id for book series. Invalid if <= 0.
+     * @param seriesId id for book series. Invalid if < 0.
      * @param volume volume index for a book. Invalid if < 0.
      * @return true if already registered
      */
@@ -50,11 +50,11 @@ public class BookDaoBase extends DaoBase {
      * This does not check if data exists in DB
      * This only checks whether the given seriesId is legal value or not
      *
-     * @param seriesId id for book series. Invalid if <= 0.
+     * @param seriesId id for book series. Invalid if < 0.
      * @return true if valid seriesId
      */
     protected boolean isValidBookSeriesId(int seriesId) {
-        return !(seriesId <= 0);
+        return seriesId >= 0;
     }
 
     /**
@@ -66,7 +66,7 @@ public class BookDaoBase extends DaoBase {
      * @return true if valid book volume
      */
     protected boolean isValidBookVolume(int bookVolume) {
-        return !(bookVolume < 0);
+        return bookVolume >= 0;
     }
 
 

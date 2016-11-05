@@ -14,6 +14,8 @@ import com.tablecloth.bookshelf.util.Const;
  */
 public class BookSeriesDao extends BookDaoBase {
 
+    private BookVolumeDao mBookVolumeDao;
+
     /**
      * Constructor
      *
@@ -21,16 +23,18 @@ public class BookSeriesDao extends BookDaoBase {
      */
     public BookSeriesDao(@NonNull Context context) {
         super(context);
+
+        mBookVolumeDao = new BookVolumeDao(context);
     }
 
     /**
      * Load series data, related to given seriesId
      *
-     * @param seriesId id for book series. Invalid if <= 0.
+     * @param seriesId id for book series. Invalid if < 0.
      * @return SeriesData related with seriesId, or null if not found
      */
     @Nullable
-    public SeriesData loadSeriesData(int seriesId) {
+    public SeriesData loadBookSeriesData(int seriesId) {
         if(!isValidBookSeriesId(seriesId)) {
             return null;
         }
@@ -40,9 +44,13 @@ public class BookSeriesDao extends BookDaoBase {
             return null;
         }
 
-        // TODO return value
-        return null;
-//        SeriesData data =
+        try {
+            SeriesData data = createSeriesDataFromCursor(cursor);
+            data.setVolumeList(mBookVolumeDao.loadBookVolumes(data.getSeriesId()));
+            return data;
+        } finally {
+            closeCursor(cursor);
+        }
     }
 
     /**
@@ -58,8 +66,29 @@ public class BookSeriesDao extends BookDaoBase {
             return null;
         }
 
-        SeriesData seriesData = new SeriesData(getStringFromCursor(cursor, Const.DB.BookSeriesTable.TITLE_NAME));
-        seriesData.mSe
+        SeriesData data = new SeriesData(mContext);
+        // basic info
+        data.setTitle(getStringFromCursor(cursor, Const.DB.BookSeriesTable.TITLE_NAME));
+        data.setAuthor(getStringFromCursor(cursor, Const.DB.BookSeriesTable.AUTHOR_NAME));
+        data.setMagazine(getStringFromCursor(cursor, Const.DB.BookSeriesTable.MAGAZINE_NAME));
+        data.setCompany(getStringFromCursor(cursor, Const.DB.BookSeriesTable.COMPANY_NAME));
+        data.setImagePath(getStringFromCursor(cursor, Const.DB.BookSeriesTable.IMAGE_PATH));
+
+        // pronounciation info
+        data.setTitlePronunciation(getStringFromCursor(cursor, Const.DB.BookSeriesTable.TITLE_PRONUNCIATION));
+        data.setAuthorPronunciation(getStringFromCursor(cursor, Const.DB.BookSeriesTable.AUTHOR_PRONUNCIATION));
+        data.setMagazinePronunciation(getStringFromCursor(cursor, Const.DB.BookSeriesTable.MAGAZINE_PRONUNCIATION));
+        data.setCompanyPronunciation(getStringFromCursor(cursor, Const.DB.BookSeriesTable.COMPANY_PRONUNCIATION));
+
+        // additional info
+        data.setMemo(getStringFromCursor(cursor, Const.DB.BookSeriesTable.MEMO));
+        data.setRawTags(getStringFromCursor(cursor, Const.DB.BookSeriesTable.TAGS));
+        // series not complete if value is 0
+        data.setSeriesComplete(!(0== getIntFromCursor(cursor, Const.DB.BookSeriesTable.SERIES_IS_FINISH)));
+        data.setInitUpdateUnix(getLongFromCursor(cursor, Const.DB.BookSeriesTable.INIT_UPDATE_UNIX));
+        data.setLastUpdateUnix(getLongFromCursor(cursor, Const.DB.BookSeriesTable.LAST_UPDATE_UNIX));
+
+        return data;
     }
 
 }

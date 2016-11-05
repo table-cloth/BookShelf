@@ -16,34 +16,6 @@ import com.tablecloth.bookshelf.util.Const;
  */
 public class DaoBase {
 
-//     // Basic info
-//     private  int mSeriesId = -1;
-//     private String mTitle;
-//     private String mAuthor;
-//     private String mCompany;
-//     private String mMagazine;
-//     private String mImagePath;
-//
-//     // Sub info
-//     private String mTitlePronunciation;
-//     private String mAuthorPronunciation;
-//     private String mCompanyPronunciation;
-//     private String mMagazinePronunciation;
-//
-//     //Additional info
-//     private ArrayList<String> mTagsList;
-//     private ArrayList<Integer> mVolumeList;
-//     private String mMemo;
-//     private boolean mIsSeriesComplete = false;
-//
-//     // Update info
-//     private long mInitUpdateUnix;
-//     private long mLastUpdateUnix;
-//
-//     // Cache
-//     private Bitmap mImageCache;
-
-
     /**
      * Context
      */
@@ -123,4 +95,17 @@ public class DaoBase {
     public int getIntFromCursor(@NonNull Cursor cursor, @NonNull String columnIndexKey) {
         return cursor.getInt(cursor.getColumnIndex(columnIndexKey));
     }
+
+    /**
+     * Get value from given key, in given cursor
+     * Cursor will NOT be closed within this method
+     *
+     * @param cursor         cursor
+     * @param columnIndexKey key name
+     * @return value or null key is not valid
+     */
+    public long getLongFromCursor(@NonNull Cursor cursor, @NonNull String columnIndexKey) {
+        return cursor.getLong(cursor.getColumnIndex(columnIndexKey));
+    }
+
 }

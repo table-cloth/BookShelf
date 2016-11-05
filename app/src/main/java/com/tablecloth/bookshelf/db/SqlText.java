@@ -97,7 +97,7 @@ public class SqlText {
     /**
      * Create SQLite text for loading book series for given seriesId
      *
-     * @param seriesId id for book series. Invalid if <= 0.
+     * @param seriesId id for book series. Invalid if < 0.
      * @return SQLite text
      */
     public static String createLoadBookSeriesSQL(int seriesId) {
@@ -112,16 +112,30 @@ public class SqlText {
     /**
      * Create SQLite text for loading book volume in given seriesId
      *
-     * @param seriesId id for book series. Invalid if <= 0.
+     * @param seriesId id for book series. Invalid if < 0.
+     * @return SQLite text
+     */
+    public static String createLoadBookVolumeSQL(int seriesId) {
+        return "SELECT * FROM "
+                + Const.DB.BookVolumeDetailTable.TABLE_NAME
+                + " WHERE "
+                + Const.DB.BookVolumeDetailTable.SERIES_ID
+                + " = "
+                + seriesId;
+    }
+
+    /**
+     * Create SQLite text for loading book volume in given seriesId
+     *
+     * @param seriesId id for book series. Invalid if <x 0.
      * @param volume volume index for a book. Invalid if < 0.
      * @return SQLite text
      */
-    public static String createLoadBookVolumeSQL(int seriesId, int volume)
-    {
+    public static String createLoadBookVolumeSQL(int seriesId, int volume) {
         return "SELECT * FROM "
-                + Const.DB.BookSeriesTable.TABLE_NAME
+                + Const.DB.BookVolumeDetailTable.TABLE_NAME
                 + " WHERE "
-                + Const.DB.BookSeriesTable.SERIES_ID
+                + Const.DB.BookVolumeDetailTable.SERIES_ID
                 + " = "
                 + seriesId
                 + " AND "
@@ -130,6 +144,19 @@ public class SqlText {
                 + volume;
     }
 
-
-
+    /**
+     * Create where clause for updating book volume
+     * Expected where args are
+     * 1. seriesId
+     * 2. bookVolume
+     *
+     * @return WhereClause
+     */
+    public static String createWhereClause4UpdateBookVolume() {
+        return Const.DB.BookVolumeDetailTable.SERIES_ID
+                + " = ? "
+                + " AND "
+                + Const.DB.BookVolumeDetailTable.SERIES_VOLUME
+                + " = ? ";
+    }
 }

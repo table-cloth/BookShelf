@@ -7,12 +7,14 @@ import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Queue;
 
@@ -26,6 +28,8 @@ import com.tablecloth.bookshelf.util.Util;
  * Created by shnomura on 2014/08/16.
  */
 public class SeriesData {
+
+    private final static String TAGS_SEPARATOR_SYMBOL = "\n";
 
     Context mContext;
 
@@ -44,8 +48,8 @@ public class SeriesData {
     private String mMagazinePronunciation;
 
     //Additional info
-    private ArrayList<String> mTagsList;
     private ArrayList<Integer> mVolumeList;
+    private String mRawTags; // raw data of tags, same format as saved in DB
     private String mMemo;
     private boolean mIsSeriesComplete = false;
 
@@ -64,7 +68,6 @@ public class SeriesData {
         mContext = context;
 
         mVolumeList = new ArrayList<>();
-        mTagsList = new ArrayList<>();
 
         mImageCache = null;
         mVolumeTextCache = null;
@@ -251,6 +254,24 @@ public class SeriesData {
     }
 
     /**
+     * Gets rawTags
+     *
+     * @return rawTags
+     */
+    public String getRawTags() {
+        return mRawTags;
+    }
+
+    /**
+     * Sets rawTags
+     *
+     * @param rawTags rawTags
+     */
+    public void setRawTags(String rawTags) {
+        mRawTags = rawTags;
+    }
+
+    /**
      * Gets memo
      *
      * @return memo
@@ -323,6 +344,30 @@ public class SeriesData {
     }
 
     /**
+     * Get text to show volumes
+     * Uses cache if available, else update cache
+     *
+     * @return volume text or "" if no volume is set
+     */
+    @NonNull
+    public String getVolumeText() {
+        if(!Util.isEmpty(mVolumeTextCache)) {
+            return mVolumeTextCache;
+        }
+        mVolumeTextCache = createVolumeText();
+        return mVolumeTextCache;
+    }
+
+    /**
+     * Set volumeList
+     *
+     * @param volumeList volumeList
+     */
+    public void setVolumeList(ArrayList<Integer> volumeList) {
+        mVolumeList = volumeList;
+    }
+
+    /**
      * Add volume to this series
      *
      * @param volume volume
@@ -349,21 +394,6 @@ public class SeriesData {
             // Clear cache since volume data is changed
             clearVolumeTextCache();
         }
-    }
-
-    /**
-     * Get text to show volumes
-     * Uses cache if available, else update cache
-     *
-     * @return volume text or "" if no volume is set
-     */
-    @NonNull
-    public String getVolumeText() {
-        if(!Util.isEmpty(mVolumeTextCache)) {
-            return mVolumeTextCache;
-        }
-        mVolumeTextCache = createVolumeText();
-        return mVolumeTextCache;
     }
 
     /**
@@ -423,6 +453,49 @@ public class SeriesData {
                 });
             }
         });
+    }
+
+    /**
+     * Converts tags list into raw text tags data
+     *
+     * @param tagsList tags list
+     * @return raw text tags data
+     */
+    @NonNull
+    public String convertTagsList2TagsRawText(@Nullable ArrayList<String> tagsList) {
+        StringBuilder rawTagsText = new StringBuilder();
+        boolean isFirstValue = true;
+
+        if(tagsList != null && !tagsList.isEmpty()) {
+            for (String tag : tagsList) {
+                if (isFirstValue) {
+                    isFirstValue = false;
+                } else {
+                    rawTagsText.append(TAGS_SEPARATOR_SYMBOL);
+                }
+                rawTagsText.append(tag);
+            }
+        }
+        return rawTagsText.toString();
+    }
+
+    /**
+     * Converts raw text tags data into tags list
+     *
+     * @param rawTextTagsData raw text tags data
+     * @return tags list
+     */
+    @NonNull
+    public ArrayList<String> convertTagsRawText2TagsList(String rawTextTagsData) {
+        // return if tags is empty
+        if(Util.isEmpty(rawTextTagsData)) {
+            return new ArrayList<>();
+        }
+
+        String[] tagsArray = rawTextTagsData.contains(TAGS_SEPARATOR_SYMBOL)
+                ? rawTextTagsData.split(TAGS_SEPARATOR_SYMBOL)
+                : new String[] {rawTextTagsData};
+        return new ArrayList<>(Arrays.asList(tagsArray));
     }
 
     /**

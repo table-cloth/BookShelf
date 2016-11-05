@@ -265,37 +265,6 @@ public class FilterDao extends DaoBase {
         }
     }
 
-    public static ArrayList<String> getTagsData(String tagsStr) {
-        ArrayList<String> ret = new ArrayList<>();
-        String[] tagsData = null;
-        if(tagsStr != null && tagsStr.length() > 0) {
-            if (tagsStr.contains("\n")) {
-                tagsData = tagsStr.split("\n");
-            } else {
-                tagsData = new String[]{tagsStr};
-            }
-        }
-        if(tagsData != null) {
-            for(int i = 0 ; i < tagsData.length ; i ++) {
-                ret.add(tagsData[i]);
-            }
-        }
-        return ret;
-    }
-
-    public static String getTagsStr(ArrayList<String> tagsStr) {
-        String ret = "";
-        if(tagsStr != null) {
-            for(int i = 0 ; i < tagsStr.size() ; i ++) {
-                if(i != 0) {
-                    ret += "\n";
-                }
-                ret += tagsStr.get(i);
-            }
-        }
-        return ret;
-    }
-
     private static ContentValues convertSeries2ContentValues(SeriesData data, boolean isUpdate) {
         ContentValues cv = new ContentValues();
         // SeriesIdが0以下（設定されていない場合）は登録しない
@@ -320,94 +289,6 @@ public class FilterDao extends DaoBase {
         return cv;
     }
     
-    /**
-     * 巻数情報の保存
-     * 最終更新日時を返す
-     *
-     * @param seriesId 作品用ID
-     * @param volume 巻数
-     */
-    public static void saveVolume(int seriesId, int volume) {
-        if(isSeriesVolumeExist(seriesId, volume)) {
-            ContentValues contentValues = convertSeriesVolume2ContentValues(seriesId, volume, true); 
-            mDb.getSQLiteDatabase().update(DB.BookDetail.TABLE_NAME, contentValues, DB.BookDetail.SERIES_ID + " = ? AND " + DB.BookDetail.SERIES_VOLUME + " = ? ", new String[]{Integer.toString(seriesId), Integer.toString(volume)});
-        } else {
-            ContentValues contentValues = convertSeriesVolume2ContentValues(seriesId, volume, false);
-            mDb.getSQLiteDatabase().insert(DB.BookDetail.TABLE_NAME, null, contentValues);
-
-        }
-
-//        long nowUnix = Calendar.getDB().getTimeInMillis() / 1000L;
-//        data.mLastUpdateUnix = nowUnix;
-//        return nowUnix;
-    }
-    
-    /**
-     * 巻数情報の削除
-     * 復元不可能なので要注意
-     * @param seriesId 作品用ID
-     * @return
-     */
-    public static void deleteVolume(int seriesId, int volume) {
-        mDb.getSQLiteDatabase().delete(DB.BookDetail.TABLE_NAME, DB.BookDetail.SERIES_ID + " = ? AND " + DB.BookDetail.SERIES_VOLUME + " = ?", new String[]{Integer.toString(seriesId), Integer.toString(volume)});
-    }
-    
-    /**
-     * 巻数情報DB用カーソル作成
-     *
-     * @param seriesId 作品用ID
-     * @param volume 巻数
-     * @param isUpdate 更新 or 新規追加かのフラグ
-     * @return
-     */
-    private static ContentValues convertSeriesVolume2ContentValues(int seriesId, int volume, boolean isUpdate) {
-        ContentValues cv = new ContentValues();
-        // SeriesIdが0以下（設定されていない場合）は登録しない
-        if(seriesId > 0) {
-            cv.put(DB.BookDetail.SERIES_ID, seriesId);
-        }
-        cv.put(DB.BookDetail.SERIES_VOLUME, volume);
-        Calendar now = Calendar.getInstance();
-        cv.put(DB.BookDetail.LAST_UPDATE_UNIX, now.getTimeInMillis());
-        if(!isUpdate) cv.put(DB.BookDetail.LAST_UPDATE_UNIX, now.getTimeInMillis());
-        return cv;
-    }
-
-    /**
-     * 巻数情報を取得
-     * @param context
-     * @param seriesId 作品用ID
-     * @return
-     */
-    public static int[] loadVolumes(Context context, int seriesId) {
-        instantiateDB(context);
-
-        StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT * FROM ");
-        sql.append(DB.BookDetail.TABLE_NAME);
-        sql.append(" WHERE " + DB.BookDetail.SERIES_ID + " = " + seriesId);
-
-        Cursor cursor = mDb.getSQLiteDatabase().rawQuery(sql.toString(), null);
-        int[] retData = null;
-
-        // cursorからSeriesDataを生成
-        if(cursor != null) {
-            try {
-                int max = cursor.getCount();
-                retData = new int[max];
-                for(int i = 0 ; i < max ; i ++) {
-                    if(cursor.moveToNext()) {
-                    	retData[i] = cursor.getInt(cursor.getColumnIndex(DB.BookDetail.SERIES_VOLUME));
-                    } else {
-                        break;
-                    }
-                }
-            } finally {
-                cursor.close();
-            }
-        }
-        return retData;
-    }
 
     public static boolean saveTags(Context context, String tag) {
         instantiateDB(context);
