@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,16 +15,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.db.DB;
 import com.tablecloth.bookshelf.db.FilterDao;
 import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
@@ -183,14 +177,14 @@ public class SeriesDetailActivity extends BaseActivity {
             }
             ((TextView)findViewById(R.id.company)).setText(mSeriesData.mCompany);
 	        ((TextView)findViewById(R.id.memo)).setText(mSeriesData.mMemo);
-	        ((TextView)findViewById(R.id.volume)).setText(mSeriesData.getVolumeString());
+	        ((TextView)findViewById(R.id.volume)).setText(mSeriesData.getVolumeText());
             final View plus = findViewById(R.id.plus);
             Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
             if(cacheImage != null) {
                 mImageView.setImageBitmap(cacheImage);
                 plus.setVisibility(View.GONE);
             } else {
-                mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                mSeriesData.loadImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
                     @Override
                     public void onFinish(Bitmap bitmap) {
                         if (bitmap != null) {
@@ -271,7 +265,7 @@ public class SeriesDetailActivity extends BaseActivity {
                         mImageView.setImageBitmap(cacheImage);
                         plus.setVisibility(View.GONE);
                     } else {
-                        mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                        mSeriesData.loadImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
                             @Override
                             public void onFinish(Bitmap bitmap) {
                                 if (bitmap != null) {
@@ -324,7 +318,7 @@ public class SeriesDetailActivity extends BaseActivity {
                     mImageView.setImageBitmap(cacheImage);
                     plus.setVisibility(View.GONE);
                 } else {
-                    mSeriesData.getImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                    mSeriesData.loadImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
                         @Override
                         public void onFinish(Bitmap bitmap) {
                             if (bitmap != null) {

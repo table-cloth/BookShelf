@@ -1,10 +1,12 @@
 package com.tablecloth.bookshelf.db;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Queue;
 
+import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
@@ -23,41 +26,366 @@ import com.tablecloth.bookshelf.util.Util;
  * Created by shnomura on 2014/08/16.
  */
 public class SeriesData {
-    public int mSeriesId = -1;
-    public String mTitle;
-    public String mTitlePronunciation;
-    public String mAuthor;
-    public String mAuthorPronunciation;
-    public String mCompany;
-    public String mCompanyPronunciation;
-    public String mMagazine;
-    public String mMagazinePronunciation;
+
+    Context mContext;
+
+    // Basic info
+    private  int mSeriesId = -1;
+    private String mTitle;
+    private String mAuthor;
+    private String mCompany;
+    private String mMagazine;
+    private String mImagePath;
+
+    // Sub info
+    private String mTitlePronunciation;
+    private String mAuthorPronunciation;
+    private String mCompanyPronunciation;
+    private String mMagazinePronunciation;
+
+    //Additional info
+    private ArrayList<String> mTagsList;
+    private ArrayList<Integer> mVolumeList;
+    private String mMemo;
+    private boolean mIsSeriesComplete = false;
+
+    // Update info
+    private long mInitUpdateUnix;
+    private long mLastUpdateUnix;
+
+    // Cache
     private Bitmap mImageCache;
-    public String mImagePath;
-    public String mMemo;
+    private String mVolumeTextCache;
 
-    public ArrayList<String> mTagsList;
-    public boolean mIsSeriesEnd = false;
-    public ArrayList<Integer> mVolumeList;
+    /**
+     * Constructor
+     */
+    public SeriesData(@NonNull Context context) {
+        mContext = context;
 
-    public long mInitUpdateUnix;
-    public long mLastUpdateUnix;
+        mVolumeList = new ArrayList<>();
+        mTagsList = new ArrayList<>();
 
-    public SeriesData(String seriesName) {
-        mTitle = seriesName;
-        mVolumeList = new ArrayList<Integer>();
-        mTagsList = new ArrayList<String>();
+        mImageCache = null;
+        mVolumeTextCache = null;
     }
-    
-    public void getImage(final Handler handler, Activity activity, final ListenerUtil.LoadBitmapListener listener) {
-    	if(mImageCache != null) {
+
+    /**
+     * Gets seriesId
+     *
+     * @return seriesId
+     */
+    public int getSeriesId() {
+        return mSeriesId;
+    }
+
+    /**
+     * Sets seriesId
+     *
+     * @param seriesId seriesId
+     */
+    public void setSeriesId(int seriesId) {
+        mSeriesId = seriesId;
+    }
+
+    /**
+     * Gets title
+     *
+     * @return title
+     */
+    public String getTitle() {
+        return mTitle;
+    }
+
+    /**
+     * Sets title
+     *
+     * @param title title
+     */
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+
+    /**
+     * Gets author
+     *
+     * @return author
+     */
+    public String getAuthor() {
+        return mAuthor;
+    }
+
+    /**
+     * Sets author
+     *
+     * @param author author
+     */
+    public void setAuthor(String author) {
+        mAuthor = author;
+    }
+
+    /**
+     * Gets company
+     *
+     * @return company
+     */
+    public String getCompany() {
+        return mCompany;
+    }
+
+    /**
+     * Sets company
+     *
+     * @param company company
+     */
+    public void setCompany(String company) {
+        mCompany = company;
+    }
+
+    /**
+     * Gets magazine
+     *
+     * @return magazine
+     */
+    public String getMagazine() {
+        return mMagazine;
+    }
+
+    /**
+     * Sets magazine
+     *
+     * @param magazine magazine
+     */
+    public void setMagazine(String magazine) {
+        mMagazine = magazine;
+    }
+
+    /**
+     * Gets imagePath
+     *
+     * @return imagePath
+     */
+    public String getImagePath() {
+        return mImagePath;
+    }
+
+    /**
+     * Sets imagePath
+     *
+     * @param imagePath imagePath
+     */
+    public void setImagePath(String imagePath) {
+        mImagePath = imagePath;
+    }
+
+    /**
+     * Gets titlePronunciation
+     *
+     * @return titlePronunciation
+     */
+    public String getTitlePronunciation() {
+        return mTitlePronunciation;
+    }
+
+    /**
+     * Sets titlePronunciation
+     *
+     * @param titlePronunciation titlePronunciation
+     */
+    public void setTitlePronunciation(String titlePronunciation) {
+        mTitlePronunciation = titlePronunciation;
+    }
+
+    /**
+     * Gets authorPronunciation
+     *
+     * @return authorPronunciation
+     */
+    public String getAuthorPronunciation() {
+        return mAuthorPronunciation;
+    }
+
+    /**
+     * Sets authorPronunciation
+     *
+     * @param authorPronunciation authorPronunciation
+     */
+    public void setAuthorPronunciation(String authorPronunciation) {
+        mAuthorPronunciation = authorPronunciation;
+    }
+
+    /**
+     * Gets companyPronunciation
+     *
+     * @return companyPronunciation
+     */
+    public String getCompanyPronunciation() {
+        return mCompanyPronunciation;
+    }
+
+    /**
+     * Sets companyPronunciation
+     *
+     * @param companyPronunciation companyPronunciation
+     */
+    public void setCompanyPronunciation(String companyPronunciation) {
+        mCompanyPronunciation = companyPronunciation;
+    }
+
+    /**
+     * Gets magazinePronunciation
+     *
+     * @return magazinePronunciation
+     */
+    public String getMagazinePronunciation() {
+        return mMagazinePronunciation;
+    }
+
+    /**
+     * Sets magazinePronunciation
+     *
+     * @param magazinePronunciation magazinePronunciation
+     */
+    public void setMagazinePronunciation(String magazinePronunciation) {
+        mMagazinePronunciation = magazinePronunciation;
+    }
+
+    /**
+     * Gets memo
+     *
+     * @return memo
+     */
+    public String getMemo() {
+        return mMemo;
+    }
+
+    /**
+     * Sets memo
+     *
+     * @param memo memo
+     */
+    public void setMemo(String memo) {
+        mMemo = memo;
+    }
+
+    /**
+     * Gets seriesComplete
+     *
+     * @return seriesComplete
+     */
+    public boolean isSeriesComplete() {
+        return mIsSeriesComplete;
+    }
+
+    /**
+     * Sets seriesComplete
+     *
+     * @param seriesComplete seriesComplete
+     */
+    public void setSeriesComplete(boolean seriesComplete) {
+        mIsSeriesComplete = seriesComplete;
+    }
+
+    /**
+     * Gets initUpdateUnix
+     *
+     * @return initUpdateUnix
+     */
+    public long getInitUpdateUnix() {
+        return mInitUpdateUnix;
+    }
+
+    /**
+     * Sets initUpdateUnix
+     *
+     * @param initUpdateUnix initUpdateUnix
+     */
+    public void setInitUpdateUnix(long initUpdateUnix) {
+        mInitUpdateUnix = initUpdateUnix;
+    }
+
+    /**
+     * Gets lastUpdateUnix
+     *
+     * @return lastUpdateUnix
+     */
+    public long getLastUpdateUnix() {
+        return mLastUpdateUnix;
+    }
+
+    /**
+     * Sets lastUpdateUnix
+     *
+     * @param lastUpdateUnix lastUpdateUnix
+     */
+    public void setLastUpdateUnix(long lastUpdateUnix) {
+        mLastUpdateUnix = lastUpdateUnix;
+    }
+
+    /**
+     * Add volume to this series
+     *
+     * @param volume volume
+     */
+    public void addVolume(int volume) {
+        if(!mVolumeList.contains(volume)) {
+            mVolumeList.add(volume);
+
+            // Clear cache since volume data is changed
+            clearVolumeTextCache();
+        }
+    }
+
+    /**
+     * Remove volume from this series
+     *
+     * @param volume volume
+     */
+    public void removeVolume(int volume) {
+    	int index = mVolumeList.indexOf(volume);
+    	if(index >= 0 && index < mVolumeList.size()) {
+            mVolumeList.remove(index);
+
+            // Clear cache since volume data is changed
+            clearVolumeTextCache();
+        }
+    }
+
+    /**
+     * Get text to show volumes
+     * Uses cache if available, else update cache
+     *
+     * @return volume text or "" if no volume is set
+     */
+    @NonNull
+    public String getVolumeText() {
+        if(!Util.isEmpty(mVolumeTextCache)) {
+            return mVolumeTextCache;
+        }
+        mVolumeTextCache = createVolumeText();
+        return mVolumeTextCache;
+    }
+
+    /**
+     * Load bitmap image
+     * Uses cache if available
+     * If failed to load image from file path, it will re-try loading from url
+     *
+     * @param handler handler
+     * @param activity activity
+     * @param listener LoadBitmapListener instance
+     */
+    public void loadImage(@NonNull final Handler handler, @NonNull Activity activity, @NonNull final ListenerUtil.LoadBitmapListener listener) {
+        if(mImageCache != null) {
             listener.onFinish(mImageCache);
             return;
         }
-    	if(Util.isEmpty(mImagePath)) {
+        if(Util.isEmpty(mImagePath)) {
+            listener.onError();
             return;
         }
-        // 画像パスからの取得
+
+        // Try loading image from file path
         getImageByPath(activity, new ListenerUtil.LoadBitmapListener() {
             @Override
             public void onFinish(final Bitmap bitmap) {
@@ -71,7 +399,7 @@ public class SeriesData {
 
             @Override
             public void onError() {
-                // パスからの取得に失敗した場合はURLからの取得を試す
+                // If failed to load image from file path, re-try loading image from url
                 getImageByUrl(new ListenerUtil.LoadBitmapListener() {
                     @Override
                     public void onFinish(final Bitmap bitmap) {
@@ -98,9 +426,86 @@ public class SeriesData {
     }
 
     /**
-     * 画像ファイルパスから画像を取得する
-     * @param activity
-     * @param listener
+     * Clear volume text cache
+     */
+    private void clearVolumeTextCache() {
+        mVolumeTextCache = null;
+    }
+
+    /**
+     * Creates text to show volumes from list
+     * list will be sorted before generating text
+     *
+     * @return volume text
+     */
+    @NonNull
+    private String createVolumeText() {
+
+        // return if no volume is set
+        if(mVolumeList == null || mVolumeList.size() <= 0) {
+            mContext.getString(R.string.series_data_no_volume);
+        }
+
+
+        // sort so list becomes smaller value -> larger value
+        Collections.sort(mVolumeList);
+
+        // initialize values with first index value
+        StringBuilder volumeTextBuilder = new StringBuilder();
+        int firstVolume = mVolumeList.get(0); // first volume set in list
+        int currentVolume; // current volume in loop
+        int prevVolume = firstVolume; // previous volume in loop
+        int firstVolume4CurrentConsecutive = firstVolume; // start volume of current consecutive
+
+        // go through list from smaller values
+        for(int i = 1; i < mVolumeList.size() ; i ++) {
+            currentVolume = mVolumeList.get(i);
+            boolean isLastVolume = i + 1 == mVolumeList.size();
+
+            // if last value or current volume is not consecutive
+            if(isLastVolume
+                    || currentVolume != prevVolume + 1) {
+                // If current first consecutive volume does not equal first volume if list
+                if(firstVolume4CurrentConsecutive != firstVolume) {
+                    volumeTextBuilder.append(
+                            mContext.getString(R.string.series_data_volume_separator_symbol));
+                }
+
+                // use current volume if this is last volume, else use prevVolume
+                int volume = isLastVolume
+                        ? currentVolume
+                        * prevVolume;
+
+                // if volume is consecutive
+                if(firstVolume4CurrentConsecutive < volume) {
+                    String text = firstVolume4CurrentConsecutive
+                            + mContext.getString(R.string.series_data_volume_symbol)
+                            + mContext.getString(R.string.series_data_volume_conjunction_symbol)
+                            + volume
+                            + mContext.getString(R.string.series_data_volume_conjunction_symbol);
+                    volumeTextBuilder.append(text);
+                }
+                // if volume is not consecutive
+                else {
+                    String text = volume
+                            + mContext.getString(R.string.series_data_volume_symbol);
+                    volumeTextBuilder.append(text);
+                }
+
+                firstVolume4CurrentConsecutive = currentVolume;
+            }
+            prevVolume = currentVolume;
+        }
+
+        return volumeTextBuilder.toString();
+    }
+
+    /**
+     * Load image bitmap from file path
+     * Result will be given to LoadBitmapLister
+     *
+     * @param activity activity
+     * @param listener LoadBitmapListener instance
      */
     private void getImageByPath(Activity activity, ListenerUtil.LoadBitmapListener listener) {
         if(Util.isEmpty(mImagePath)) {
@@ -129,19 +534,21 @@ public class SeriesData {
                 return;
             }
         } catch(OutOfMemoryError e) {
-            ToastUtil.show(activity, "メモリー不足のため、画像の取得に失敗しました");
+            ToastUtil.show(activity, mContext.getString(R.string.series_data_error_load_image_by_memory));
             ImageUtil.clearCache();
             e.printStackTrace();
         } catch (IOException e) {
-            ToastUtil.show(activity, "予期せぬエラーのため、画像の取得に失敗しました");
+            ToastUtil.show(activity, mContext.getString(R.string.series_data_error_load_image));
             e.printStackTrace();
         }
         listener.onError();
     }
 
     /**
-     * 画像URLから画像を取得する
-     * @param listener
+     * Load image bitmap from url
+     * Result will be given to LoadBitmapLister
+     *
+     * @param listener LoadBitmapListener instance
      */
     private void getImageByUrl(final ListenerUtil.LoadBitmapListener listener) {
         if(Util.isEmpty(mImagePath)) {
@@ -169,92 +576,4 @@ public class SeriesData {
             }
         }).start();
     }
-
-    public void setImage(String filePath, Bitmap bitmap) {
-    	if(bitmap == null) {
-    		if(mImageCache != null) {
-    			mImageCache.recycle();
-    			mImageCache = null;
-    		}
-    	} else {
-    		mImageCache = bitmap;
-    	}
-    	mImagePath = filePath;
-    }
-    public void setImage(String filePath) {
-    	setImage(filePath, null);
-    }
-
-    public SeriesData() {
-        mVolumeList = new ArrayList<Integer>();
-        mTagsList = new ArrayList<String>();
-    }
-
-
-    /**
-     * 小さい巻数->最大巻数の順番入っている前提
-     * @param volume
-     */
-    public void addVolume(int volume) {
-        // 新しく所持巻情報を追加
-        mVolumeList.add(volume);
-        Collections.sort(mVolumeList);
-    }
-
-    public void removeVolume(int volume) {
-        // 新しく所持巻情報を追加
-    	int index = mVolumeList.indexOf(volume);
-    	if(index >= 0) mVolumeList.remove(index);
-    	Collections.sort(mVolumeList);
-    }
-
-    public String getVolumeString() {
-        String ret = "";
-        int prevVolume = -1; // 最後に所持情報がある巻数
-        int firstContinueVolume = -1; // 連番が始まった巻数
-        int firstVolume = 0; // はじめに記録された巻数
-        //ソート処理
-        Collections.sort(mVolumeList);
-
-        // 所持している巻数を小さいものから順番に見ていく
-        for(int i = 0 ; i <= mVolumeList.size() ; i ++ ) {
-            int value = -1;
-        	if(i < mVolumeList.size()) {
-        		value = mVolumeList.get(i);
-        	}
-
-            // はじめの巻専用
-            if(i == 0) {
-            	firstVolume = value;
-                firstContinueVolume = value;
-                prevVolume = value;
-            }
-            // 連番中
-            else if(prevVolume + 1 == value) {
-            	prevVolume = value;
-            // 連番終了・または単発の巻数がある
-            } else {
-            	if(firstVolume != firstContinueVolume) {
-            		ret += "、";
-            	}
-            	// 連番
-            	if(firstContinueVolume < prevVolume) {
-            		ret += firstContinueVolume + "巻 〜 " + prevVolume + "巻";
-            	}
-            	// 単発
-            	else {
-            		ret += prevVolume + "巻";
-            	}
-            	
-            	firstContinueVolume = value;
-            	prevVolume = value;
-            }
-        }
-    	
-        if(mVolumeList.size() <= 0) {
-            ret += "所持巻なし";
-        }
-        return ret;
-    }
-
 }

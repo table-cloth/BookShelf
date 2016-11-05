@@ -84,12 +84,52 @@ public class SqlText {
      * @param key Key of setting
      * @return SQLite text
      */
-    public static String loadSettingsSQL(String key) {
-        StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT * FROM ");
-        sql.append(Const.DB.Settings.SettingsTable.TABLE_NAME);
-        sql.append(" WHERE " + Const.DB.Settings.SettingsTable.KEY + " = " + "'" + key + "'");
-        return sql.toString();
+    public static String createLoadSettingsSQL(String key) {
+        return " SELECT * FROM "
+                + Const.DB.Settings.SettingsTable.TABLE_NAME
+                + " WHERE "
+                + Const.DB.Settings.SettingsTable.KEY
+                + " = '"
+                + key
+                + "'";
     }
+
+    /**
+     * Create SQLite text for loading book series for given seriesId
+     *
+     * @param seriesId id for book series. Invalid if <= 0.
+     * @return SQLite text
+     */
+    public static String createLoadBookSeriesSQL(int seriesId) {
+        return "SELECT * FROM "
+                + Const.DB.BookSeriesTable.TABLE_NAME
+                + " WHERE "
+                + Const.DB.BookSeriesTable.SERIES_ID
+                + " = "
+                + seriesId;
+    }
+
+    /**
+     * Create SQLite text for loading book volume in given seriesId
+     *
+     * @param seriesId id for book series. Invalid if <= 0.
+     * @param volume volume index for a book. Invalid if < 0.
+     * @return SQLite text
+     */
+    public static String createLoadBookVolumeSQL(int seriesId, int volume)
+    {
+        return "SELECT * FROM "
+                + Const.DB.BookSeriesTable.TABLE_NAME
+                + " WHERE "
+                + Const.DB.BookSeriesTable.SERIES_ID
+                + " = "
+                + seriesId
+                + " AND "
+                + Const.DB.BookVolumeDetailTable.SERIES_VOLUME
+                + " = "
+                + volume;
+    }
+
+
 
 }

@@ -62,7 +62,7 @@ public class SettingsDao extends DaoBase {
     public String load(String key, String defValue) {
         // Get cursor with given key
         SQLiteDatabase sqLiteDatabase = DB.getDB(mContext).getSQLiteDatabase(mContext);
-        Cursor cursor = sqLiteDatabase.rawQuery(SqlText.loadSettingsSQL(key), null);
+        Cursor cursor = sqLiteDatabase.rawQuery(SqlText.createLoadSettingsSQL(key), null);
         // return if cursor not found
         if(cursor == null) {
             return defValue;

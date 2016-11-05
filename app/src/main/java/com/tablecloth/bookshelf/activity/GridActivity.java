@@ -106,7 +106,7 @@ public class GridActivity extends MainBaseActivity {
                     if(mMode == G.MODE_API_SEARCH_RESULT) {
                         volume.setVisibility(View.GONE);
                     } else {
-                        volume.setText(series.getVolumeString());
+                        volume.setText(series.getVolumeText());
                         volume.setVisibility(View.VISIBLE);
                     }
                     Bitmap cacheImage = null;
@@ -118,7 +118,7 @@ public class GridActivity extends MainBaseActivity {
                         image.setImageBitmap(cacheImage);
                     } else {
                         final int seriesId = series.mSeriesId;
-                        series.getImage(mHandler, GridActivity.this, new ListenerUtil.LoadBitmapListener() {
+                        series.loadImage(mHandler, GridActivity.this, new ListenerUtil.LoadBitmapListener() {
                             @Override
                             public void onFinish(Bitmap bitmap) {
                                 if (bitmap != null) {

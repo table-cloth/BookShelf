@@ -57,59 +57,6 @@ public class FilterDao extends DaoBase {
     }
 
     /**
-     * SeriesIDを取得、取得失敗した場合は-1を返す
-     * @param lastUpdateUnix
-     * @return
-     */
-    public static int getSeriesId(long lastUpdateUnix) {
-        Cursor cursor = mDb.getSQLiteDatabase().rawQuery("SELECT " + DB.BookSeriesTable.SERIES_ID + " FROM " + DB.BookSeriesTable.TABLE_NAME + " WHERE " + DB.BookSeriesTable.LAST_UPDATE_UNIX + " = " + lastUpdateUnix, null);
-        if(cursor.moveToFirst()) {
-            // データが存在する
-            return cursor.getInt(cursor.getColumnIndex(DB.BookSeriesTable.SERIES_ID));
-        } else {
-            // データが存在しない
-            return -1;
-        }
-
-    }
-
-    /**
-     * そのシリーズが登録済みかを確認
-     * @param seriesId
-     * @return
-     */
-    private static boolean isSeriesExist(int seriesId) {
-        // IDがそもそも設定されていない場合
-        if(seriesId <= 0) {
-            return false;
-        }
-
-        Cursor cursor = mDb.getSQLiteDatabase().rawQuery("SELECT * FROM " + DB.BookSeriesTable.TABLE_NAME + " WHERE " + DB.BookSeriesTable.SERIES_ID + " = " + seriesId, null);
-        if(cursor.moveToFirst()) {
-            // データが存在する
-            return true;
-        } else {
-            // データが存在しない
-            return false;
-        }
-    }
-    private static boolean isSeriesVolumeExist(int seriesId, int volume) {
-        // IDがそもそも設定されていない場合
-        if(seriesId <= 0 || volume < 0) {
-            return false;
-        }
-        Cursor cursor = mDb.getSQLiteDatabase().rawQuery("SELECT * FROM " + DB.BookDetail.TABLE_NAME + " WHERE " + DB.BookDetail.SERIES_ID + " = " + seriesId + " AND " + DB.BookDetail.SERIES_VOLUME + " = " + volume, null);
-        if(cursor.moveToFirst()) {
-            // データが存在する
-            return true;
-        } else {
-            // データが存在しない
-            return false;
-        }
-    }
-    
-
-    /**
      * 全てのシリーズ情報の取得
      * @param context
      * @return
@@ -205,9 +152,9 @@ public class FilterDao extends DaoBase {
 
                         int isSeriesEnd = cursor.getInt(cursor.getColumnIndex(DB.BookSeriesTable.SERIES_IS_FINISH));
                         if(isSeriesEnd == 0) {
-                            retData[i].mIsSeriesEnd = false;
+                            retData[i].mIsSeriesComplete = false;
                         } else {
-                            retData[i].mIsSeriesEnd = true;
+                            retData[i].mIsSeriesComplete = true;
                         }
                         retData[i].mInitUpdateUnix = cursor.getLong(cursor.getColumnIndex(DB.BookSeriesTable.INIT_UPDATE_UNIX));
                         retData[i].mLastUpdateUnix = cursor.getLong(cursor.getColumnIndex(DB.BookSeriesTable.LAST_UPDATE_UNIX));
@@ -278,9 +225,9 @@ public class FilterDao extends DaoBase {
 
                         int isSeriesEnd = cursor.getInt(cursor.getColumnIndex(DB.BookSeriesTable.SERIES_IS_FINISH));
                         if(isSeriesEnd == 0) {
-                            retData.mIsSeriesEnd = false;
+                            retData.mIsSeriesComplete = false;
                         } else {
-                            retData.mIsSeriesEnd = true;
+                            retData.mIsSeriesComplete = true;
                         }
                         retData.mInitUpdateUnix = cursor.getLong(cursor.getColumnIndex(DB.BookSeriesTable.INIT_UPDATE_UNIX));
                         retData.mLastUpdateUnix = cursor.getLong(cursor.getColumnIndex(DB.BookSeriesTable.LAST_UPDATE_UNIX));
@@ -366,7 +313,7 @@ public class FilterDao extends DaoBase {
         cv.put(DB.BookSeriesTable.IMAGE_PATH, data.mImagePath);
         cv.put(DB.BookSeriesTable.MEMO, data.mMemo);
         cv.put(DB.BookSeriesTable.TAGS, getTagsStr(data.mTagsList));
-        cv.put(DB.BookSeriesTable.SERIES_IS_FINISH, data.mIsSeriesEnd);
+        cv.put(DB.BookSeriesTable.SERIES_IS_FINISH, data.mIsSeriesComplete);
         Calendar now = Calendar.getInstance();
         cv.put(DB.BookSeriesTable.LAST_UPDATE_UNIX, now.getTimeInMillis());
         if(!isUpdate) cv.put(DB.BookSeriesTable.LAST_UPDATE_UNIX, now.getTimeInMillis());
