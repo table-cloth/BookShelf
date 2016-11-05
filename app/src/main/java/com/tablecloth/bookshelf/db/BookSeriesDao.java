@@ -5,9 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.tablecloth.bookshelf.util.Const;
+import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Util;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -48,12 +52,71 @@ public class BookSeriesDao extends BookDaoBase {
         }
 
         try {
-            SeriesData data = createSeriesDataFromCursor(cursor);
-            data.setVolumeList(mBookVolumeDao.loadBookVolumes(data.getSeriesId()));
-            return data;
+            if(cursor.moveToFirst()) {
+                SeriesData data = createSeriesDataFromCursor(cursor);
+                if(data != null) {
+                    data.setVolumeList(mBookVolumeDao.loadBookVolumes(data.getSeriesId()));
+                    return data;
+                }
+            }
         } finally {
             closeCursor(cursor);
         }
+        return null;
+    }
+
+    /**
+     * Load all series data
+     *
+     * @return list of SeriesData found, or null if not found
+     */
+    @Nullable
+    public ArrayList<SeriesData> loadAllBookSeriesDataList() {
+        return loadBookSeriesDataList(G.SEARCH_MODE_ALL, "");
+    }
+
+    /**
+     * Load all series data related with search mode & search content
+     *
+     * @param rawSearchMode search mode
+     * @param rawSearchText search text
+     * @return list of SeriesData found, or null if not found
+     */
+    @Nullable
+    public ArrayList<SeriesData> loadBookSeriesDataList(int rawSearchMode, String rawSearchText) {
+        // init search content if invalid
+        if(Util.isEmpty(rawSearchText)) {
+            rawSearchText = "";
+        }
+
+        // split search content by space & double byte space
+        String[] searchContent = rawSearchText.split("[ 　]");
+        if(Util.isEmpty(searchContent)) {
+            searchContent = new String[] {rawSearchText};
+        }
+
+        int[] searchMode = rawSearchMode == G.SEARCH_MODE_ALL
+                ? new int[] {G.SEARCH_MODE_TITLE, G.SEARCH_MODE_AUTHOR, G.SEARCH_MODE_COMPANY, G.SEARCH_MODE_MAGAZINES , G.SEARCH_MODE_TAG}
+                : new int[] {rawSearchMode};
+
+        Cursor cursor = openCursor(SqlText.createSearchBookSeriesSQL(searchMode, searchContent));
+        if(cursor == null) {
+            return null;
+        }
+
+        ArrayList<SeriesData> seriesDataList = new ArrayList<>();
+        try {
+            for (boolean nextIsAvailable = cursor.moveToFirst(); nextIsAvailable; nextIsAvailable = cursor.moveToNext()) {
+                SeriesData data = createSeriesDataFromCursor(cursor);
+                if(data != null) {
+                    data.setVolumeList(mBookVolumeDao.loadBookVolumes(data.getSeriesId()));
+                    seriesDataList.add(data);
+                }
+            }
+        } finally {
+            closeCursor(cursor);
+        }
+        return seriesDataList;
     }
 
     /**

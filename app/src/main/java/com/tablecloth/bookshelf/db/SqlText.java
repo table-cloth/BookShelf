@@ -1,6 +1,7 @@
 package com.tablecloth.bookshelf.db;
 
 import com.tablecloth.bookshelf.util.Const;
+import com.tablecloth.bookshelf.util.G;
 
 /**
  * Created by nomura on 2016/11/04.
@@ -110,6 +111,78 @@ public class SqlText {
     }
 
     /**
+     * Create SQLite text for loading book series that matches given data
+     *
+     * @param searchMode search mode
+     * @param searchContent search text content
+     * @return SQLite text
+     */
+    public static String createSearchBookSeriesSQL(int[] searchMode, String[] searchContent) {
+        StringBuilder sql = new StringBuilder()
+                .append("SELECT * FROM ")
+                .append(Const.DB.BookSeriesTable.TABLE_NAME);
+
+        // loop each search word
+        boolean isFirstSearchWord = true;
+        for(String searchWord : searchContent) {
+            // add AND clause after first search word
+            if(isFirstSearchWord) {
+                isFirstSearchWord = false;
+                sql.append(" WHERE ");
+            } else {
+                sql.append(" AND ");
+            }
+
+            // start next search word block
+            sql.append(" ( ");
+
+            // loop each search mode
+            boolean isFirstMode = true;
+            for(int mode : searchMode) {
+                // add OR clause after first mode
+                if(isFirstMode) {
+                    isFirstMode = false;
+                } else {
+                    sql.append(" OR ");
+                }
+
+                switch(mode) {
+                    case G.SEARCH_MODE_TITLE:
+                        sql.append(Const.DB.BookSeriesTable.TITLE_NAME);
+                        break;
+                    case G.SEARCH_MODE_AUTHOR:
+                        sql.append(Const.DB.BookSeriesTable.AUTHOR_NAME);
+                        break;
+                    case G.SEARCH_MODE_COMPANY:
+                        sql.append(Const.DB.BookSeriesTable.COMPANY_NAME);
+                        break;
+                    case G.SEARCH_MODE_MAGAZINES:
+                        sql.append(Const.DB.BookSeriesTable.MAGAZINE_NAME);
+                        break;
+                    case G.SEARCH_MODE_TAG:
+                        sql.append(Const.DB.BookSeriesTable.TAGS);
+                        break;
+                    // safety net to avoid illegal sql
+                    // will check title, since it is the most basic search mode
+                    default:
+                        sql.append(Const.DB.BookSeriesTable.TITLE_NAME);
+                        break;
+                }
+
+                sql.append(" LIKE '%");
+                sql.append(searchWord);
+                sql.append("%' ");
+            }
+
+            // close search word block
+            sql.append(" ) ");
+        }
+        return sql.toString();
+    }
+
+
+
+    /**
      * Create SQLite text for loading book volume in given seriesId
      *
      * @param seriesId id for book series. Invalid if < 0.
@@ -123,6 +196,7 @@ public class SqlText {
                 + " = "
                 + seriesId;
     }
+
 
     /**
      * Create SQLite text for loading book volume in given seriesId
@@ -213,6 +287,4 @@ public class SqlText {
         return Const.DB.TagHistoryTable.TAG_NAME
                 + " = ? ";
     }
-
-
 }

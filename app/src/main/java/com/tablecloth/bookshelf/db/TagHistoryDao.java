@@ -53,7 +53,7 @@ public class TagHistoryDao extends DaoBase {
 
         try {
             ArrayList<String> tagsList = new ArrayList<>();
-            for (boolean next = cursor.moveToFirst(); next; next = cursor.moveToNext()) {
+            for (boolean nextIsAvailable = cursor.moveToFirst(); nextIsAvailable; nextIsAvailable = cursor.moveToNext()) {
                 String value = getStringFromCursor(cursor, Const.DB.TagHistoryTable.TAG_NAME);
                 if(!Util.isEmpty(value)) {
                     tagsList.add(value);

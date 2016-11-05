@@ -46,7 +46,7 @@ public class BookVolumeDao extends BookDaoBase {
 
         try {
             ArrayList<Integer> bookVolumeList = new ArrayList<>();
-            for (boolean next = cursor.moveToFirst(); next; next = cursor.moveToNext()) {
+            for (boolean nextIsAvailable = cursor.moveToFirst(); nextIsAvailable; nextIsAvailable = cursor.moveToNext()) {
                 bookVolumeList.add(getIntFromCursor(cursor, Const.DB.BookVolumeDetailTable.SERIES_VOLUME));
             }
             return bookVolumeList;
