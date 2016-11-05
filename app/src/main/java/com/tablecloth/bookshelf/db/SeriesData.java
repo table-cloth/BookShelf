@@ -532,7 +532,7 @@ public class SeriesData {
 
         // return if no volume is set
         if(mVolumeList == null || mVolumeList.size() <= 0) {
-            mContext.getString(R.string.series_data_no_volume);
+            return mContext.getString(R.string.series_data_no_volume);
         }
 
 
