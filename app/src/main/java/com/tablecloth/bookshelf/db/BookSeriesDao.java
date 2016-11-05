@@ -1,11 +1,14 @@
 package com.tablecloth.bookshelf.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.tablecloth.bookshelf.util.Const;
+
+import java.util.Calendar;
 
 /**
  * Data accessor for book series
@@ -54,6 +57,52 @@ public class BookSeriesDao extends BookDaoBase {
     }
 
     /**
+     * Saves book series data
+     *
+     * @param seriesData series data to save.
+     * @return is save success
+     */
+    public boolean saveSeries(SeriesData seriesData) {
+        if(seriesData == null
+                || !isValidBookSeriesId(seriesData.getSeriesId())) {
+            return false;
+        }
+
+        boolean isUpdate = isBookSeriesRegistered(seriesData.getSeriesId());
+        ContentValues contentValues = createContentValues4BookSeries(seriesData, isUpdate);
+        if(contentValues == null) {
+            return false;
+        }
+
+        if(isUpdate) {
+            int result = DB.getDB(mContext).getSQLiteDatabase(mContext).update(
+                    Const.DB.BookSeriesTable.TABLE_NAME,
+                    contentValues,
+                    SqlText.createWhereClause4UpdateBookSeries(),
+                    new String[]{Integer.toString(seriesData.getSeriesId())});
+            return result >= 0;
+        } else {
+            long result = DB.getDB(mContext).getSQLiteDatabase(mContext).insert(
+                    Const.DB.BookSeriesTable.TABLE_NAME, null, contentValues);
+            return result != -1L;
+        }
+    }
+
+    /**
+     * Deletes book series data
+     *
+     * @param seriesId id for book series. Invalid if <x 0.
+     * @return is delete success
+     */
+    public boolean deleteBookSeries(int seriesId) {
+        int result = DB.getDB(mContext).getSQLiteDatabase(mContext).delete(
+                Const.DB.BookSeriesTable.TABLE_NAME,
+                SqlText.createWhereClause4UpdateBookSeries(),
+                new String[] {Integer.toString(seriesId)});
+        return result >= 0;
+    }
+
+    /**
      * Create SeriesData from cursor's current position
      * Cursor will NOT be closed within this method
      *
@@ -74,7 +123,7 @@ public class BookSeriesDao extends BookDaoBase {
         data.setCompany(getStringFromCursor(cursor, Const.DB.BookSeriesTable.COMPANY_NAME));
         data.setImagePath(getStringFromCursor(cursor, Const.DB.BookSeriesTable.IMAGE_PATH));
 
-        // pronounciation info
+        // pronunciation info
         data.setTitlePronunciation(getStringFromCursor(cursor, Const.DB.BookSeriesTable.TITLE_PRONUNCIATION));
         data.setAuthorPronunciation(getStringFromCursor(cursor, Const.DB.BookSeriesTable.AUTHOR_PRONUNCIATION));
         data.setMagazinePronunciation(getStringFromCursor(cursor, Const.DB.BookSeriesTable.MAGAZINE_PRONUNCIATION));
@@ -91,4 +140,44 @@ public class BookSeriesDao extends BookDaoBase {
         return data;
     }
 
+    /**
+     * Create ContentValues for given SeriesData
+     *
+     * @param seriesData SeriesData instance.
+     * @param isUpdate whether is updating, or newly adding
+     * @return ContentValues instance or null if invalid data is given
+     */
+    @Nullable
+    private ContentValues createContentValues4BookSeries(SeriesData seriesData, boolean isUpdate) {
+        // return null if invalid value is given
+        if(!isValidBookSeriesId(seriesData.getSeriesId())) {
+            return null;
+        }
+
+        Calendar now = Calendar.getInstance();
+        ContentValues contentValues = new ContentValues();
+        // basic info
+        contentValues.put(Const.DB.BookSeriesTable.SERIES_ID, seriesData.getSeriesId());
+        contentValues.put(Const.DB.BookSeriesTable.TITLE_NAME, seriesData.getTitle());
+        contentValues.put(Const.DB.BookSeriesTable.AUTHOR_NAME, seriesData.getAuthor());
+        contentValues.put(Const.DB.BookSeriesTable.MAGAZINE_NAME, seriesData.getMagazine());
+        contentValues.put(Const.DB.BookSeriesTable.COMPANY_NAME, seriesData.getCompany());
+        contentValues.put(Const.DB.BookSeriesTable.IMAGE_PATH, seriesData.getImagePath());
+
+        // pronunciation info
+        contentValues.put(Const.DB.BookSeriesTable.TITLE_PRONUNCIATION, seriesData.getTitlePronunciation());
+        contentValues.put(Const.DB.BookSeriesTable.AUTHOR_PRONUNCIATION, seriesData.getAuthorPronunciation());
+        contentValues.put(Const.DB.BookSeriesTable.MAGAZINE_PRONUNCIATION, seriesData.getMagazinePronunciation());
+        contentValues.put(Const.DB.BookSeriesTable.COMPANY_PRONUNCIATION, seriesData.getCompanyPronunciation());
+
+        contentValues.put(Const.DB.BookSeriesTable.MEMO, seriesData.getMemo());
+        contentValues.put(Const.DB.BookSeriesTable.TAGS, seriesData.getRawTags());
+        contentValues.put(Const.DB.BookSeriesTable.SERIES_IS_FINISH, seriesData.isSeriesComplete());
+        contentValues.put(Const.DB.BookSeriesTable.LAST_UPDATE_UNIX, now.getTimeInMillis());
+        if(!isUpdate) {
+            contentValues.put(Const.DB.BookSeriesTable.INIT_UPDATE_UNIX, now.getTimeInMillis());
+        }
+
+        return contentValues;
+    }
 }

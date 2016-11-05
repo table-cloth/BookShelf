@@ -59,12 +59,16 @@ public class BookVolumeDao extends BookDaoBase {
      * Saves book volume data
      *
      * @param seriesId id for book series. Invalid if < 0.
-     * @return volume list in given seriesId
+     * @param bookVolume book volume in series
      * @return is save success
      */
     public boolean saveBookVolume(int seriesId, int bookVolume) {
         boolean isUpdate = isBookVolumeRegistered(seriesId, bookVolume);
+
         ContentValues contentValues = createContentValues4BookVolume(seriesId, bookVolume, isUpdate);
+        if(contentValues == null) {
+            return false;
+        }
 
         if(isUpdate) {
             int result = DB.getDB(mContext).getSQLiteDatabase(mContext).update(
@@ -111,7 +115,7 @@ public class BookVolumeDao extends BookDaoBase {
             return null;
         }
 
-        Calendar now =Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
         ContentValues contentValues = new ContentValues();
         contentValues.put(Const.DB.BookVolumeDetailTable.SERIES_ID, seriesId);
         contentValues.put(Const.DB.BookVolumeDetailTable.SERIES_VOLUME, bookVolume);

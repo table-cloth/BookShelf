@@ -58,13 +58,13 @@ public class SqlText {
             + " integer "
             + ")";
 
-    // Create SQLite text for registering Book Series Tags table
+    // Create SQLite text for registering Tags History table
     public static final String CREATE_TAGS_SQL = "create table "
-            + Const.DB.BookSeriesTagsTable.TABLE_NAME
+            + Const.DB.TagHistoryTable.TABLE_NAME
             + " ( "
-            + Const.DB.BookSeriesTagsTable.TAG_NAME
+            + Const.DB.TagHistoryTable.TAG_NAME
             + " text not null primary key, "
-            + Const.DB.BookSeriesTagsTable.LAST_UPDATE
+            + Const.DB.TagHistoryTable.LAST_UPDATE
             + " integer not null "
             + " ) ";
 
@@ -145,6 +145,48 @@ public class SqlText {
     }
 
     /**
+     * Create SQLite text for loading given tag
+     *
+     * @param tag tag
+     * @return SQLite text
+     */
+    public static String createLoadTagSQL(String tag) {
+        return "SELECT * FROM "
+                + Const.DB.TagHistoryTable.TABLE_NAME
+                + " WHERE "
+                + Const.DB.TagHistoryTable.TAG_NAME
+                + " = "
+                + "'"
+                + tag
+                + "'";
+    }
+
+    /**
+     * Create SQLite text for loading all tags
+     *
+     * @return SQLite text
+     */
+    public static String createLoadAllTagsSQL() {
+        return "SELECT * FROM "
+                + Const.DB.TagHistoryTable.TABLE_NAME
+                + " ORDER BY "
+                + Const.DB.TagHistoryTable.LAST_UPDATE
+                + " DESC ";
+    }
+
+    /**
+     * Create where clause for updating book series
+     * Expected where args are
+     * 1. seriesId
+     *
+     * @return WhereClause
+     */
+    public static String createWhereClause4UpdateBookSeries() {
+        return Const.DB.BookSeriesTable.SERIES_ID
+                + " = ? ";
+    }
+
+    /**
      * Create where clause for updating book volume
      * Expected where args are
      * 1. seriesId
@@ -159,4 +201,18 @@ public class SqlText {
                 + Const.DB.BookVolumeDetailTable.SERIES_VOLUME
                 + " = ? ";
     }
+
+    /**
+     * Create where clause for updating tag
+     * Expected where args are
+     * 1. tag
+     *
+     * @return WhereClause
+     */
+    public static String createWhereClause4UpdateTag() {
+        return Const.DB.TagHistoryTable.TAG_NAME
+                + " = ? ";
+    }
+
+
 }

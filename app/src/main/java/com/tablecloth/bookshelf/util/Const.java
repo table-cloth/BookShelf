@@ -104,11 +104,9 @@ public class Const {
         }
 
         /**
-         * Column names for Book Series Tag Table
-         * Several tags can be registered for each series
-         * If several tags are registered, content of TAG_NAME will be like "<TagA>|||<TagB>"
+         * Column names for Tag Hisotory Table
          */
-        public static class BookSeriesTagsTable {
+        public static class TagHistoryTable {
             // Table name for book series tags
             public static final String TABLE_NAME = "tags";
             // Name of tags

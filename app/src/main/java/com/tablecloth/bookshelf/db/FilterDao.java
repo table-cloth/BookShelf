@@ -26,37 +26,6 @@ public class FilterDao extends DaoBase {
     }
 
     /**
-     * シリーズ情報の保存
-     * 最終更新日時を返すので、登録直後に本の情報を検索したい場合はそれを使う
-     * @param data
-     */
-    public static void saveSeries(SeriesData data) {
-        if(isSeriesExist(data.mSeriesId)) {
-            ContentValues contentValues = convertSeries2ContentValues(data, true);
-
-            mDb.getSQLiteDatabase().update(DB.BookSeriesTable.TABLE_NAME, contentValues, DB.BookSeriesTable.SERIES_ID + " = ?", new String[]{Integer.toString(data.mSeriesId)});
-        } else {
-            ContentValues contentValues = convertSeries2ContentValues(data, false);
-
-//            data.mInitUpdateUnix = nowUnix;
-            mDb.getSQLiteDatabase().insert(DB.BookSeriesTable.TABLE_NAME, null, contentValues);
-        }
-//        return nowUnix;
-    }
-
-    /**
-     * シリーズ情報の削除
-     * 復元不可能なので要注意
-     * @param seriesId
-     * @return
-     */
-    public static boolean deleteSeries(int seriesId) {
-        int rows = mDb.getSQLiteDatabase().delete(DB.BookSeriesTable.TABLE_NAME, DB.BookSeriesTable.SERIES_ID + " = ?", new String[]{Integer.toString(seriesId)});
-        if(rows <= 0) return false;
-        return true;
-    }
-
-    /**
      * 全てのシリーズ情報の取得
      * @param context
      * @return
@@ -204,11 +173,11 @@ public class FilterDao extends DaoBase {
         SeriesData retData = null;
 
         // cursorからSeriesDataを生成
-        if(cursor != null) {
+        if (cursor != null) {
             try {
                 int max = cursor.getCount();
-                for(int i = 0 ; i < max ; i ++) {
-                    if(cursor.moveToNext()) {
+                for (int i = 0; i < max; i++) {
+                    if (cursor.moveToNext()) {
                         String title = cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TITLE_NAME));
                         retData = new SeriesData(title);
                         retData.mSeriesId = cursor.getInt(cursor.getColumnIndex(DB.BookSeriesTable.SERIES_ID));
@@ -224,7 +193,7 @@ public class FilterDao extends DaoBase {
                         retData.mTagsList = getTagsData(cursor.getString(cursor.getColumnIndex(DB.BookSeriesTable.TAGS)));
 
                         int isSeriesEnd = cursor.getInt(cursor.getColumnIndex(DB.BookSeriesTable.SERIES_IS_FINISH));
-                        if(isSeriesEnd == 0) {
+                        if (isSeriesEnd == 0) {
                             retData.mIsSeriesComplete = false;
                         } else {
                             retData.mIsSeriesComplete = true;
@@ -233,10 +202,10 @@ public class FilterDao extends DaoBase {
                         retData.mLastUpdateUnix = cursor.getLong(cursor.getColumnIndex(DB.BookSeriesTable.LAST_UPDATE_UNIX));
 
                         int[] volumes = loadVolumes(context, seriesId);
-                        if(volumes != null) {
-                        	for(int k = 0 ; k < volumes.length ; k ++) {
-                        		retData.addVolume(volumes[k]);
-                        	}
+                        if (volumes != null) {
+                            for (int k = 0; k < volumes.length; k++) {
+                                retData.addVolume(volumes[k]);
+                            }
                         }
 //                        ///TODO 所持している巻数情報は後々
 //                        retData.addVolume(1);
@@ -253,114 +222,6 @@ public class FilterDao extends DaoBase {
             }
         }
         return retData;
-    }
-
-    /**
-     * DBの初期化処理
-     * @param context
-     */
-    private static void instantiateDB(Context context) {
-        if(mDb == null) {
-            mDb = DB.getDB(context);
-        }
-    }
-
-    private static ContentValues convertSeries2ContentValues(SeriesData data, boolean isUpdate) {
-        ContentValues cv = new ContentValues();
-        // SeriesIdが0以下（設定されていない場合）は登録しない
-        if(data.mSeriesId > 0) {
-            cv.put(DB.BookSeriesTable.SERIES_ID, data.mSeriesId);
-        }
-        cv.put(DB.BookSeriesTable.AUTHOR_NAME, data.mAuthor);
-        cv.put(DB.BookSeriesTable.AUTHOR_PRONUNCIATION, data.mAuthorPronunciation);
-        cv.put(DB.BookSeriesTable.TITLE_NAME, data.mTitle);
-        cv.put(DB.BookSeriesTable.TITLE_PRONUNCIATION, data.mTitlePronunciation);
-        cv.put(DB.BookSeriesTable.MAGAZINE_NAME, data.mMagazine);
-        cv.put(DB.BookSeriesTable.MAGAZINE_PRONUNCIATION, data.mMagazinePronunciation);
-        cv.put(DB.BookSeriesTable.COMPANY_NAME, data.mCompany);
-        cv.put(DB.BookSeriesTable.COMPANY_PRONUNCIATION, data.mCompanyPronunciation);
-        cv.put(DB.BookSeriesTable.IMAGE_PATH, data.mImagePath);
-        cv.put(DB.BookSeriesTable.MEMO, data.mMemo);
-        cv.put(DB.BookSeriesTable.TAGS, getTagsStr(data.mTagsList));
-        cv.put(DB.BookSeriesTable.SERIES_IS_FINISH, data.mIsSeriesComplete);
-        Calendar now = Calendar.getInstance();
-        cv.put(DB.BookSeriesTable.LAST_UPDATE_UNIX, now.getTimeInMillis());
-        if(!isUpdate) cv.put(DB.BookSeriesTable.LAST_UPDATE_UNIX, now.getTimeInMillis());
-        return cv;
-    }
-    
-
-    public static boolean saveTags(Context context, String tag) {
-        instantiateDB(context);
-
-        long result = 0;
-        if (isTagExist(tag)) {
-            ContentValues contentValues = getTagContentValues(tag);
-            result = mDb.getSQLiteDatabase().update(DB.Tags.TABLE_NAME, contentValues, DB.Tags.TAG_NAME + " = ? ", new String[]{ tag });
-        } else {
-            ContentValues contentValues = getTagContentValues(tag);
-            result = mDb.getSQLiteDatabase().insert(DB.Tags.TABLE_NAME, null, contentValues);
-        }
-        if(result <= 0) return false;
-        return true;
-    }
-
-    public static ArrayList<String> loadTags(Context context) {
-        instantiateDB(context);
-
-        StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT * FROM ");
-        sql.append(DB.Tags.TABLE_NAME);
-        sql.append(" ORDER BY " + DB.Tags.LAST_UPDATE + " DESC ");
-
-        Cursor cursor = mDb.getSQLiteDatabase().rawQuery(sql.toString(), null);
-        ArrayList<String> tags = new ArrayList<>();
-
-        // cursorからSeriesDataを生成
-        if(cursor != null) {
-            try {
-                int max = cursor.getCount();
-                for(int i = 0 ; i < max ; i ++) {
-                    if(cursor.moveToNext()) {
-                        String tag = cursor.getString(cursor.getColumnIndex(DB.Tags.TAG_NAME));
-                        if(!Util.isEmpty(tag)) {
-                            tags.add(tag);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            } finally {
-                cursor.close();
-            }
-        }
-        return tags;
-    }
-
-    /**
-     * 指定のタグ
-     * @param tag
-     * @return
-     */
-    private static boolean isTagExist(String tag) {
-        if(Util.isEmpty(tag)) return false;
-        Cursor cursor = mDb.getSQLiteDatabase().rawQuery("SELECT * FROM " + DB.Tags.TABLE_NAME + " WHERE " + DB.Tags.TAG_NAME + " = '" + tag + "'", null);
-        if(cursor.moveToFirst()) {
-            // データが存在する
-            return true;
-        } else {
-            // データが存在しない
-            return false;
-        }
-    }
-
-    private static ContentValues getTagContentValues(String tag) {
-        ContentValues cv = new ContentValues();
-        if(Util.isEmpty(tag)) return cv;
-        cv.put(DB.Tags.TAG_NAME, tag);
-        Calendar now = Calendar.getInstance();
-        cv.put(DB.Tags.LAST_UPDATE, now.getTimeInMillis());
-        return cv;
     }
 
 }
