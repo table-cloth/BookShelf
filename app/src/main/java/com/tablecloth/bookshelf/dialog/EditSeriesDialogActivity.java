@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SeriesData;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ToastUtil;
@@ -26,6 +27,8 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
     private static SeriesData sTmpSeriesData = null;
     ViewGroup tagContainer;
 
+    BookSeriesDao mBookSeriesDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,15 +36,16 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         Intent intent = getIntent();
 
         mSeriesId = intent.getIntExtra(KEY_ID, -1);
+        mBookSeriesDao = new BookSeriesDao(this);
 
         // SeriesIDが登録されていない場合、tmpSeriesDataに一部情報が存在するかを確認する
         if(mSeriesId <= -1 && sTmpSeriesData != null) {
-            mSeriesId = sTmpSeriesData.mSeriesId;
+            mSeriesId = sTmpSeriesData.getSeriesId();
             sSeriesData = sTmpSeriesData;
         } else {
             // 作品IDが取得できれば、情報をDBから読み取る
             if(mSeriesId >= 0) {
-                sSeriesData = FilterDao.loadSeries(EditSeriesDialogActivity.this, mSeriesId);
+                sSeriesData = mBookSeriesDao.loadBookSeriesData(mSeriesId);
                 if(sSeriesData != null) {
                     // 削除ボタンを表示する
                     findViewById(R.id.btn_delete).setVisibility(View.VISIBLE);
@@ -49,7 +53,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
             }
         }
         // 取得に失敗した場合、新規登録の場合は空のデータを作成
-        if(sSeriesData == null) sSeriesData = new SeriesData();
+        if(sSeriesData == null) sSeriesData = new SeriesData(this);
         sTmpSeriesData = null;
 
         tagContainer = (ViewGroup)findViewById(R.id.tag_container);
@@ -66,25 +70,27 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         
         // 内容設定
         // タイトル
-        setRowContents(findViewById(R.id.data_detail_row_title), "タイトル", sSeriesData.mTitle);
-        setRowContents(findViewById(R.id.data_detail_row_title_pronunciation), "タイトル（カナ）", sSeriesData.mTitlePronunciation);
+        setRowContents(findViewById(R.id.data_detail_row_title), "タイトル", sSeriesData.getTitle());
+        setRowContents(findViewById(R.id.data_detail_row_title_pronunciation), "タイトル（カナ）", sSeriesData.getTitlePronunciation());
         // 作者
-        setRowContents(findViewById(R.id.data_detail_row_author), "作者", sSeriesData.mAuthor);
-        setRowContents(findViewById(R.id.data_detail_row_author_pronunciation), "作者（カナ）", sSeriesData.mAuthorPronunciation);
+        setRowContents(findViewById(R.id.data_detail_row_author), "作者", sSeriesData.getAuthor());
+        setRowContents(findViewById(R.id.data_detail_row_author_pronunciation), "作者（カナ）", sSeriesData.getAuthorPronunciation());
         // 掲載誌
-        setRowContents(findViewById(R.id.data_detail_row_magazine), "掲載誌", sSeriesData.mMagazine);
-        setRowContents(findViewById(R.id.data_detail_row_magazine_pronunctaion), "掲載誌（カナ）", sSeriesData.mMagazinePronunciation);
+        setRowContents(findViewById(R.id.data_detail_row_magazine), "掲載誌", sSeriesData.getMagazine());
+        setRowContents(findViewById(R.id.data_detail_row_magazine_pronunctaion), "掲載誌（カナ）", sSeriesData.getMagazinePronunciation());
         // 出版社
-        setRowContents(findViewById(R.id.data_detail_row_company), "出版社", sSeriesData.mCompany);
+        setRowContents(findViewById(R.id.data_detail_row_company), "出版社", sSeriesData.getCompany());
         // メモ
-        setRowContents(findViewById(R.id.data_detail_row_memo), "メモ", sSeriesData.mMemo);
+        setRowContents(findViewById(R.id.data_detail_row_memo), "メモ", sSeriesData.getCompanyPronunciation());
         // タグ
         updateTags();
 
         findViewById(R.id.btn_tag_edit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = TagsEditDialogActivity.getIntent(EditSeriesDialogActivity.this, "タグを編集", sSeriesData.mTagsList, "完了");
+                Intent intent = TagsEditDialogActivity.getIntent(
+                        EditSeriesDialogActivity.this, "タグを編集",
+                        SeriesData.convertTagsRawText2TagsList(sSeriesData.getRawTags()), "完了");
                 if(intent != null) startActivityForResult(intent, G.REQUEST_CODE_TAGS_EDIT);
             }
         });
@@ -107,22 +113,22 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
                             });
                             return;
                         }
-                        sSeriesData.mTitle = title;
-                        sSeriesData.mTitlePronunciation = getRowContents(findViewById(R.id.data_detail_row_title_pronunciation));
+                        sSeriesData.setTitle(title);
+                        sSeriesData.setTitlePronunciation(getRowContents(findViewById(R.id.data_detail_row_title_pronunciation)));
                         // 作者
-                        sSeriesData.mAuthor = getRowContents(findViewById(R.id.data_detail_row_author));
-                        sSeriesData.mAuthorPronunciation = getRowContents(findViewById(R.id.data_detail_row_author_pronunciation));
+                        sSeriesData.setAuthor(getRowContents(findViewById(R.id.data_detail_row_author)));
+                        sSeriesData.setAuthorPronunciation(getRowContents(findViewById(R.id.data_detail_row_author_pronunciation)));
                         // 掲載誌
-                        sSeriesData.mMagazine = getRowContents(findViewById(R.id.data_detail_row_magazine));
-                        sSeriesData.mMagazinePronunciation = getRowContents(findViewById(R.id.data_detail_row_magazine_pronunctaion));
+                        sSeriesData.setMagazine(getRowContents(findViewById(R.id.data_detail_row_magazine)));
+                        sSeriesData.setMagazinePronunciation(getRowContents(findViewById(R.id.data_detail_row_magazine_pronunctaion)));
                         // 出版社
-                        sSeriesData.mCompany = getRowContents(findViewById(R.id.data_detail_row_company));
+                        sSeriesData.setCompany(getRowContents(findViewById(R.id.data_detail_row_company)));
                         // メモ
-                        sSeriesData.mMemo = getRowContents(findViewById(R.id.data_detail_row_memo));
+                        sSeriesData.setMemo(getRowContents(findViewById(R.id.data_detail_row_memo)));
                         // タグ（初期は実装しない）
 //                setRowContents(findViewById(R.id.data_detail_row_title), "タイトル", sSeriesData.);
 
-                        FilterDao.saveSeries(sSeriesData);
+                        mBookSeriesDao.saveSeries(sSeriesData);
                         setResult(G.RESULT_POSITIVE);
                         EditSeriesDialogActivity.this.finish();
                     }
@@ -187,7 +193,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
         switch (requestCode) {
             case G.REQUEST_CODE_SIMPLE_CHECK:
                 if(resultCode == G.RESULT_POSITIVE) {
-                    if(FilterDao.deleteSeries(mSeriesId)) {
+                    if(mBookSeriesDao.deleteBookSeries(mSeriesId)) {
                         ToastUtil.show(EditSeriesDialogActivity.this, "作品の情報を削除しました");
                         EditSeriesDialogActivity.this.setResult(G.RESULT_SPECIAL);
                         EditSeriesDialogActivity.this.finish();
@@ -199,7 +205,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
             case G.REQUEST_CODE_TAGS_EDIT:
                 if(data != null) {
                     String tagsStr = data.getStringExtra(TagsEditDialogActivity.KEY_TAGS);
-                    sSeriesData.mTagsList = FilterDao.getTagsData(tagsStr);
+                    sSeriesData.setRawTags(tagsStr);
                     updateTags();
                 }
                 break;
@@ -209,7 +215,7 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
     private void updateTags() {
         // タグ
         tagContainer.removeAllViews();
-        tagContainer = ViewUtil.setTagInfoNormal(EditSeriesDialogActivity.this, sSeriesData.mTagsList, tagContainer);
+        tagContainer = ViewUtil.setTagInfoNormal(EditSeriesDialogActivity.this, SeriesData.convertTagsRawText2TagsList(sSeriesData.getRawTags()), tagContainer);
         tagContainer.invalidate();
     }
 }
