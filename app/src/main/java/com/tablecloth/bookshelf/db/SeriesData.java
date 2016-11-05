@@ -474,7 +474,7 @@ public class SeriesData {
                 // use current volume if this is last volume, else use prevVolume
                 int volume = isLastVolume
                         ? currentVolume
-                        * prevVolume;
+                        : prevVolume;
 
                 // if volume is consecutive
                 if(firstVolume4CurrentConsecutive < volume) {
