@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
@@ -42,7 +43,7 @@ public class BookSeriesDao extends BookDaoBase {
      */
     @Nullable
     public SeriesData loadBookSeriesData(int seriesId) {
-        if(!isValidBookSeriesId(seriesId)) {
+        if(!BookData.isValidBookSeriesId(seriesId)) {
             return null;
         }
 
@@ -212,7 +213,7 @@ public class BookSeriesDao extends BookDaoBase {
     @Nullable
     private ContentValues createContentValues4BookSeries(SeriesData seriesData, boolean isUpdate) {
         // return null if is update & invalid seriesId is given
-        if(isUpdate && !isValidBookSeriesId(seriesData.getSeriesId())) {
+        if(isUpdate && !BookData.isValidBookSeriesId(seriesData.getSeriesId())) {
             return null;
         }
 

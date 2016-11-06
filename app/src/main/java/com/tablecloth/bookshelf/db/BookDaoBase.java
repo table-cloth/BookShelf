@@ -3,6 +3,8 @@ package com.tablecloth.bookshelf.db;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.tablecloth.bookshelf.data.BookData;
+
 /**
  * Data accessor for getting information of Books
  * This class should only read data, and not set data
@@ -27,7 +29,7 @@ public class BookDaoBase extends DaoBase {
      * @return true if already registered
      */
     public boolean isBookSeriesRegistered(int seriesId) {
-        return isValidBookSeriesId(seriesId)
+        return BookData.isValidBookSeriesId(seriesId)
                 && isDataAvailable(SqlText.createLoadBookSeriesSQL(seriesId));
     }
 
@@ -40,34 +42,11 @@ public class BookDaoBase extends DaoBase {
      */
     public boolean isBookVolumeRegistered(int seriesId, int volume)
     {
-        return isValidBookSeriesId(seriesId)
-                && isValidBookVolume(volume)
+        return BookData.isValidBookSeriesId(seriesId)
+                && BookData.isValidBookVolume(volume)
                 && isDataAvailable(SqlText.createLoadBookVolumeSQL(seriesId, volume));
     }
 
-    /**
-     * Checks whether given book seriesId is valid
-     * This does not check if data exists in DB
-     * This only checks whether the given seriesId is legal value or not
-     *
-     * @param seriesId id for book series. Invalid if < 0.
-     * @return true if valid seriesId
-     */
-    protected boolean isValidBookSeriesId(int seriesId) {
-        return seriesId >= 0;
-    }
-
-    /**
-     * Checks whether given book volume is valid
-     * This does not check if data exists in DB
-     * This only checks whether the given volume is legal value or not
-     *
-     * @param bookVolume volume of a book in a series. Invalid if < 0.
-     * @return true if valid book volume
-     */
-    protected boolean isValidBookVolume(int bookVolume) {
-        return bookVolume >= 0;
-    }
 
 
 

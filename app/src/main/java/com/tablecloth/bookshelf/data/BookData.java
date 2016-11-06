@@ -60,4 +60,29 @@ public class BookData {
                 : new String[] {rawTextTagsData};
         return new ArrayList<>(Arrays.asList(tagsArray));
     }
+
+    /**
+     * Checks whether given book seriesId is valid
+     * This does not check if data exists in DB
+     * This only checks whether the given seriesId is legal value or not
+     *
+     * @param seriesId id for book series. Invalid if < 0.
+     * @return true if valid seriesId
+     */
+    public static boolean isValidBookSeriesId(int seriesId) {
+        return seriesId >= 0;
+    }
+
+    /**
+     * Checks whether given book volume is valid
+     * This does not check if data exists in DB
+     * This only checks whether the given volume is legal value or not
+     *
+     * @param bookVolume volume of a book in a series. Invalid if < 0.
+     * @return true if valid book volume
+     */
+    public static boolean isValidBookVolume(int bookVolume) {
+        return bookVolume >= 0;
+    }
+
 }
