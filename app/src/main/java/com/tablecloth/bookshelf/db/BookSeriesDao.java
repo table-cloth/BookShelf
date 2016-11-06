@@ -178,6 +178,7 @@ public class BookSeriesDao extends BookDaoBase {
 
         SeriesData data = new SeriesData(mContext);
         // basic info
+        data.setSeriesId(getIntFromCursor(cursor, Const.DB.BookSeriesTable.SERIES_ID));
         data.setTitle(getStringFromCursor(cursor, Const.DB.BookSeriesTable.TITLE_NAME));
         data.setAuthor(getStringFromCursor(cursor, Const.DB.BookSeriesTable.AUTHOR_NAME));
         data.setMagazine(getStringFromCursor(cursor, Const.DB.BookSeriesTable.MAGAZINE_NAME));
