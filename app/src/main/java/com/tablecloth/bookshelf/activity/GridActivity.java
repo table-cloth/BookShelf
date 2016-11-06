@@ -13,11 +13,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
-import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -29,7 +28,6 @@ public class GridActivity extends MainBaseActivity {
 
     private GridView mGridView;
     private GridAdapter mGridAdapter;
-    final private int COLUMNS_PER_ROW = 4; // 1行に何セルあるか
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +88,7 @@ public class GridActivity extends MainBaseActivity {
             // 右のボーダー
             v.findViewById(R.id.border_right).setVisibility(View.VISIBLE);
 
-            final ImageView image = (ImageView) v.findViewById(R.id.image);
+            final ImageView image = (ImageView) v.findViewById(R.id.book_cover_image);
             image.setImageResource(R.drawable.no_image);
 
             if(mDataArrayList != null) {
@@ -111,11 +109,11 @@ public class GridActivity extends MainBaseActivity {
                     }
                     Bitmap cacheImage = null;
                     // Web検索時はキャッシュを仕様しない
-                    if(mMode != G.MODE_API_SEARCH_RESULT) {
-                        cacheImage = ImageUtil.getImageCache(series.getSeriesId());
-                    }
+//                    if(mMode != G.MODE_API_SEARCH_RESULT) {
+//                        cacheImage = ImageUtil.getImageCache(series.getSeriesId());
+//                    }
                     if(cacheImage != null) {
-                        image.setImageBitmap(cacheImage);
+//                        image.setImageBitmap(cacheImage);
                     } else {
                         final int seriesId = series.getSeriesId();
                         series.loadImage(mHandler, GridActivity.this, new ListenerUtil.LoadBitmapListener() {
@@ -123,7 +121,7 @@ public class GridActivity extends MainBaseActivity {
                             public void onFinish(Bitmap bitmap) {
                                 if (bitmap != null) {
                                     image.setImageBitmap(bitmap);
-                                    ImageUtil.setImageCache(seriesId, bitmap);
+//                                    ImageUtil.setImageCache(seriesId, bitmap);
                                 } else {
                                     image.setImageResource(R.drawable.no_image);
                                 }
@@ -131,7 +129,7 @@ public class GridActivity extends MainBaseActivity {
 
                             @Override
                             public void onError() {
-                                image.setImageResource(R.drawable.no_image);
+//                                image.setImageResource(R.drawable.no_image);
                             }
                         });
                     }

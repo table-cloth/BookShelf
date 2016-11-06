@@ -1,4 +1,4 @@
-package com.tablecloth.bookshelf.db;
+package com.tablecloth.bookshelf.data;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,16 +7,12 @@ import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Queue;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.util.ImageUtil;
@@ -29,9 +25,7 @@ import com.tablecloth.bookshelf.util.Util;
  *
  * Created by Minami on 2014/08/16.
  */
-public class SeriesData {
-
-    private final static String TAGS_SEPARATOR_SYMBOL = "\n";
+public class SeriesData extends BookData {
 
     private Context mContext;
 
@@ -471,49 +465,6 @@ public class SeriesData {
                 });
             }
         });
-    }
-
-    /**
-     * Converts tags list into raw text tags data
-     *
-     * @param tagsList tags list
-     * @return raw text tags data
-     */
-    @NonNull
-    public static String convertTagsList2TagsRawText(@Nullable ArrayList<String> tagsList) {
-        StringBuilder rawTagsText = new StringBuilder();
-        boolean isFirstValue = true;
-
-        if(tagsList != null && !tagsList.isEmpty()) {
-            for (String tag : tagsList) {
-                if (isFirstValue) {
-                    isFirstValue = false;
-                } else {
-                    rawTagsText.append(TAGS_SEPARATOR_SYMBOL);
-                }
-                rawTagsText.append(tag);
-            }
-        }
-        return rawTagsText.toString();
-    }
-
-    /**
-     * Converts raw text tags data into tags list
-     *
-     * @param rawTextTagsData raw text tags data
-     * @return tags list
-     */
-    @NonNull
-    public static ArrayList<String> convertTagsRawText2TagsList(String rawTextTagsData) {
-        // return if tags is empty
-        if(Util.isEmpty(rawTextTagsData)) {
-            return new ArrayList<>();
-        }
-
-        String[] tagsArray = rawTextTagsData.contains(TAGS_SEPARATOR_SYMBOL)
-                ? rawTextTagsData.split(TAGS_SEPARATOR_SYMBOL)
-                : new String[] {rawTextTagsData};
-        return new ArrayList<>(Arrays.asList(tagsArray));
     }
 
     /**

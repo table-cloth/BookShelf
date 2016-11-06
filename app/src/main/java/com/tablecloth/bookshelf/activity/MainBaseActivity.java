@@ -1,28 +1,35 @@
 package com.tablecloth.bookshelf.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
-import com.tablecloth.bookshelf.db.SeriesData;
-import com.tablecloth.bookshelf.db.SettingsDao;
+import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.GAEvent;
+import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.JsonUtil;
 import com.tablecloth.bookshelf.util.ProgressUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
@@ -41,6 +48,9 @@ import java.util.List;
  * ListActivity / GridActivity両方で行う共通の処理・変数等はこちらに保持しておく
  */
 public abstract class MainBaseActivity extends BaseActivity {
+
+    // number of book series item shown in a single row, for grid layout
+    final private int BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID = 4;
 
     protected Spinner spinnerView;
     protected ArrayList<SeriesData> mDataArrayList = new ArrayList<SeriesData>();
@@ -506,4 +516,61 @@ public abstract class MainBaseActivity extends BaseActivity {
             }
         });
     }
+
+    /**
+     * Initializes view for bookSeries in listView / gridView
+     *
+     * @return initialized View
+     */
+    /**
+     *
+     * @param position position of the item in list / grid
+     * @param convertView View for list / grid item
+     * @param parentView Parent view of convertView
+     * @param seriesData SeriesData instance to show
+     * @param isGridView whether the view is for grid or list
+     * @return
+     */
+    @NonNull
+    protected View initializeBookSeriesItemView(int position, @Nullable View convertView, @Nullable ViewGroup parentView, @NonNull SeriesData seriesData, boolean isGridView) {
+        if(convertView == null) {
+            LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(isGridView
+                    ? R.layout.book_grid_item
+                    : R.layout.book_list_item;
+        }
+
+        ImageView bookConverImageView = (ImageView)convertView.findViewById(R.id.book_cover_image);
+        TextView titleTextView = (TextView)convertView.findViewById(R.id.title);
+        TextView authorTextView = (TextView)convertView.findViewById(R.id.author);
+        TextView volumeTextView = (TextView)convertView.findViewById(R.id.volume);
+
+        // do not use image cache when searching on internet
+        boolean doUseImageCache = mMode !=G.MODE_API_SEARCH_RESULT
+                &&;
+        Bitmap imageCache = doUseImageCache
+                ? ImageUtil.getImageCache(seriesData.getSeriesId())
+                : null;
+
+        // set border for gridView
+        if(isGridView) {
+            // border above view
+            convertView.findViewById(R.id.border_top).setVisibility(
+                    position < BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID
+                            ? View.VISIBLE
+                            : View.GONE;
+            // border below view
+            convertView.findViewById(R.id.border_top).setVisibility(View.VISIBLE);
+            // border left of view
+            convertView.findViewById(R.id.border_left).setVisibility(
+                    position % BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID == 0
+                            ? View.VISIBLE
+                            : View.GONE;
+            // border right of view
+            convertView.findViewById(R.id.border_right).setVisibility(View.VISIBLE);
+        }
+
+
+    }
+
 }

@@ -10,7 +10,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.data.BookData;
+import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 
@@ -104,7 +105,7 @@ public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
             // get tag to delete
             String deleteTag = ((TextView)view.findViewById(R.id.tag_name)).getText().toString();
 
-            ArrayList<String> tagsTmp = SeriesData.convertTagsRawText2TagsList(getTagData());
+            ArrayList<String> tagsTmp = BookData.convertTagsRawText2TagsList(getTagData());
             if(!tagsTmp.contains(deleteTag)) {
                 ToastUtil.show(mContext, R.string.tag_error_failed_2_delete);
                 return;
@@ -112,7 +113,7 @@ public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
 
             // delete tag
             tagsTmp.remove(deleteTag);
-            setTagData(SeriesData.convertTagsList2TagsRawText(tagsTmp));
+            setTagData(BookData.convertTagsList2TagsRawText(tagsTmp));
 
             // update view
             if(mOnCurrentTagUpdateListener != null) mOnCurrentTagUpdateListener.onUpdate(getTagData());

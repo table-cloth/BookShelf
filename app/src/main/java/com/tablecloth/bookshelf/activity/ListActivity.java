@@ -11,7 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.CustomListView;
 import com.tablecloth.bookshelf.R;
@@ -75,7 +75,7 @@ public class ListActivity extends MainBaseActivity {
 
             if(v==null){
                 LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = inflater.inflate(R.layout.book_list_row, null);
+                v = inflater.inflate(R.layout.book_list_item, null);
             }
             if(mDataArrayList != null) {
                 final SeriesData series = (SeriesData) mDataArrayList.get(position);
@@ -86,7 +86,7 @@ public class ListActivity extends MainBaseActivity {
                     volume = (TextView) v.findViewById(R.id.volume);
                     tagContainer = (ViewGroup) v.findViewById(R.id.tag_container);
 
-                    final ImageView image = (ImageView) v.findViewById(R.id.image);
+                    final ImageView image = (ImageView) v.findViewById(R.id.book_cover_image);
 
                     title.setText(series.getTitle());
                     author.setText(series.getAuthor());
