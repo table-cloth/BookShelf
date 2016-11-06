@@ -3,6 +3,7 @@
 
     <string name="app_name">本棚管理</string>
 
+    <string name="add">追加</string>
     <string name="add_detail"><u>情報を追加する</u></string>
 
     <string name="id_google_analytics_tracking">UA-44238770-2</string>
@@ -30,4 +31,6 @@
     <string name="tag_error_failed_2_delete">タグの削除に失敗しました</string>
     <string name="tag_error_already_added">すでに登録済みのタグです</string>
 
+    <string name="series_data_error_invalid_series_id_found">不正な作品IDを検出しました。時間を置いて再度お試しください。</string>
+    <string name="series_data_add_confirm_content">この作品を追加しますか？</string>
 </resources>

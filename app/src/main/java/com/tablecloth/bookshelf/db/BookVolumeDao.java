@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.util.Const;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class BookVolumeDao extends BookDaoBase {
      */
     @Nullable
     public ArrayList<Integer> loadBookVolumes(int seriesId) {
-        if(!isValidBookSeriesId(seriesId)) {
+        if(!BookData.isValidBookSeriesId(seriesId)) {
             return null;
         }
 
@@ -111,8 +112,8 @@ public class BookVolumeDao extends BookDaoBase {
     private ContentValues createContentValues4BookVolume(int seriesId, int bookVolume, boolean isUpdate) {
         // return null if invalid value is given
         // seriesId always must bu valid, since bookVolume is registered AFTER bookSeries data is registered
-        if(!isValidBookSeriesId(seriesId)
-                || !isValidBookVolume(bookVolume)) {
+        if(!BookData.isValidBookSeriesId(seriesId)
+                || !BookData.isValidBookVolume(bookVolume)) {
             return null;
         }
 
