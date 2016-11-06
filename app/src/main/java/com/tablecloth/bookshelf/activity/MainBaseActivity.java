@@ -22,8 +22,8 @@ import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.data.BookData;
+import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
-import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
@@ -40,7 +40,6 @@ import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.VersionUtil;
 import com.tablecloth.bookshelf.util.ViewUtil;
-import com.tablecloth.bookshelf.view.BookCoverImageView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -58,10 +57,10 @@ public abstract class MainBaseActivity extends BaseActivity {
     final private int BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID = 4;
 
     protected Spinner spinnerView;
-    protected ArrayList<SeriesData> mDataArrayList = new ArrayList<SeriesData>();
+    protected ArrayList<BookSeriesData> mDataArrayList = new ArrayList<BookSeriesData>();
 
     // 楽天WebAPIでの検索結果の保持用変数
-    protected ArrayList<SeriesData> mApiSearchResultArrayList = new ArrayList<SeriesData>();
+    protected ArrayList<BookSeriesData> mApiSearchResultArrayList = new ArrayList<BookSeriesData>();
     protected JSONObject mAPISearchResultJsonObject = null;
 
     protected ProgressUtil mProgress;
@@ -364,7 +363,7 @@ public abstract class MainBaseActivity extends BaseActivity {
      * @param jsonStr
      */
     private void convertJsonStr2JsonArrayObject(String jsonStr) {
-        mApiSearchResultArrayList = new ArrayList<SeriesData>();
+        mApiSearchResultArrayList = new ArrayList<BookSeriesData>();
 
         // JSON情報を分析する
         mAPISearchResultJsonObject = JsonUtil.getJsonObject(jsonStr);
@@ -387,7 +386,7 @@ public abstract class MainBaseActivity extends BaseActivity {
         // 取得した結果を作品情報一覧へと分解する
         for(int i = 0 ; i < jsonObjList.size() ; i ++ ) {
             JSONObject detailData = JsonUtil.getJsonObject(jsonObjList.get(i), Rakuten.Key.ITEM_DETAIL);
-            SeriesData data = new SeriesData(this);
+            BookSeriesData data = new BookSeriesData(this);
 
             data.setTitle(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME));
             data.setTitlePronunciation(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME_KANA));
@@ -532,12 +531,12 @@ public abstract class MainBaseActivity extends BaseActivity {
      * @param position position of the item in list / grid
      * @param convertView View for list / grid item
      * @param parentView Parent view of convertView
-     * @param seriesData SeriesData instance to show
+     * @param bookSeriesData BookSeriesData instance to show
      * @param isGridView whether the view is for grid or list
      * @return
      */
     @NonNull
-    protected View initializeBookSeriesItemView(int position, @Nullable View convertView, @Nullable ViewGroup parentView, @NonNull final SeriesData seriesData, boolean isGridView) {
+    protected View initializeBookSeriesItemView(int position, @Nullable View convertView, @Nullable ViewGroup parentView, @NonNull final BookSeriesData bookSeriesData, boolean isGridView) {
         if(convertView == null) {
             LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(
@@ -554,11 +553,11 @@ public abstract class MainBaseActivity extends BaseActivity {
 
         // init final values
         final boolean doUseImageCache = !isAPISearchMode
-                && BookData.isValidBookSeriesId(seriesData.getSeriesId());
+                && BookData.isValidBookSeriesId(bookSeriesData.getSeriesId());
         final ImageView bookCoverImageView = (ImageView)convertView.findViewById(R.id.book_cover_image);
         // set no_image for default
         bookCoverImageView.setImageResource(R.drawable.no_image);
-        bookCoverImageView.setTag(seriesData.getTitle());
+        bookCoverImageView.setTag(bookSeriesData.getTitle());
 
         // init non-final values
         ViewGroup tagContainer = (ViewGroup)convertView.findViewById(R.id.tag_container);
@@ -572,7 +571,7 @@ public abstract class MainBaseActivity extends BaseActivity {
 
         // do not use image cache when searching on internet
         Bitmap imageCache = doUseImageCache
-                ? ImageUtil.getImageCache(seriesData.getSeriesId())
+                ? ImageUtil.getImageCache(bookSeriesData.getSeriesId())
                 : null;
 
         // set border for gridView
@@ -594,16 +593,16 @@ public abstract class MainBaseActivity extends BaseActivity {
         }
 
         // set basic values for each view
-        titleTextView.setText(seriesData.getTitle());
-        authorTextView.setText(seriesData.getAuthor());
+        titleTextView.setText(bookSeriesData.getTitle());
+        authorTextView.setText(bookSeriesData.getAuthor());
         if(volumeTextView.getVisibility() == View.VISIBLE) {
-            volumeTextView.setText(seriesData.getVolumeText());
+            volumeTextView.setText(bookSeriesData.getVolumeText());
         }
 
         // set tag data
         tagContainer.removeAllViews();
         tagContainer = ViewUtil.setTagInfoSmall(
-                this, seriesData.getTagsAsList(), tagContainer);
+                this, bookSeriesData.getTagsAsList(), tagContainer);
         // TODO check whether this invalidate is necessary
         tagContainer.invalidate();
 
@@ -611,15 +610,15 @@ public abstract class MainBaseActivity extends BaseActivity {
         if(imageCache != null) {
             bookCoverImageView.setImageBitmap(imageCache);
         } else {
-            seriesData.loadImage(mHandler, this, new ListenerUtil.LoadBitmapListener() {
+            bookSeriesData.loadImage(mHandler, this, new ListenerUtil.LoadBitmapListener() {
                 @Override
                 public void onFinish(Bitmap bitmap) {
                     if(bitmap != null) {
-                        if(Util.isEqual(seriesData.getTitle(),
+                        if(Util.isEqual(bookSeriesData.getTitle(),
                                 String.valueOf(bookCoverImageView.getTag()))) {
                             bookCoverImageView.setImageBitmap(bitmap);
                             if(doUseImageCache) {
-                                ImageUtil.setImageCache(seriesData.getSeriesId(), bitmap);
+                                ImageUtil.setImageCache(bookSeriesData.getSeriesId(), bitmap);
                             }
                         }
                     }
@@ -635,8 +634,8 @@ public abstract class MainBaseActivity extends BaseActivity {
         // when current mode is search mode, move to adding series screen
         // else, move to check series detail screen
         convertView.setOnClickListener(isAPISearchMode
-                ? getOnClick4AddSeriesConfirmScreen(seriesData)
-                : getOnClick4StartSeriesDetailIntent(seriesData.getSeriesId()));
+                ? getOnClick4AddSeriesConfirmScreen(bookSeriesData)
+                : getOnClick4StartSeriesDetailIntent(bookSeriesData.getSeriesId()));
 
         return convertView;
     }
@@ -666,11 +665,11 @@ public abstract class MainBaseActivity extends BaseActivity {
     /**
      * Get OnClickListener instance for starting book series add confirm screen
      *
-     * @param seriesData SeriesData instance
+     * @param bookSeriesData BookSeriesData instance
      * @return OnClickListener instance
      */
     @NonNull
-    private View.OnClickListener getOnClick4AddSeriesConfirmScreen(@NonNull final SeriesData seriesData) {
+    private View.OnClickListener getOnClick4AddSeriesConfirmScreen(@NonNull final BookSeriesData bookSeriesData) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -680,7 +679,7 @@ public abstract class MainBaseActivity extends BaseActivity {
                                 MainBaseActivity.this,
                                 getString(R.string.series_data_add_confirm_content),
                                 getString(R.string.add),
-                                seriesData),
+                                bookSeriesData),
                         // request code
                         G.REQUEST_CODE_LIST_ADD_SERIES);
             }

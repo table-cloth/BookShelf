@@ -1,25 +1,13 @@
 package com.tablecloth.bookshelf.activity;
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.data.SeriesData;
-import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
-import com.tablecloth.bookshelf.util.G;
-import com.tablecloth.bookshelf.util.IntentUtil;
-import com.tablecloth.bookshelf.util.ListenerUtil;
-import com.tablecloth.bookshelf.util.ViewUtil;
 
 /**
  * Created by Minami on 2015/03/15.

@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.data.BookData;
-import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 

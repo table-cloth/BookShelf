@@ -25,7 +25,7 @@ import com.tablecloth.bookshelf.util.Util;
  *
  * Created by Minami on 2014/08/16.
  */
-public class SeriesData extends BookData {
+public class BookSeriesData extends BookData {
 
     private Context mContext;
 
@@ -59,7 +59,7 @@ public class SeriesData extends BookData {
     /**
      * Constructor
      */
-    public SeriesData(@NonNull Context context) {
+    public BookSeriesData(@NonNull Context context) {
         mContext = context;
         mVolumeList = new ArrayList<>();
         mVolumeTextCache = null;
@@ -487,7 +487,10 @@ public class SeriesData extends BookData {
         if(mVolumeList == null || mVolumeList.size() <= 0) {
             return mContext.getString(R.string.series_data_no_volume);
         }
-
+        // return simple result is only 1 volume is set
+        if(mVolumeList.size() <= 1) {
+            return mVolumeList.get(0) + mContext.getString(R.string.series_data_volume_symbol);
+        }
 
         // sort so list becomes smaller value -> larger value
         Collections.sort(mVolumeList);
@@ -500,36 +503,34 @@ public class SeriesData extends BookData {
         int firstVolume4CurrentConsecutive = firstVolume; // start volume of current consecutive
 
         // go through list from smaller values
-        for(int i = 1; i < mVolumeList.size() ; i ++) {
-            currentVolume = mVolumeList.get(i);
-            boolean isLastVolume = i + 1 == mVolumeList.size();
+        for(int i = 1; i < mVolumeList.size() + 1 ; i ++) {
 
-            // if last value or current volume is not consecutive
-            if(isLastVolume
-                    || currentVolume != prevVolume + 1) {
-                // If current first consecutive volume does not equal first volume if list
+            currentVolume = i < mVolumeList.size()
+                    ? mVolumeList.get(i)
+                    : BookData.BOOK_VOLUME_ERROR_VALUE;
+
+            // check if is consecutive
+            // last volume will be automatically not consecutive since
+            // currentVolume in last loop is set as BookData.BOOK_VOLUME_ERROR_VALUE
+            if(currentVolume != prevVolume + 1) {
+                // If current first consecutive volume does not equal first volume in list
                 if(firstVolume4CurrentConsecutive != firstVolume) {
                     volumeTextBuilder.append(
                             mContext.getString(R.string.series_data_volume_separator_symbol));
                 }
 
-                // use current volume if this is last volume, else use prevVolume
-                int volume = isLastVolume
-                        ? currentVolume
-                        : prevVolume;
-
                 // if volume is consecutive
-                if(firstVolume4CurrentConsecutive < volume) {
+                if(firstVolume4CurrentConsecutive < prevVolume) {
                     String text = firstVolume4CurrentConsecutive
                             + mContext.getString(R.string.series_data_volume_symbol)
                             + mContext.getString(R.string.series_data_volume_conjunction_symbol)
-                            + volume
-                            + mContext.getString(R.string.series_data_volume_conjunction_symbol);
+                            + prevVolume
+                            + mContext.getString(R.string.series_data_volume_symbol);
                     volumeTextBuilder.append(text);
                 }
                 // if volume is not consecutive
                 else {
-                    String text = volume
+                    String text = prevVolume
                             + mContext.getString(R.string.series_data_volume_symbol);
                     volumeTextBuilder.append(text);
                 }

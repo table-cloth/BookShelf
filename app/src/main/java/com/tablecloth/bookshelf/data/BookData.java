@@ -16,6 +16,9 @@ import java.util.Arrays;
  */
 public class BookData {
 
+    public final static int BOOK_SERIES_ERROR_VALUE = -1;
+    public final static int BOOK_VOLUME_ERROR_VALUE = -1;
+
     private final static String TAGS_SEPARATOR_SYMBOL = "\n";
 
     /**
