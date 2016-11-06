@@ -3,14 +3,14 @@ package com.tablecloth.bookshelf.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.data.BookData;
+import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 
@@ -111,7 +111,7 @@ public class RecentTagRelativeLayout extends BaseTagRelativeLayout {
                 return;
             }
 
-            ArrayList<String> tagInList = SeriesData.convertTagsRawText2TagsList(getTagData());
+            ArrayList<String> tagInList = BookData.convertTagsRawText2TagsList(getTagData());
 
             // tag is already added
             if(tagInList.contains(newTag)) {
@@ -121,7 +121,7 @@ public class RecentTagRelativeLayout extends BaseTagRelativeLayout {
 
             // add new tag and update view
             tagInList.add(newTag);
-            setTagData(SeriesData.convertTagsList2TagsRawText(tagInList));
+            setTagData(BookData.convertTagsList2TagsRawText(tagInList));
             if(mOnCurrentTagUpdateListener != null) mOnCurrentTagUpdateListener.onUpdate(getTagData());
 
             // save in DB

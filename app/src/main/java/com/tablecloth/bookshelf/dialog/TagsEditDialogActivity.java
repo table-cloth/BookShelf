@@ -8,7 +8,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.data.BookData;
+import com.tablecloth.bookshelf.data.SeriesData;
+import com.tablecloth.bookshelf.db.BookDaoBase;
 import com.tablecloth.bookshelf.db.TagHistoryDao;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ToastUtil;
@@ -67,7 +69,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
             public void onClick(View v) {
                 String newTag = addTagEditText.getText().toString();
                 addTagEditText.setText("");
-                ArrayList<String> tagsTmp = SeriesData.convertTagsRawText2TagsList(tagsData);
+                ArrayList<String> tagsTmp = BookData.convertTagsRawText2TagsList(tagsData);
 
                 // 登録失敗
                 if(Util.isEmpty(newTag)) {
@@ -81,7 +83,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
                 // 登録成功
                 if(tagsTmp == null) tagsTmp = new ArrayList<String>();
                 tagsTmp.add(newTag);
-                tagsData = SeriesData.convertTagsList2TagsRawText(tagsTmp);
+                tagsData = BookData.convertTagsList2TagsRawText(tagsTmp);
 
                 // save newly added tag to history DB
                 mTagHistoryDao.saveTag(newTag);
@@ -137,7 +139,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
 
 //        tagContainer.getViewTreeObserver().addOnGlobalLayoutListener(mCurrentTagLayoutListener);
         tagContainer = (CurrentTagRelativeLayout)ViewUtil.setTagInfoLargeDelete(
-                TagsEditDialogActivity.this, SeriesData.convertTagsRawText2TagsList(tagsData),
+                TagsEditDialogActivity.this, BookData.convertTagsRawText2TagsList(tagsData),
                 tagContainer, View.INVISIBLE);
         tagContainer.setTagData(tagsData);
         tagContainer.setTagUpdateListener(new BaseTagRelativeLayout.OnCurrentTagUpdateListener() {
@@ -161,7 +163,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
         // タグ履歴領域に最新のタグを入れて、再描画(invalidate)を呼び出す
         ArrayList<String> tagsLog = mTagHistoryDao.loadAllTags();
         recentTagContainer = (RecentTagRelativeLayout)ViewUtil.setTagInfoLarge(TagsEditDialogActivity.this, tagsLog, recentTagContainer, View.INVISIBLE);
-        recentTagContainer.setTagData(SeriesData.convertTagsList2TagsRawText(tagsLog));
+        recentTagContainer.setTagData(BookData.convertTagsList2TagsRawText(tagsLog));
         recentTagContainer.setCurrentTagData(tagsData);
         recentTagContainer.setTagUpdateListener(new BaseTagRelativeLayout.OnCurrentTagUpdateListener() {
             @Override
@@ -189,7 +191,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
         Intent intent = new Intent(context, TagsEditDialogActivity.class);
 
         intent.putExtra(KEY_TITLE, title);
-        intent.putExtra(KEY_TAGS, SeriesData.convertTagsList2TagsRawText(tags));
+        intent.putExtra(KEY_TAGS, BookData.convertTagsList2TagsRawText(tags));
         intent.putExtra(KEY_BTN_POSITIVE, btnPositive);
 
         return intent;

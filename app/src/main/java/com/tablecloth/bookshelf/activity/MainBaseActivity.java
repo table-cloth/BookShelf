@@ -1,34 +1,46 @@
 package com.tablecloth.bookshelf.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
-import com.tablecloth.bookshelf.db.SeriesData;
-import com.tablecloth.bookshelf.db.SettingsDao;
+import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.GAEvent;
+import com.tablecloth.bookshelf.util.ImageUtil;
+import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.JsonUtil;
+import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ProgressUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.VersionUtil;
+import com.tablecloth.bookshelf.util.ViewUtil;
+import com.tablecloth.bookshelf.view.BookCoverImageView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,6 +53,9 @@ import java.util.List;
  * ListActivity / GridActivity両方で行う共通の処理・変数等はこちらに保持しておく
  */
 public abstract class MainBaseActivity extends BaseActivity {
+
+    // number of book series item shown in a single row, for grid layout
+    final private int BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID = 4;
 
     protected Spinner spinnerView;
     protected ArrayList<SeriesData> mDataArrayList = new ArrayList<SeriesData>();
@@ -506,4 +521,167 @@ public abstract class MainBaseActivity extends BaseActivity {
             }
         });
     }
+
+    /**
+     * Initializes view for bookSeries in listView / gridView
+     *
+     * @return initialized View
+     */
+    /**
+     *
+     * @param position position of the item in list / grid
+     * @param convertView View for list / grid item
+     * @param parentView Parent view of convertView
+     * @param seriesData SeriesData instance to show
+     * @param isGridView whether the view is for grid or list
+     * @return
+     */
+    @NonNull
+    protected View initializeBookSeriesItemView(int position, @Nullable View convertView, @Nullable ViewGroup parentView, @NonNull final SeriesData seriesData, boolean isGridView) {
+        if(convertView == null) {
+            LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(
+                    // layout id
+                    isGridView
+                            ? R.layout.book_grid_item
+                            : R.layout.book_list_item,
+                    // root
+                    null);
+        }
+
+        // is showing search result on internet
+        boolean isAPISearchMode = mMode == G.MODE_API_SEARCH_RESULT;
+
+        // init final values
+        final boolean doUseImageCache = !isAPISearchMode
+                && BookData.isValidBookSeriesId(seriesData.getSeriesId());
+        final ImageView bookCoverImageView = (ImageView)convertView.findViewById(R.id.book_cover_image);
+        // set no_image for default
+        bookCoverImageView.setImageResource(R.drawable.no_image);
+
+        // init non-final values
+        ViewGroup tagContainer = (ViewGroup)convertView.findViewById(R.id.tag_container);
+        TextView titleTextView = (TextView)convertView.findViewById(R.id.title);
+        TextView authorTextView = (TextView)convertView.findViewById(R.id.author);
+        TextView volumeTextView = (TextView)convertView.findViewById(R.id.volume);
+        // volumes are only used when looking at non-search results
+        volumeTextView.setVisibility(isAPISearchMode
+                ? View.GONE
+                : View.VISIBLE);
+
+        // do not use image cache when searching on internet
+        Bitmap imageCache = doUseImageCache
+                ? ImageUtil.getImageCache(seriesData.getSeriesId())
+                : null;
+
+        // set border for gridView
+        if(isGridView) {
+            // border above view
+            convertView.findViewById(R.id.border_top).setVisibility(
+                    position < BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID
+                            ? View.VISIBLE
+                            : View.GONE);
+            // border below view
+            convertView.findViewById(R.id.border_top).setVisibility(View.VISIBLE);
+            // border left of view
+            convertView.findViewById(R.id.border_left).setVisibility(
+                    position % BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID == 0
+                            ? View.VISIBLE
+                            : View.GONE);
+            // border right of view
+            convertView.findViewById(R.id.border_right).setVisibility(View.VISIBLE);
+        }
+
+        // set basic values for each view
+        titleTextView.setText(seriesData.getTitle());
+        authorTextView.setText(seriesData.getAuthor());
+        if(volumeTextView.getVisibility() == View.VISIBLE) {
+            volumeTextView.setText(seriesData.getVolumeText());
+        }
+
+        // set tag data
+        tagContainer.removeAllViews();
+        tagContainer = ViewUtil.setTagInfoSmall(
+                this, seriesData.getTagsAsList(), tagContainer);
+        // TODO check whether this invalidate is necessary
+        tagContainer.invalidate();
+
+        // set image data
+        if(imageCache != null) {
+            bookCoverImageView.setImageBitmap(imageCache);
+        } else {
+            final int seriesIdCopy = seriesData.getSeriesId();
+            seriesData.loadImage(mHandler, this, new ListenerUtil.LoadBitmapListener() {
+                @Override
+                public void onFinish(Bitmap bitmap) {
+                    if(bitmap != null) {
+                        bookCoverImageView.setImageBitmap(bitmap);
+                        if(doUseImageCache) {
+                            ImageUtil.setImageCache(seriesIdCopy, bitmap);
+                        }
+                    }
+                }
+
+                @Override
+                public void onError() {
+                }
+            });
+        }
+
+        // set click listener
+        // when current mode is search mode, move to adding series screen
+        // else, move to check series detail screen
+        convertView.setOnClickListener(isAPISearchMode
+                ? getOnClick4AddSeriesConfirmScreen(seriesData)
+                : getOnClick4StartSeriesDetailIntent(seriesData.getSeriesId()));
+
+        return convertView;
+    }
+
+    /**
+     * Get OnClickListener instance for starting book series detail screen
+     * Error toast will be shown if the given seriesId is not found in DB
+     *
+     * @param seriesId id for book series. Invalid if < 0.
+     * @return OnClickListener instance
+     */
+    @NonNull
+    private View.OnClickListener getOnClick4StartSeriesDetailIntent(final int seriesId) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // start activity or show error text if invalid seriesId
+                if(mBookSeriesDao.isBookSeriesRegistered(seriesId)) {
+                    startActivity(IntentUtil.getSeriesDetailIntent(MainBaseActivity.this, seriesId));
+                } else {
+                    ToastUtil.show(MainBaseActivity.this, R.string.series_data_error_invalid_series_id_found);
+                }
+            }
+        };
+    }
+
+    /**
+     * Get OnClickListener instance for starting book series add confirm screen
+     *
+     * @param seriesData SeriesData instance
+     * @return OnClickListener instance
+     */
+    @NonNull
+    private View.OnClickListener getOnClick4AddSeriesConfirmScreen(@NonNull final SeriesData seriesData) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(
+                        // intent
+                        EditSeriesDialogActivity.getIntent(
+                                MainBaseActivity.this,
+                                getString(R.string.series_data_add_confirm_content),
+                                getString(R.string.add),
+                                seriesData),
+                        // request code
+                        G.REQUEST_CODE_LIST_ADD_SERIES);
+            }
+        };
+    }
+
 }

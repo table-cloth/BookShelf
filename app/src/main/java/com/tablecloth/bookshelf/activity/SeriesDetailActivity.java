@@ -22,7 +22,7 @@ import android.widget.TextView;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.BookVolumeDao;
-import com.tablecloth.bookshelf.db.SeriesData;
+import com.tablecloth.bookshelf.data.SeriesData;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.G;
@@ -68,7 +68,7 @@ public class SeriesDetailActivity extends BaseActivity {
 
         mLayoutnflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mImageView = (ImageView) findViewById(R.id.image);
+        mImageView = (ImageView) findViewById(R.id.book_cover_image);
 
         mPicker = (NumberPicker) findViewById(R.id.number_picker);
         mPicker.setMaxValue(200);
