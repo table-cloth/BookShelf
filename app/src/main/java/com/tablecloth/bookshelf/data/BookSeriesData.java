@@ -530,7 +530,6 @@ public class BookSeriesData extends BookData {
                 }
                 // if volume is not consecutive
                 else {
-                    // if is last volume, make sure to write the volume v
                     String text = prevVolume
                             + mContext.getString(R.string.series_data_volume_symbol);
                     volumeTextBuilder.append(text);
