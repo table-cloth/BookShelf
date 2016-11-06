@@ -558,6 +558,7 @@ public abstract class MainBaseActivity extends BaseActivity {
         final ImageView bookCoverImageView = (ImageView)convertView.findViewById(R.id.book_cover_image);
         // set no_image for default
         bookCoverImageView.setImageResource(R.drawable.no_image);
+        bookCoverImageView.setTag(seriesData.getTitle());
 
         // init non-final values
         ViewGroup tagContainer = (ViewGroup)convertView.findViewById(R.id.tag_container);
@@ -610,14 +611,16 @@ public abstract class MainBaseActivity extends BaseActivity {
         if(imageCache != null) {
             bookCoverImageView.setImageBitmap(imageCache);
         } else {
-            final int seriesIdCopy = seriesData.getSeriesId();
             seriesData.loadImage(mHandler, this, new ListenerUtil.LoadBitmapListener() {
                 @Override
                 public void onFinish(Bitmap bitmap) {
                     if(bitmap != null) {
-                        bookCoverImageView.setImageBitmap(bitmap);
-                        if(doUseImageCache) {
-                            ImageUtil.setImageCache(seriesIdCopy, bitmap);
+                        if(Util.isEqual(seriesData.getTitle(),
+                                String.valueOf(bookCoverImageView.getTag()))) {
+                            bookCoverImageView.setImageBitmap(bitmap);
+                            if(doUseImageCache) {
+                                ImageUtil.setImageCache(seriesData.getSeriesId(), bitmap);
+                            }
                         }
                     }
                 }

@@ -8,6 +8,7 @@ import com.tablecloth.bookshelf.R;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -36,6 +37,19 @@ public class Util {
     }
     public static boolean isEmpty(ArrayList list) {
         return list == null || list.isEmpty();
+    }
+
+    /**
+     * Checks whether given value is equal
+     * Will return false if any is null
+     *
+     * @param strA text to compare
+     * @param strB text to compare
+     * @return is equal
+     */
+    public static boolean isEqual(@Nullable String strA, @Nullable String strB) {
+        return !(strA == null || strB ==null)
+                && strA.equals(strB);
     }
 
     public static void initAdview(Activity activity, ViewGroup parentView) {
