@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.data.BookData;
-import com.tablecloth.bookshelf.data.SeriesData;
-import com.tablecloth.bookshelf.db.BookDaoBase;
 import com.tablecloth.bookshelf.db.TagHistoryDao;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ToastUtil;

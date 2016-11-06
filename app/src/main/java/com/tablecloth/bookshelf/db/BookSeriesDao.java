@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.tablecloth.bookshelf.data.BookData;
-import com.tablecloth.bookshelf.data.SeriesData;
+import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.Util;
@@ -39,10 +39,10 @@ public class BookSeriesDao extends BookDaoBase {
      * Load series data, related to given seriesId
      *
      * @param seriesId id for book series. Invalid if < 0.
-     * @return SeriesData related with seriesId, or null if not found
+     * @return BookSeriesData related with seriesId, or null if not found
      */
     @Nullable
-    public SeriesData loadBookSeriesData(int seriesId) {
+    public BookSeriesData loadBookSeriesData(int seriesId) {
         if(!BookData.isValidBookSeriesId(seriesId)) {
             return null;
         }
@@ -54,7 +54,7 @@ public class BookSeriesDao extends BookDaoBase {
 
         try {
             if(cursor.moveToFirst()) {
-                SeriesData data = createSeriesDataFromCursor(cursor);
+                BookSeriesData data = createSeriesDataFromCursor(cursor);
                 if(data != null) {
                     data.setVolumeList(mBookVolumeDao.loadBookVolumes(data.getSeriesId()));
                     return data;
@@ -69,10 +69,10 @@ public class BookSeriesDao extends BookDaoBase {
     /**
      * Load all series data
      *
-     * @return list of SeriesData found, or null if not found
+     * @return list of BookSeriesData found, or null if not found
      */
     @Nullable
-    public ArrayList<SeriesData> loadAllBookSeriesDataList() {
+    public ArrayList<BookSeriesData> loadAllBookSeriesDataList() {
         return loadBookSeriesDataList(G.SEARCH_MODE_ALL, "");
     }
 
@@ -81,10 +81,10 @@ public class BookSeriesDao extends BookDaoBase {
      *
      * @param rawSearchMode search mode
      * @param rawSearchText search text
-     * @return list of SeriesData found, or null if not found
+     * @return list of BookSeriesData found, or null if not found
      */
     @Nullable
-    public ArrayList<SeriesData> loadBookSeriesDataList(int rawSearchMode, String rawSearchText) {
+    public ArrayList<BookSeriesData> loadBookSeriesDataList(int rawSearchMode, String rawSearchText) {
         // init search content if invalid
         if(Util.isEmpty(rawSearchText)) {
             rawSearchText = "";
@@ -105,34 +105,34 @@ public class BookSeriesDao extends BookDaoBase {
             return null;
         }
 
-        ArrayList<SeriesData> seriesDataList = new ArrayList<>();
+        ArrayList<BookSeriesData> bookSeriesDataList = new ArrayList<>();
         try {
             for (boolean nextIsAvailable = cursor.moveToFirst(); nextIsAvailable; nextIsAvailable = cursor.moveToNext()) {
-                SeriesData data = createSeriesDataFromCursor(cursor);
+                BookSeriesData data = createSeriesDataFromCursor(cursor);
                 if(data != null) {
                     data.setVolumeList(mBookVolumeDao.loadBookVolumes(data.getSeriesId()));
-                    seriesDataList.add(data);
+                    bookSeriesDataList.add(data);
                 }
             }
         } finally {
             closeCursor(cursor);
         }
-        return seriesDataList;
+        return bookSeriesDataList;
     }
 
     /**
      * Saves book series data
      *
-     * @param seriesData series data to save.
+     * @param bookSeriesData series data to save.
      * @return is save success
      */
-    public boolean saveSeries(SeriesData seriesData) {
-        if(seriesData == null) {
+    public boolean saveSeries(BookSeriesData bookSeriesData) {
+        if(bookSeriesData == null) {
             return false;
         }
 
-        boolean isUpdate = isBookSeriesRegistered(seriesData.getSeriesId());
-        ContentValues contentValues = createContentValues4BookSeries(seriesData, isUpdate);
+        boolean isUpdate = isBookSeriesRegistered(bookSeriesData.getSeriesId());
+        ContentValues contentValues = createContentValues4BookSeries(bookSeriesData, isUpdate);
         if(contentValues == null) {
             return false;
         }
@@ -142,7 +142,7 @@ public class BookSeriesDao extends BookDaoBase {
                     Const.DB.BookSeriesTable.TABLE_NAME,
                     contentValues,
                     SqlText.createWhereClause4UpdateBookSeries(),
-                    new String[]{Integer.toString(seriesData.getSeriesId())});
+                    new String[]{Integer.toString(bookSeriesData.getSeriesId())});
             return result >= 0;
         } else {
             long result = DB.getDB(mContext).getSQLiteDatabase(mContext).insert(
@@ -166,19 +166,19 @@ public class BookSeriesDao extends BookDaoBase {
     }
 
     /**
-     * Create SeriesData from cursor's current position
+     * Create BookSeriesData from cursor's current position
      * Cursor will NOT be closed within this method
      *
      * @param cursor cursor
-     * @return SeriesData instance, or if cursor is invalid
+     * @return BookSeriesData instance, or if cursor is invalid
      */
     @Nullable
-    private SeriesData createSeriesDataFromCursor(@Nullable Cursor cursor) {
+    private BookSeriesData createSeriesDataFromCursor(@Nullable Cursor cursor) {
         if(cursor == null || cursor.isClosed()) {
             return null;
         }
 
-        SeriesData data = new SeriesData(mContext);
+        BookSeriesData data = new BookSeriesData(mContext);
         // basic info
         data.setSeriesId(getIntFromCursor(cursor, Const.DB.BookSeriesTable.SERIES_ID));
         data.setTitle(getStringFromCursor(cursor, Const.DB.BookSeriesTable.TITLE_NAME));
@@ -205,16 +205,16 @@ public class BookSeriesDao extends BookDaoBase {
     }
 
     /**
-     * Create ContentValues for given SeriesData
+     * Create ContentValues for given BookSeriesData
      *
-     * @param seriesData SeriesData instance.
+     * @param bookSeriesData BookSeriesData instance.
      * @param isUpdate whether is updating, or newly adding
      * @return ContentValues instance or null if invalid data is given
      */
     @Nullable
-    private ContentValues createContentValues4BookSeries(SeriesData seriesData, boolean isUpdate) {
+    private ContentValues createContentValues4BookSeries(BookSeriesData bookSeriesData, boolean isUpdate) {
         // return null if is update & invalid seriesId is given
-        if(isUpdate && !BookData.isValidBookSeriesId(seriesData.getSeriesId())) {
+        if(isUpdate && !BookData.isValidBookSeriesId(bookSeriesData.getSeriesId())) {
             return null;
         }
 
@@ -223,23 +223,23 @@ public class BookSeriesDao extends BookDaoBase {
         // basic info
         if(isUpdate) {
             // add seriesId only when updating, since seriesId is given only after registered to DB
-            contentValues.put(Const.DB.BookSeriesTable.SERIES_ID, seriesData.getSeriesId());
+            contentValues.put(Const.DB.BookSeriesTable.SERIES_ID, bookSeriesData.getSeriesId());
         }
-        contentValues.put(Const.DB.BookSeriesTable.TITLE_NAME, seriesData.getTitle());
-        contentValues.put(Const.DB.BookSeriesTable.AUTHOR_NAME, seriesData.getAuthor());
-        contentValues.put(Const.DB.BookSeriesTable.MAGAZINE_NAME, seriesData.getMagazine());
-        contentValues.put(Const.DB.BookSeriesTable.COMPANY_NAME, seriesData.getCompany());
-        contentValues.put(Const.DB.BookSeriesTable.IMAGE_PATH, seriesData.getImagePath());
+        contentValues.put(Const.DB.BookSeriesTable.TITLE_NAME, bookSeriesData.getTitle());
+        contentValues.put(Const.DB.BookSeriesTable.AUTHOR_NAME, bookSeriesData.getAuthor());
+        contentValues.put(Const.DB.BookSeriesTable.MAGAZINE_NAME, bookSeriesData.getMagazine());
+        contentValues.put(Const.DB.BookSeriesTable.COMPANY_NAME, bookSeriesData.getCompany());
+        contentValues.put(Const.DB.BookSeriesTable.IMAGE_PATH, bookSeriesData.getImagePath());
 
         // pronunciation info
-        contentValues.put(Const.DB.BookSeriesTable.TITLE_PRONUNCIATION, seriesData.getTitlePronunciation());
-        contentValues.put(Const.DB.BookSeriesTable.AUTHOR_PRONUNCIATION, seriesData.getAuthorPronunciation());
-        contentValues.put(Const.DB.BookSeriesTable.MAGAZINE_PRONUNCIATION, seriesData.getMagazinePronunciation());
-        contentValues.put(Const.DB.BookSeriesTable.COMPANY_PRONUNCIATION, seriesData.getCompanyPronunciation());
+        contentValues.put(Const.DB.BookSeriesTable.TITLE_PRONUNCIATION, bookSeriesData.getTitlePronunciation());
+        contentValues.put(Const.DB.BookSeriesTable.AUTHOR_PRONUNCIATION, bookSeriesData.getAuthorPronunciation());
+        contentValues.put(Const.DB.BookSeriesTable.MAGAZINE_PRONUNCIATION, bookSeriesData.getMagazinePronunciation());
+        contentValues.put(Const.DB.BookSeriesTable.COMPANY_PRONUNCIATION, bookSeriesData.getCompanyPronunciation());
 
-        contentValues.put(Const.DB.BookSeriesTable.MEMO, seriesData.getMemo());
-        contentValues.put(Const.DB.BookSeriesTable.TAGS, seriesData.getRawTags());
-        contentValues.put(Const.DB.BookSeriesTable.SERIES_IS_FINISH, seriesData.isSeriesComplete());
+        contentValues.put(Const.DB.BookSeriesTable.MEMO, bookSeriesData.getMemo());
+        contentValues.put(Const.DB.BookSeriesTable.TAGS, bookSeriesData.getRawTags());
+        contentValues.put(Const.DB.BookSeriesTable.SERIES_IS_FINISH, bookSeriesData.isSeriesComplete());
         contentValues.put(Const.DB.BookSeriesTable.LAST_UPDATE_UNIX, now.getTimeInMillis());
         if(!isUpdate) {
             contentValues.put(Const.DB.BookSeriesTable.INIT_UPDATE_UNIX, now.getTimeInMillis());
