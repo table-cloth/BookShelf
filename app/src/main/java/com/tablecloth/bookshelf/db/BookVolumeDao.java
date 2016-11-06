@@ -110,6 +110,7 @@ public class BookVolumeDao extends BookDaoBase {
     @Nullable
     private ContentValues createContentValues4BookVolume(int seriesId, int bookVolume, boolean isUpdate) {
         // return null if invalid value is given
+        // seriesId always must bu valid, since bookVolume is registered AFTER bookSeries data is registered
         if(!isValidBookSeriesId(seriesId)
                 || !isValidBookVolume(bookVolume)) {
             return null;

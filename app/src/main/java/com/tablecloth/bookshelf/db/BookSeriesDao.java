@@ -125,8 +125,7 @@ public class BookSeriesDao extends BookDaoBase {
      * @return is save success
      */
     public boolean saveSeries(SeriesData seriesData) {
-        if(seriesData == null
-                || !isValidBookSeriesId(seriesData.getSeriesId())) {
+        if(seriesData == null) {
             return false;
         }
 
@@ -144,9 +143,14 @@ public class BookSeriesDao extends BookDaoBase {
                     new String[]{Integer.toString(seriesData.getSeriesId())});
             return result >= 0;
         } else {
-            long result = DB.getDB(mContext).getSQLiteDatabase(mContext).insert(
-                    Const.DB.BookSeriesTable.TABLE_NAME, null, contentValues);
-            return result != -1L;
+            try {
+                long result = DB.getDB(mContext).getSQLiteDatabase(mContext).insertOrThrow(
+                        Const.DB.BookSeriesTable.TABLE_NAME, null, contentValues);
+                return result != -1L;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         }
     }
 
@@ -211,15 +215,18 @@ public class BookSeriesDao extends BookDaoBase {
      */
     @Nullable
     private ContentValues createContentValues4BookSeries(SeriesData seriesData, boolean isUpdate) {
-        // return null if invalid value is given
-        if(!isValidBookSeriesId(seriesData.getSeriesId())) {
+        // return null if is update & invalid seriesId is given
+        if(isUpdate && !isValidBookSeriesId(seriesData.getSeriesId())) {
             return null;
         }
 
         Calendar now = Calendar.getInstance();
         ContentValues contentValues = new ContentValues();
         // basic info
-        contentValues.put(Const.DB.BookSeriesTable.SERIES_ID, seriesData.getSeriesId());
+        if(isUpdate) {
+            // add seriesId only when updating, since seriesId is given only after registered to DB
+            contentValues.put(Const.DB.BookSeriesTable.SERIES_ID, seriesData.getSeriesId());
+        }
         contentValues.put(Const.DB.BookSeriesTable.TITLE_NAME, seriesData.getTitle());
         contentValues.put(Const.DB.BookSeriesTable.AUTHOR_NAME, seriesData.getAuthor());
         contentValues.put(Const.DB.BookSeriesTable.MAGAZINE_NAME, seriesData.getMagazine());

@@ -1,7 +1,10 @@
 package com.tablecloth.bookshelf.db;
 
+import android.text.TextUtils;
+
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Util;
 
 /**
  * Created by nomura on 2016/11/04.
@@ -122,9 +125,20 @@ public class SqlText {
                 .append("SELECT * FROM ")
                 .append(Const.DB.BookSeriesTable.TABLE_NAME);
 
+        // if no search content is given, do not add where statements
+        if(searchContent == null
+                || searchContent.length <= 0) {
+            return sql.toString();
+        }
+
         // loop each search word
         boolean isFirstSearchWord = true;
         for(String searchWord : searchContent) {
+            // if search word is invalid, continue without any action
+            if(Util.isEmpty(searchWord)) {
+                continue;
+            }
+
             // add AND clause after first search word
             if(isFirstSearchWord) {
                 isFirstSearchWord = false;
