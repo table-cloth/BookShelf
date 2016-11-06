@@ -3,7 +3,7 @@ package com.tablecloth.bookshelf.util;
 import android.graphics.Bitmap;
 
 /**
- * Created by shnomura on 2015/03/14.
+ * Created by Minami on 2015/03/14.
  */
 public class ListenerUtil {
 

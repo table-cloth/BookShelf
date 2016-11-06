@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 /**
  * 汎用的な処理を格納する
- * Created by shnomura on 2014/08/17.
+ * Created by Minami on 2014/08/17.
  */
 public class Util {
     public static boolean isDebuggable(Context context) {
@@ -37,7 +37,7 @@ public class Util {
     public static boolean isEmpty(ArrayList list) {
         return list == null || list.isEmpty();
     }
-    
+
     public static void initAdview(Activity activity, ViewGroup parentView) {
     	// adView を作成する
         AdView adView = new AdView(activity);

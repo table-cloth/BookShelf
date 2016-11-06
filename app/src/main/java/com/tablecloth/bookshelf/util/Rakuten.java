@@ -17,7 +17,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 
 /**
- * Created by shnomura on 2015/02/22.
+ * Created by Minami on 2015/02/22.
  */
 public class Rakuten {
 

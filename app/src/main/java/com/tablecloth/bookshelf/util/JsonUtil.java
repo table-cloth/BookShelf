@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by shnomura on 2015/02/22.
+ * Created by Minami on 2015/02/22.
  */
 public class JsonUtil {
 

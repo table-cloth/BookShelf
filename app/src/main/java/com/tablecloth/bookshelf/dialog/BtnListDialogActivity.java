@@ -13,7 +13,7 @@ import com.tablecloth.bookshelf.util.G;
 /**
  * 縦にボタンが並んだダイアログ
  * ボタンの数は可変に変更したい（現状は内容も個数も固定＠2015/02/21）
- * Created by shnomura on 2015/02/21.
+ * Created by Minami on 2015/02/21.
  */
 public class BtnListDialogActivity extends DialogBaseActivity {
 

@@ -7,7 +7,7 @@ import android.widget.ImageView;
 /**
  * 書籍の表紙用のImageView。
  * 縦横比率を3:2とする
- * Created by shnomura on 2015/03/15.
+ * Created by Minami on 2015/03/15.
  */
 public class BookCoverImageView extends ImageView {
 

@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by shnomura on 2015/03/15.
+ * Created by Minami on 2015/03/15.
  * ListActivity / GridActivity両方で行う共通の処理・変数等はこちらに保持しておく
  */
 public abstract class MainBaseActivity extends BaseActivity {

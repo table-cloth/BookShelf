@@ -9,7 +9,7 @@ import android.content.pm.PackageManager;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 
 /**
- * Created by shnomura on 2015/02/15.
+ * Created by Minami on 2015/02/15.
  *
  * アップデートダイアログやバージョンアップデート内容を記録するためのクラス
  */

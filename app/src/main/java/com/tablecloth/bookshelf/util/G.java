@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * あらゆるクラスで使用する用の定数を保格納する
- * Created by shnomura on 2014/08/17.
+ * Created by Minami on 2014/08/17.
  */
 public class G {
 	

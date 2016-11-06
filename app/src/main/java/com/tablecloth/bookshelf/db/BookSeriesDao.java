@@ -16,7 +16,7 @@ import java.util.Calendar;
 /**
  * Data accessor for book series
  *
- * Created by nomura on 2016/11/05.
+ * Created by Minami on 2016/11/05.
  */
 public class BookSeriesDao extends BookDaoBase {
 

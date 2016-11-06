@@ -12,7 +12,7 @@ import com.tablecloth.bookshelf.util.Const;
  * Data access object Base class
  * All DaoXx class should override this class to manage same DB usage
  *
- * Created by shnomura on 2015/03/29.
+ * Created by Minami on 2015/03/29.
  */
 public class DaoBase {
 

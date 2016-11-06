@@ -11,7 +11,7 @@ import com.tablecloth.bookshelf.R;
 
 /**
  * タイトル・メッセージ・YES/NOボタンの要素を持ったダイアログ拡張クラス
- * Created by shnomura on 2014/08/17.
+ * Created by Minami on 2014/08/17.
  */
 public class SimpleDialogActivity extends DialogBaseActivity {
     @Override

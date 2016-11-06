@@ -14,7 +14,7 @@ import java.util.Calendar;
 /**
  * Data accessor for previously used tags
  *
- * Created by nomura on 2016/11/05.
+ * Created by Minami on 2016/11/05.
  */
 public class TagHistoryDao extends DaoBase {
 

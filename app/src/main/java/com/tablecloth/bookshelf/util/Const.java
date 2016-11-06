@@ -1,7 +1,7 @@
 package com.tablecloth.bookshelf.util;
 
 /**
- * Created by nomura on 2016/11/04.
+ * Created by Minami on 2016/11/04.
  */
 
 public class Const {

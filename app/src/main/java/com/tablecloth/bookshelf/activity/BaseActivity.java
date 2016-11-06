@@ -17,7 +17,7 @@ import com.tablecloth.bookshelf.util.Util;
 
 
 /**
- * Created by shnomura on 2015/02/19.
+ * Created by Minami on 2015/02/19.
  */
 public abstract class BaseActivity extends Activity {
 

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 /**
- * Created by shnomura on 2015/02/15.
+ * Created by Minami on 2015/02/15.
  */
 public class PrefUtil {
 

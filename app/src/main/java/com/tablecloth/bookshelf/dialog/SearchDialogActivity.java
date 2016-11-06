@@ -16,7 +16,7 @@ import com.tablecloth.bookshelf.util.Rakuten;
 
 /**
  * タイトル・メッセージ・YES/NOボタンの要素を持ったダイアログ拡張クラス
- * Created by shnomura on 2014/08/17.
+ * Created by Minami on 2014/08/17.
  */
 public class SearchDialogActivity extends DialogBaseActivity {
 

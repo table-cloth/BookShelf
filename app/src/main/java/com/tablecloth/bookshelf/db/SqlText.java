@@ -8,7 +8,7 @@ import com.tablecloth.bookshelf.util.Util;
  * SQL text creator
  * Keeps SQL text constants & Creates SQL texts with given values
  *
- * Created by nomura on 2016/11/04.
+ * Created by Minami on 2016/11/04.
  */
 public class SqlText {
 

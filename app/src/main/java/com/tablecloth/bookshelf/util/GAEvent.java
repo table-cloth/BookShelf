@@ -2,7 +2,7 @@ package com.tablecloth.bookshelf.util;
 
 /**
  * GoogleAnalytics用イベント一覧
- * Created by shnomura on 2015/02/19.
+ * Created by Minami on 2015/02/19.
  */
 public class GAEvent {
     /**

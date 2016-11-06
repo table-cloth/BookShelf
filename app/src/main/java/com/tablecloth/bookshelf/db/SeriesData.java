@@ -27,7 +27,7 @@ import com.tablecloth.bookshelf.util.Util;
 /**
  * Data class to manage book series
  *
- * Created by shnomura on 2014/08/16.
+ * Created by Minami on 2014/08/16.
  */
 public class SeriesData {
 

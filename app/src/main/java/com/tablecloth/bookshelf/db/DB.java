@@ -11,7 +11,7 @@ import com.tablecloth.bookshelf.util.Const;
  * DB singleton class
  * All access to DB, with SQLiteDatabase must be done using this class
  *
- * Created by shnomura on 2014/08/16.
+ * Created by Minami on 2014/08/16.
  */
 public class DB {
 

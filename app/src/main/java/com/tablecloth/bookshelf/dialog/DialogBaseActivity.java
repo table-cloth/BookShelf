@@ -6,7 +6,7 @@ import android.view.Window;
 import com.tablecloth.bookshelf.activity.BaseActivity;
 
 /**
- * Created by shnomura on 2014/08/17.
+ * Created by Minami on 2014/08/17.
  */
 public abstract class DialogBaseActivity extends BaseActivity {
 

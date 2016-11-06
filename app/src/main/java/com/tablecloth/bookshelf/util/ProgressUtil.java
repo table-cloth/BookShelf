@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 /**
- * Created by shnomura on 2015/03/14.
+ * Created by Minami on 2015/03/14.
  */
 public class ProgressUtil {
     final private Context mContext;

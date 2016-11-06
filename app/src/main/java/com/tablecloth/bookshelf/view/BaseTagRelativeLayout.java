@@ -9,7 +9,7 @@ import com.tablecloth.bookshelf.db.TagHistoryDao;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
- * Created by shnomura on 2015/04/10.
+ * Created by Minami on 2015/04/10.
  */
 public class BaseTagRelativeLayout extends RelativeLayout {
     private String mTagData = null;

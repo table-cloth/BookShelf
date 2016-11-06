@@ -11,7 +11,7 @@ import com.tablecloth.bookshelf.R;
 
 /**
  * 設定ボタンタップ後に表示されるダイアログ
- * Created by shnomura on 2014/11/24.
+ * Created by Minami on 2014/11/24.
  */
 public class SortDialogActivity extends DialogBaseActivity {
     @Override

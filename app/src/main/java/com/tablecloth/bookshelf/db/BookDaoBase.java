@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
  * Data accessor for getting information of Books
  * This class should only read data, and not set data
  *
- * Created by nomura on 2016/11/04.
+ * Created by Minami on 2016/11/04.
  */
 public class BookDaoBase extends DaoBase {
 

@@ -23,7 +23,7 @@ import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ViewUtil;
 
 /**
- * Created by shnomura on 2015/03/15.
+ * Created by Minami on 2015/03/15.
  */
 public class GridActivity extends MainBaseActivity {
 

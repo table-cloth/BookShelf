@@ -12,7 +12,7 @@ import com.tablecloth.bookshelf.util.Util;
 /**
  * Data accessor for Settings within the app
  *
- * Created by shnomura on 2015/03/29.
+ * Created by Minami on 2015/03/29.
  */
 public class SettingsDao extends DaoBase {
 

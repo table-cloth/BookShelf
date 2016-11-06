@@ -16,7 +16,7 @@ import android.graphics.Matrix;
 import android.text.format.DateFormat;
 
 /**
- * Created by shnomura on 2014/08/17.
+ * Created by Minami on 2014/08/17.
  */
 public class ImageUtil {
 

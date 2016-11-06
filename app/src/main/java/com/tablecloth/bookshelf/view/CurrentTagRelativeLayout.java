@@ -17,7 +17,7 @@ import com.tablecloth.bookshelf.util.Util;
 import java.util.ArrayList;
 
 /**
- * Created by shnomura on 2015/04/10.
+ * Created by Minami on 2015/04/10.
  */
 public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
 

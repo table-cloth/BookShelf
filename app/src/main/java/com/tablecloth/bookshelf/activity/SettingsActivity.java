@@ -27,7 +27,7 @@ import com.tablecloth.bookshelf.util.Util;
 import java.security.MessageDigest;
 
 /**
- * Created by shnomura on 2015/03/15.
+ * Created by Minami on 2015/03/15.
  */
 public class SettingsActivity extends BaseActivity {
 

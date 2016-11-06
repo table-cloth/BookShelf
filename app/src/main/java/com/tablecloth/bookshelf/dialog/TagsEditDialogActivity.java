@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 /**
  * タグの編集用ダイアログ
- * Created by shnomura on 2015/04/02.
+ * Created by Minami on 2015/04/02.
  */
 public class TagsEditDialogActivity extends DialogBaseActivity {
 

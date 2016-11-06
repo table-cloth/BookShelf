@@ -10,7 +10,7 @@ import com.tablecloth.bookshelf.R;
 import java.util.ArrayList;
 
 /**
- * Created by shnomura on 2015/04/05.
+ * Created by Minami on 2015/04/05.
  */
 public class ViewUtil {
 
