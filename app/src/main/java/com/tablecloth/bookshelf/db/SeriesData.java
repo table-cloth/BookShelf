@@ -25,13 +25,15 @@ import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
+ * Data class to manage book series
+ *
  * Created by shnomura on 2014/08/16.
  */
 public class SeriesData {
 
     private final static String TAGS_SEPARATOR_SYMBOL = "\n";
 
-    Context mContext;
+    private Context mContext;
 
     // Basic info
     private  int mSeriesId = -1;
