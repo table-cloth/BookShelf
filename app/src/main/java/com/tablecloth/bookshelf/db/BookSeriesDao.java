@@ -143,14 +143,9 @@ public class BookSeriesDao extends BookDaoBase {
                     new String[]{Integer.toString(seriesData.getSeriesId())});
             return result >= 0;
         } else {
-            try {
-                long result = DB.getDB(mContext).getSQLiteDatabase(mContext).insertOrThrow(
-                        Const.DB.BookSeriesTable.TABLE_NAME, null, contentValues);
-                return result != -1L;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
+            long result = DB.getDB(mContext).getSQLiteDatabase(mContext).insert(
+                    Const.DB.BookSeriesTable.TABLE_NAME, null, contentValues);
+            return result != -1L;
         }
     }
 

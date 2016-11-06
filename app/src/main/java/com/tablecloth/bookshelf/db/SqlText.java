@@ -1,15 +1,15 @@
 package com.tablecloth.bookshelf.db;
 
-import android.text.TextUtils;
-
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
+ * SQL text creator
+ * Keeps SQL text constants & Creates SQL texts with given values
+ *
  * Created by nomura on 2016/11/04.
  */
-
 public class SqlText {
 
     // Create SQLite text for registering Book Series table
@@ -126,8 +126,7 @@ public class SqlText {
                 .append(Const.DB.BookSeriesTable.TABLE_NAME);
 
         // if no search content is given, do not add where statements
-        if(searchContent == null
-                || searchContent.length <= 0) {
+        if(Util.isEmpty(searchContent)) {
             return sql.toString();
         }
 

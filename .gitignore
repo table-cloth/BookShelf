@@ -2,6 +2,7 @@
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries
+/.idea/fileTemplates
 .DS_Store
 /build
 *.iml
