@@ -26,7 +26,7 @@ public class SplashActivity extends BaseActivity {
 
     /**
      * Constructor
-     * 
+     *
      * @param savedInstanceState savedInstanceState
      */
     @Override
@@ -49,5 +49,4 @@ public class SplashActivity extends BaseActivity {
         // Finish this activity after starting next activity
         SplashActivity.this.finish();
     }
-
 }

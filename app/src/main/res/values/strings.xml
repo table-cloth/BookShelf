@@ -2,6 +2,14 @@
 <resources>
 
     <string name="app_name">本棚管理</string>
+    <string name="email">table.cloth.03@gmail.com</string>
+
+    <string name="email_inquiry_line1_title">＊＊お問い合わせ情報＊＊\n</string>
+    <string name="email_inquiry_line2_id">お問い合わせID：%1$s\n</string>
+    <string name="email_inquiry_line3_app_version">アプリバージョン：%1$s\n</string>
+    <string name="email_inquiry_line4_os_version">OSバージョン：%1$s\n</string>
+    <string name="email_inquiry_line5_device">機種名：%1$s\n</string>
+    <string name="email_inquiry_line6_closing">＊＊＊＊＊＊＊＊＊＊＊＊\n\n</string>
 
     <string name="add">追加</string>
     <string name="add_detail"><u>情報を追加する</u></string>
