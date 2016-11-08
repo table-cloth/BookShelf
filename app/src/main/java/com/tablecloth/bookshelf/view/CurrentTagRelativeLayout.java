@@ -86,7 +86,7 @@ public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
         }
         this.setLayoutParams(parentParams);
         if(parentParams.height > Util.convertDp2Px(mContext, 100)) {
-            ViewGroup ScrollParent = (ViewGroup)((ViewGroup)getParent()).getParent();
+            ViewGroup ScrollParent = (ViewGroup)(getParent()).getParent();
             ViewGroup.LayoutParams param = ScrollParent.getLayoutParams();
             param.height = Util.convertDp2Px(mContext, 100);
             ScrollParent.setLayoutParams(param);
@@ -102,7 +102,7 @@ public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
         @Override
         public void onClick(View view) {
             // get tag to delete
-            String deleteTag = ((TextView)view.findViewById(R.id.tag_name)).getText().toString();
+            String deleteTag = (String) view.findViewById(R.id.tag_name).getTag();
 
             ArrayList<String> tagsTmp = BookData.convertTagsRawText2TagsList(getTagData());
             if(!tagsTmp.contains(deleteTag)) {
