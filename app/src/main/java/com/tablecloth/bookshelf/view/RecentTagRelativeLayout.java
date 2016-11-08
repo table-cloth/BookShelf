@@ -104,7 +104,7 @@ public class RecentTagRelativeLayout extends BaseTagRelativeLayout {
     OnClickListener onClick = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            String newTag = ((TextView)view.findViewById(R.id.tag_name)).getText().toString();
+            String newTag = (String) view.findViewById(R.id.tag_name).getTag();
             // invalid tag
             if(Util.isEmpty(newTag)) {
                 ToastUtil.show(mContext, R.string.tag_error_enter_tag_2_add);

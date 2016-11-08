@@ -81,7 +81,6 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
                 }
 
                 // 登録成功
-                if(tagsTmp == null) tagsTmp = new ArrayList<String>();
                 tagsTmp.add(newTag);
                 tagsData = BookData.convertTagsList2TagsRawText(tagsTmp);
 
