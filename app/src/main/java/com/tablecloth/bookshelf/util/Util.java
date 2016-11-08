@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * Created by Minami on 2014/08/17.
  */
 public class Util {
-    public static boolean isDebuggable(Context context) {
+    public static boolean isDebugMode(Context context) {
         return ( 0 != ( context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE ) );
     }
 

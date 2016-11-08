@@ -1,14 +1,12 @@
 package com.tablecloth.bookshelf.util;
 
-import java.util.Collection;
-
 /**
  * あらゆるクラスで使用する用の定数を保格納する
  * Created by Minami on 2014/08/17.
  */
 public class G {
-	
-	final public static String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
+
+//	final public static String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
 	
     final public static int RESULT_NONE = 0;
     final public static int RESULT_POSITIVE = 1;

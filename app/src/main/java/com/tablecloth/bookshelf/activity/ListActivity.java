@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.tablecloth.bookshelf.util.Const;
-import com.tablecloth.bookshelf.util.CustomListView;
+import com.tablecloth.bookshelf.view.CustomListView;
 import com.tablecloth.bookshelf.R;
 
 /**

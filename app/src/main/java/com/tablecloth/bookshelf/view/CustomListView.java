@@ -1,4 +1,4 @@
-package com.tablecloth.bookshelf.util;
+package com.tablecloth.bookshelf.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;

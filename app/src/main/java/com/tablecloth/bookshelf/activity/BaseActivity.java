@@ -4,52 +4,74 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.Window;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.tablecloth.bookshelf.BookShelfApplication;
-import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.db.DB;
-import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.util.Util;
 
 
 /**
+ * Base class for ALL activity
+ * Handles basic feature all activity may use
+ *
  * Created by Minami on 2015/02/19.
  */
 public abstract class BaseActivity extends Activity {
 
     protected Handler mHandler;
     final protected int CONTENT_VIEW_ID_NONE = -1;
-    protected SettingsDao mSettings;
 
+    /**
+     * Get layout ID to show in the activity
+     *
+     * @return layout ID
+     */
+    protected abstract int getContentViewID();
+
+    /**
+     * OnCreate
+     *
+     * @param savedInstanceState savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        int contentViewID = getContentViewID();
-        if(contentViewID != CONTENT_VIEW_ID_NONE) setContentView(contentViewID);
 
+        // set layout ID if valid
+        int contentViewID = getContentViewID();
+        if(contentViewID != CONTENT_VIEW_ID_NONE) {
+            setContentView(contentViewID);
+        }
+
+        // init handler
         Looper looper = getMainLooper();
         mHandler = new Handler(looper);
 
-        // GoogleAnalyticsを初期化
-        if(!Util.isDebuggable(BaseActivity.this)) {
+        // init Google Analytics Tracker
+        // This initialize needs to be called in every Activity
+        if(!Util.isDebugMode(BaseActivity.this)) {
             getGoogleAnalyticsTracker();
         }
-
-        mSettings = new SettingsDao(BaseActivity.this);
     }
 
+    /**
+     * Called when activity starts
+     */
     @Override
     public void onStart() {
         super.onStart();
         GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
+    /**
+     * Called when activity stops
+     */
     @Override
     public void onStop() {
         super.onStop();
@@ -57,50 +79,49 @@ public abstract class BaseActivity extends Activity {
     }
 
     /**
-     * GoogleAnalytics集計用インスタンスを取得・存在しなければ作成する
-     * @return
+     * Get instance of Tracker for sending values to Google Analytics
+     * Create Tracker instance if not already made
+     *
+     * @return Tracker instance
      */
     private Tracker getGoogleAnalyticsTracker() {
         return ((BookShelfApplication)getApplication()).getGoogleAnalyticsTracker();
     }
 
     /**
-     * GoogleAnalyticsに個別のイベントを送信する関数
-     * @param type
-     * @param event
-     * @param param
+     * Send tracking event to GoogleAnalytics
+     *
+     * @param eventCategory Category of the event. This must be valid value
+     * @param eventAction Action of the event. This must be valid value
      */
-    protected void sendGoogleAnalyticsEvent(String type, String event, String param) {
-        if(Util.isDebuggable(BaseActivity.this)) return;
-        if(Util.isEmpty(type)) return;
-        if(Util.isEmpty(param)) {
-            getGoogleAnalyticsTracker().send(new HitBuilders.EventBuilder()
-                    .setCategory(type)
-                    .setAction(event)
-                    .build());
-        } else {
-            getGoogleAnalyticsTracker().send(new HitBuilders.EventBuilder()
-                    .setCategory(type)
-                    .setAction(event)
-                    .setLabel(param)
-                    .build());
-
-        }
+    protected void sendGoogleAnalyticsEvent(@NonNull String eventCategory, @NonNull String eventAction) {
+        sendGoogleAnalyticsEvent(eventCategory, eventAction, null);
     }
+
     /**
-     * GoogleAnalyticsに個別のイベントを送信する関数
-     * @param type
-     * @param event
+     * Send tracking event to GoogleAnalytics
+     *
+     * @param eventCategory Category of the event. This must be valid value
+     * @param eventAction Action of the event. This must be valid value
+     * @param eventLabel Label (additional info) of the event. This may be null
      */
-    protected void sendGoogleAnalyticsEvent(String type, String event) {
-        if(Util.isDebuggable(BaseActivity.this)) return;
-        if(Util.isEmpty(type)) return;
-        getGoogleAnalyticsTracker().send(new HitBuilders.EventBuilder()
-                .setCategory(type)
-                .setAction(event)
-                .build());
+    protected void sendGoogleAnalyticsEvent(@NonNull String eventCategory, @NonNull String eventAction, @Nullable String eventLabel) {
+        // do not track if not release mode
+        if(Util.isDebugMode(this)) return;
+        // return if category or action is invalid
+        if(Util.isEmpty(eventCategory)
+                || Util.isEmpty(eventAction)) return;
+
+        // set data for EventBuilder
+        HitBuilders.EventBuilder eventBuilder = new HitBuilders.EventBuilder()
+                .setCategory(eventCategory)
+                .setAction(eventAction);
+        // set label if given param is not empty
+        if(!Util.isEmpty(eventLabel)) {
+            eventBuilder.setLabel(eventLabel);
+        }
+
+        // do send data to GoogleAnalytics
+        getGoogleAnalyticsTracker().send(eventBuilder.build());
     }
-
-    protected abstract int getContentViewID();
-
 }
