@@ -1,51 +1,42 @@
 package com.tablecloth.bookshelf.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 
-import com.tablecloth.bookshelf.util.Const;
-import com.tablecloth.bookshelf.view.CustomListView;
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.util.Const;
 
 /**
- * Created by Minami on 2014/08/16.
+ * Created by Minami on 2015/03/15.
  */
-public class ListActivity extends MainBaseActivity {
+public class GridBaseActivity extends BookSeriesCatalogBaseActivity {
 
-    private CustomListView mListView;
-    ListAdapter mListAdapter;
-
-    // http://shogogg.hatenablog.jp/entry/20110118/1295326773
-    int mDraggingPosition = -1;
+    private GridView mGridView;
+    private GridAdapter mGridAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // リスト部分の生成・設定処理
-        mListView = (CustomListView)findViewById(R.id.list_view);
-        mListAdapter = new ListAdapter();
-        mListView.setAdapter(mListAdapter);
-        mListView.setSortable(true);
+        // グリッド部分の生成・設定処理
+        mGridView = (GridView)findViewById(R.id.grid_view);
+        mGridAdapter = new GridAdapter();
+        mGridView.setAdapter(mGridAdapter);
 
     }
 
-
-    /**
-     * ListView用のAdapterクラス
-     */
-    private class ListAdapter extends BaseAdapter {
+    private class GridAdapter extends BaseAdapter {
         @Override
         public int getCount() {
-            return mDataArrayList.size();
+            return mBookSeriesDataList.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return mDataArrayList.get(position);
+            return mBookSeriesDataList.get(position);
         }
 
         @Override
@@ -56,7 +47,7 @@ public class ListActivity extends MainBaseActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             return initializeBookSeriesItemView(position, convertView, parent,
-                    mDataArrayList.get(position), false);
+                    mBookSeriesDataList.get(position), true);
         }
     }
 
@@ -66,7 +57,7 @@ public class ListActivity extends MainBaseActivity {
     protected void setClickListener() {
         super.setClickListener();
     }
-    
+
     /**
      * その他各種リスナー登録
      */
@@ -74,22 +65,14 @@ public class ListActivity extends MainBaseActivity {
         super.setOtherListener();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 
-    @Override
     protected int getContentViewID() {
-        return R.layout.activity_list;
+        return R.layout.activity_grid;
     }
 
-    /**
-     * データに変動があり、notifyDataSetChanged()が呼び出される必要があるときに呼ばれる
-     */
     @Override
     protected void notifyDataSetChanged() {
-        mListAdapter.notifyDataSetChanged();
+        mGridAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -98,7 +81,7 @@ public class ListActivity extends MainBaseActivity {
      */
     protected boolean isShowTypeCorrect() {
         String value = mSettings.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
-        if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
+        if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID.equals(value)) {
             return true;
         }
         return false;
@@ -108,7 +91,7 @@ public class ListActivity extends MainBaseActivity {
      * 現在表示している画面の種類を返す
      */
     protected String getShowType() {
-        return Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST;
+        return Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID;
     }
 
 }

@@ -24,6 +24,7 @@ import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
+import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
@@ -34,7 +35,7 @@ import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.JsonUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
-import com.tablecloth.bookshelf.util.ProgressUtil;
+import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
@@ -48,65 +49,67 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Base class for Activity showing catalog of BookSeries
+ * All common features in above 2 activities are to be declared in this class
+ *
  * Created by Minami on 2015/03/15.
- * ListActivity / GridActivity両方で行う共通の処理・変数等はこちらに保持しておく
  */
-public abstract class MainBaseActivity extends BaseActivity {
+public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
 
     // number of book series item shown in a single row, for grid layout
     final private int BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID = 4;
+    // BookSeriesData list to show in list / grid
+    protected ArrayList<BookSeriesData> mBookSeriesDataList = new ArrayList<>();
+    // Progress Dialog Util instance
+    protected ProgressDialogUtil mProgress;
 
-    protected Spinner spinnerView;
-    protected ArrayList<BookSeriesData> mDataArrayList = new ArrayList<BookSeriesData>();
+    // Current show mode
+    protected int mShowMode = G.MODE_VIEW;
 
-    // 楽天WebAPIでの検索結果の保持用変数
-    protected ArrayList<BookSeriesData> mApiSearchResultArrayList = new ArrayList<BookSeriesData>();
-    protected JSONObject mAPISearchResultJsonObject = null;
-
-    protected ProgressUtil mProgress;
-
-    // データ編集時用のID情報一時保管庫
-    // 使い終わったらnullにする
-    protected int[] mSelectSeriesIds = null;
-
-    // 操作モード
-    protected int mMode = G.MODE_VIEW;
-
-
+    // Search related
     protected int mSearchMode = G.SEARCH_MODE_ALL;
     protected String mSearchContent = "";
 
+    // Data accessor
     BookSeriesDao mBookSeriesDao;
+    SettingsDao mSettingsDao;
 
-    // 各種ヘッダー
-    View mHeader;
-    View mHeaderView;
-    View mHeaderSearch;
-    View mHeaderApiSearch;
+    // View instances
+    View mHeaderAreaView;
+    View mHeaderModeAreaView;
+    View mHeaderSearchAreaView;
+    View mHeaderApiSearchAreaView;
 
+    /**
+     * Constructor
+     *
+     * @param savedInstanceState savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mProgress = new ProgressUtil(MainBaseActivity.this);
-        mBookSeriesDao = new BookSeriesDao(MainBaseActivity.this);
-
-        mHeader = findViewById(R.id.header);
-        mHeaderView = mHeader.findViewById(R.id.header_area_mode_view);
-        mHeaderSearch = mHeader.findViewById(R.id.header_area_mode_search);
-        mHeaderApiSearch = mHeader.findViewById(R.id.header_area_mode_api_search);
-
+        // book catalog activity always starts with View Mode
         switchMode(G.MODE_VIEW);
 
-        // 広告の初期化処理
-        Util.initAdview(this, (ViewGroup) findViewById(R.id.banner));
+        // initialize dao
+        mBookSeriesDao = new BookSeriesDao(this);
+        mSettingsDao = new SettingsDao(this);
 
-        // バージョン情報の確認・アップデートダイアログの表示・及びバージョン情報の更新
-        VersionUtil versionUtil = new VersionUtil(MainBaseActivity.this);
-        versionUtil.showUpdateDialog();
-
+        // initialize view / callbacks
+        mHeaderAreaView = findViewById(R.id.header);
+        mHeaderModeAreaView = mHeaderAreaView.findViewById(R.id.header_area_mode_view);
+        mHeaderSearchAreaView = mHeaderAreaView.findViewById(R.id.header_area_mode_search);
+        mHeaderApiSearchAreaView = mHeaderAreaView.findViewById(R.id.header_area_mode_api_search);
         setClickListener();
         setOtherListener();
+
+        mProgress = ProgressDialogUtil.getInstance(this);
+
+
+        // initialize Ad
+        Util.initAdview(this, (ViewGroup) findViewById(R.id.banner));
+
     }
 
     /**
@@ -119,30 +122,30 @@ public abstract class MainBaseActivity extends BaseActivity {
             case G.MODE_VIEW:
             default:
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_VIEW);
-                mHeaderView.setVisibility(View.VISIBLE);
-                mHeaderSearch.setVisibility(View.GONE);
-                mHeaderApiSearch.setVisibility(View.GONE);
+                mHeaderModeAreaView.setVisibility(View.VISIBLE);
+                mHeaderSearchAreaView.setVisibility(View.GONE);
+                mHeaderApiSearchAreaView.setVisibility(View.GONE);
 //                findViewById(R.id.btn_search).setVisibility(View.VISIBLE);
                 break;
 
             case G.MODE_SEARCH:
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_SEARCH);
-                mHeaderView.setVisibility(View.GONE);
-                mHeaderSearch.setVisibility(View.VISIBLE);
-                mHeaderApiSearch.setVisibility(View.GONE);
+                mHeaderModeAreaView.setVisibility(View.GONE);
+                mHeaderSearchAreaView.setVisibility(View.VISIBLE);
+                mHeaderApiSearchAreaView.setVisibility(View.GONE);
                 boolean flag = findViewById(R.id.search_content).requestFocus();
                 findViewById(R.id.search_content).setVisibility(View.VISIBLE);
 //                findViewById(R.id.btn_search).setVisibility(View.VISIBLE);
                 break;
             case G.MODE_API_SEARCH_RESULT:
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_API_SEARCH_RESULT);
-                mHeaderView.setVisibility(View.GONE);
-                mHeaderSearch.setVisibility(View.GONE);
-                mHeaderApiSearch.setVisibility(View.VISIBLE);
+                mHeaderModeAreaView.setVisibility(View.GONE);
+                mHeaderSearchAreaView.setVisibility(View.GONE);
+                mHeaderApiSearchAreaView.setVisibility(View.VISIBLE);
 //                findViewById(R.id.btn_search).setVisibility(View.GONE);
                 break;
         }
-        mMode = newMode;
+        mShowMode = newMode;
     }
 
     /**
@@ -150,20 +153,20 @@ public abstract class MainBaseActivity extends BaseActivity {
      */
     private void refreshData() {
 
-        switch (mMode) {
+        switch (mShowMode) {
             case G.MODE_VIEW:
-                mDataArrayList = mBookSeriesDao.loadAllBookSeriesDataList();
+                mBookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
                 break;
             case G.MODE_SEARCH:
-                mDataArrayList = mBookSeriesDao.loadBookSeriesDataList(mSearchMode, mSearchContent);
+                mBookSeriesDataList = mBookSeriesDao.loadBookSeriesDataList(mSearchMode, mSearchContent);
                 break;
             // 検索結果を表示する。
             case G.MODE_API_SEARCH_RESULT:
-                mDataArrayList = mApiSearchResultArrayList;
+                mBookSeriesDataList = mApiSearchResultArrayList;
                 break;
             // Safety net. Show everything if mode is invalid
             default:
-                mDataArrayList = mBookSeriesDao.loadAllBookSeriesDataList();
+                mBookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
                 break;
         }
 
@@ -182,11 +185,11 @@ public abstract class MainBaseActivity extends BaseActivity {
             // 設定に合っている画面を開き、この画面を閉じる
             String value = mSettings.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, getShowType());
             if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
-                startActivity(new Intent(this, ListActivity.class));
-                MainBaseActivity.this.finish();
+                startActivity(new Intent(this, ListBaseActivity.class));
+                BookSeriesCatalogBaseActivity.this.finish();
             } else {
-                startActivity(new Intent(this, GridActivity.class));
-                MainBaseActivity.this.finish();
+                startActivity(new Intent(this, GridBaseActivity.class));
+                BookSeriesCatalogBaseActivity.this.finish();
             }
         } else {
             // DBから情報取得＋ビュー更新
@@ -214,7 +217,7 @@ public abstract class MainBaseActivity extends BaseActivity {
      */
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mMode != G.MODE_VIEW) {
+            if (mShowMode != G.MODE_VIEW) {
                 switchMode(G.MODE_VIEW);
                 return false;
             } else {
@@ -235,7 +238,7 @@ public abstract class MainBaseActivity extends BaseActivity {
 //                    if (mSelectSeriesIds != null) {
 //                        for (int i = 0; i < mSelectSeriesIds.length; i++) {
 //                            FilterDao.deleteSeries(mSelectSeriesIds[i]);
-//                            ToastUtil.show(MainBaseActivity.this, "作品を削除しました");
+//                            ToastUtil.show(BookSeriesCatalogBaseActivity.this, "作品を削除しました");
 //                        }
 //                    }
 //                    refreshData();
@@ -247,7 +250,7 @@ public abstract class MainBaseActivity extends BaseActivity {
                 if(resultCode == G.RESULT_POSITIVE) {
                     switchMode(G.MODE_VIEW);
                     refreshData();
-                    ToastUtil.show(MainBaseActivity.this, "作品を追加しました");
+                    ToastUtil.show(BookSeriesCatalogBaseActivity.this, "作品を追加しました");
                     sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.ADD_SERIES);
 
                 }
@@ -257,7 +260,7 @@ public abstract class MainBaseActivity extends BaseActivity {
             case G.REQUEST_CODE_UPDATE_DIALOG:
                 if(resultCode == G.RESULT_POSITIVE) {
                     // マーケットへ飛ばす
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketUriStr(MainBaseActivity.this.getPackageName(), "update_dialog")));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketUriStr(BookSeriesCatalogBaseActivity.this.getPackageName(), "update_dialog")));
                     if(intent != null) {
                         startActivity(intent);
                     }
@@ -272,13 +275,13 @@ public abstract class MainBaseActivity extends BaseActivity {
                         // 検索結果からの登録画面
                         case G.RESULT_DATA_SELECTED_BTN_SEARCH:
                         default:
-                            intent = SearchDialogActivity.getIntent(MainBaseActivity.this, "作品を検索", "作品を検索する項目を選択してください", "検索", "キャンセル");
+                            intent = SearchDialogActivity.getIntent(BookSeriesCatalogBaseActivity.this, "作品を検索", "作品を検索する項目を選択してください", "検索", "キャンセル");
                             startActivityForResult(intent, G.REQUEST_CODE_LIST_SEARCH_RAKUTEN);
                             sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_SEARCH_BTN);
                             break;
                         // 作品手動登録画面
                         case G.RESULT_DATA_SELECTED_BTN_MANUAL:
-                            intent = EditSeriesDialogActivity.getIntent(MainBaseActivity.this, "作品情報を追加", "追加", -1);
+                            intent = EditSeriesDialogActivity.getIntent(BookSeriesCatalogBaseActivity.this, "作品情報を追加", "追加", -1);
                             startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
                             sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_MANUAL_BTN);
                             break;
@@ -300,8 +303,8 @@ public abstract class MainBaseActivity extends BaseActivity {
                         public void run() {
 
                             // 楽天APIを利用してJSONを取得する。
-                            String url = Rakuten.getRakutenBooksBookURI(MainBaseActivity.this, key, value);
-                            Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(MainBaseActivity.this, url);
+                            String url = Rakuten.getRakutenBooksBookURI(BookSeriesCatalogBaseActivity.this, key, value);
+                            Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(BookSeriesCatalogBaseActivity.this, url);
 
                             final String jsonStr = loader.loadInBackground();
 
@@ -319,8 +322,8 @@ public abstract class MainBaseActivity extends BaseActivity {
                                             @Override
                                             public void run() {
                                                 // 楽天APIを利用してJSONを取得する。
-                                                String url = Rakuten.getRakutenBooksTotalUri(MainBaseActivity.this, key, value);
-                                                Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(MainBaseActivity.this, url);
+                                                String url = Rakuten.getRakutenBooksTotalUri(BookSeriesCatalogBaseActivity.this, key, value);
+                                                Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(BookSeriesCatalogBaseActivity.this, url);
 
                                                 final String jsonRetryStr = loader.loadInBackground();
 
@@ -330,7 +333,7 @@ public abstract class MainBaseActivity extends BaseActivity {
                                                         if(Util.isEmpty(jsonRetryStr)) {
                                                             mProgress.close();
                                                             // 検索結果が空の場合はトースト通知でお知らせ
-                                                            ToastUtil.show(MainBaseActivity.this, "取得できる作品がありませんでした。内容を変更しもう一度お試しください。");
+                                                            ToastUtil.show(BookSeriesCatalogBaseActivity.this, "取得できる作品がありませんでした。内容を変更しもう一度お試しください。");
                                                         } else {
                                                             convertJsonStr2JsonArrayObject(jsonStr);
                                                             mProgress.close();
@@ -378,9 +381,9 @@ public abstract class MainBaseActivity extends BaseActivity {
             e.printStackTrace();
         }
         if(countVal > 30) {
-            ToastUtil.show(MainBaseActivity.this, "30件以上の作品がヒットしました");
+            ToastUtil.show(BookSeriesCatalogBaseActivity.this, "30件以上の作品がヒットしました");
         } else {
-            ToastUtil.show(MainBaseActivity.this, count+"件の作品がヒットしました");
+            ToastUtil.show(BookSeriesCatalogBaseActivity.this, count+"件の作品がヒットしました");
         }
 
         // 取得した結果を作品情報一覧へと分解する
@@ -412,7 +415,7 @@ public abstract class MainBaseActivity extends BaseActivity {
     // Spinnerアアプターについて
     // http://techbooster.jpn.org/andriod/ui/606/
     private ArrayAdapter<String> getSpinnerAdapter() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainBaseActivity.this, android.R.layout.simple_spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(BookSeriesCatalogBaseActivity.this, android.R.layout.simple_spinner_item);
 
         // 検索用Spinner選択肢
         for(int i = 0 ; i < G.SEARCH_MODE_LIST.length ; i ++) {
@@ -432,14 +435,14 @@ public abstract class MainBaseActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 // 登録種類を詮索
-                Intent intent = BtnListDialogActivity.getIntent(MainBaseActivity.this, "作品登録方法を選択", "作品を登録する方法を選択してください", "決定", "キャンセル");
+                Intent intent = BtnListDialogActivity.getIntent(BookSeriesCatalogBaseActivity.this, "作品登録方法を選択", "作品を登録する方法を選択してください", "決定", "キャンセル");
                 startActivityForResult(intent, G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE);
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
             }
         });
 
         // 検索ボタン
-        mHeaderView.findViewById(R.id.btn_search).setOnClickListener(new View.OnClickListener() {
+        mHeaderModeAreaView.findViewById(R.id.btn_search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SEARCH_BTN);
@@ -449,7 +452,7 @@ public abstract class MainBaseActivity extends BaseActivity {
         });
 
         // 検索キャンセルボタン
-        mHeaderSearch.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
+        mHeaderSearchAreaView.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switchMode(G.MODE_VIEW);
@@ -457,7 +460,7 @@ public abstract class MainBaseActivity extends BaseActivity {
             }
         });
 
-        mHeaderApiSearch.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
+        mHeaderApiSearchAreaView.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switchMode(G.MODE_VIEW);
@@ -469,7 +472,7 @@ public abstract class MainBaseActivity extends BaseActivity {
         findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainBaseActivity.this, SettingsActivity.class));
+                startActivity(new Intent(BookSeriesCatalogBaseActivity.this, SettingsActivity.class));
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SETTINGS_BTN);
 
             }
@@ -479,6 +482,7 @@ public abstract class MainBaseActivity extends BaseActivity {
 
 
         // 検索対象選択スピナーボタン
+        Spinner spinnerView;
         spinnerView = ((Spinner)findViewById(R.id.spinner_search_content));
         spinnerView.setAdapter(getSpinnerAdapter());
         spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -549,7 +553,7 @@ public abstract class MainBaseActivity extends BaseActivity {
         }
 
         // is showing search result on internet
-        boolean isAPISearchMode = mMode == G.MODE_API_SEARCH_RESULT;
+        boolean isAPISearchMode = mShowMode == G.MODE_API_SEARCH_RESULT;
 
         // init final values
         final boolean doUseImageCache = !isAPISearchMode
@@ -654,9 +658,9 @@ public abstract class MainBaseActivity extends BaseActivity {
             public void onClick(View v) {
                 // start activity or show error text if invalid seriesId
                 if(mBookSeriesDao.isBookSeriesRegistered(seriesId)) {
-                    startActivity(IntentUtil.getSeriesDetailIntent(MainBaseActivity.this, seriesId));
+                    startActivity(IntentUtil.getSeriesDetailIntent(BookSeriesCatalogBaseActivity.this, seriesId));
                 } else {
-                    ToastUtil.show(MainBaseActivity.this, R.string.series_data_error_invalid_series_id_found);
+                    ToastUtil.show(BookSeriesCatalogBaseActivity.this, R.string.series_data_error_invalid_series_id_found);
                 }
             }
         };
@@ -676,7 +680,7 @@ public abstract class MainBaseActivity extends BaseActivity {
                 startActivityForResult(
                         // intent
                         EditSeriesDialogActivity.getIntent(
-                                MainBaseActivity.this,
+                                BookSeriesCatalogBaseActivity.this,
                                 getString(R.string.series_data_add_confirm_content),
                                 getString(R.string.add),
                                 bookSeriesData),

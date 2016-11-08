@@ -26,11 +26,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.tablecloth.bookshelf.activity.ListActivity"
+            android:name="com.tablecloth.bookshelf.activity.ListBaseActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name="com.tablecloth.bookshelf.activity.GridActivity"
+            android:name="com.tablecloth.bookshelf.activity.GridBaseActivity"
             android:screenOrientation="portrait"
             />
         <activity

@@ -13,6 +13,7 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.tablecloth.bookshelf.BookShelfApplication;
 import com.tablecloth.bookshelf.util.Util;
+import com.tablecloth.bookshelf.util.VersionUtil;
 
 
 /**
@@ -25,6 +26,11 @@ public abstract class BaseActivity extends Activity {
 
     protected Handler mHandler;
     final protected int CONTENT_VIEW_ID_NONE = -1;
+
+    // Whether to check version updates
+    // If version update check is not expected
+    // set this value to true before calling onCreate of base class
+    protected boolean doCheckVersionUpdates = true;
 
     /**
      * Get layout ID to show in the activity
@@ -57,6 +63,13 @@ public abstract class BaseActivity extends Activity {
         // This initialize needs to be called in every Activity
         if(!Util.isDebugMode(BaseActivity.this)) {
             getGoogleAnalyticsTracker();
+        }
+
+        // Check for version updates
+        // Show update dialog if needed
+        if(doCheckVersionUpdates) {
+            VersionUtil versionUtil = new VersionUtil(this);
+            versionUtil.showUpdateDialog();
         }
     }
 
