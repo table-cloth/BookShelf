@@ -4,14 +4,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -20,6 +19,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.BookVolumeDao;
@@ -38,51 +38,91 @@ import com.tablecloth.bookshelf.util.ViewUtil;
  */
 public class SeriesDetailActivity extends BaseActivity {
 
-    BookSeriesData mBookSeriesData = null;
-    int mSeriesId = -1;
-    NumberPicker mPicker;
+    // View
+    private TextView mBookTitleTextView = null;
+    private TextView mBookAuthorTextView = null;
+    private TextView mBookMagazineTextView = null;
+    private TextView mBookCompanyTextView = null;
 
-    ImageView mImageView = null;
-    LayoutInflater mLayoutnflater;
+    private TextView mBookTitlePronunceTextView = null;
+    private TextView mBookAuthorPronunceTextView = null;
+    private TextView mBookMagazinePronunceTextView = null;
 
-    BookSeriesDao mBookSeriesDao;
-    BookVolumeDao mBookVolumeDao;
+    private TextView mBookMemoTextView = null;
+    private TextView mBookVolumeTextView = null;
+    private ViewGroup mBookTagViewGroup = null;
 
+    private ImageView mBookCoverImageView = null;
+    private View mPlusIconInBookCoverView = null;
+
+    private NumberPicker mBookVolumePicker = null;
+
+
+    // BookData related
+//    private final int mShowBookSeriesId;
+    private BookSeriesData mShowBookSeriesData = null;
+    private BookSeriesDao mBookSeriesDao;
+    private BookVolumeDao mBookVolumeDao;
+
+    /**
+     * Get layout ID to show in the activity
+     *
+     * @return layout ID
+     */
     @Override
     protected int getContentViewID() {
         return R.layout.activity_series_detail;
     }
 
+    /**
+     * Constructor
+     *
+     * @param savedInstanceState savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSeriesId = getIntent().getIntExtra(G.INTENT_SERIES_ID, -1);
-        if(mSeriesId == -1) {
-            ToastUtil.show(SeriesDetailActivity.this, "本の情報の取得に失敗しました");
+        // Init book series id
+        final int bookSeriesId = getIntent().getIntExtra(
+                G.INTENT_SERIES_ID, BookData.BOOK_SERIES_ERROR_VALUE);
+        if(bookSeriesId == BookData.BOOK_SERIES_ERROR_VALUE) {
+            ToastUtil.show(SeriesDetailActivity.this, R.string.series_data_error_failed_2_get_data);
             SeriesDetailActivity.this.finish();
+            return;
         }
 
+        // Init DB
         mBookSeriesDao = new BookSeriesDao(this);
         mBookVolumeDao = new BookVolumeDao(this);
+        updateShowBookSeriesData(bookSeriesId);
 
-        mLayoutnflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        // Init View
+        mBookTitleTextView = (TextView)findViewById(R.id.title);
+        mBookAuthorTextView = (TextView)findViewById(R.id.author);
+        mBookMagazineTextView = (TextView)findViewById(R.id.magazine);
+        mBookCompanyTextView = (TextView)findViewById(R.id.company);
+        mBookTitlePronunceTextView = (TextView)findViewById(R.id.title_pronuncitation);
+        mBookAuthorPronunceTextView = (TextView)findViewById(R.id.author_pronunciation);
+        mBookMagazinePronunceTextView = (TextView)findViewById(R.id.magazine_pronunciation);
 
-        mImageView = (ImageView) findViewById(R.id.book_cover_image);
+        mBookMemoTextView = (TextView)findViewById(R.id.memo);
+        mBookVolumeTextView = (TextView)findViewById(R.id.volume);
+        mBookTagViewGroup = (ViewGroup)findViewById(R.id.tag_container);
+        mBookCoverImageView = (ImageView) findViewById(R.id.book_cover_image);
+        mPlusIconInBookCoverView = findViewById(R.id.plus);
+        mBookVolumePicker = (NumberPicker) findViewById(R.id.number_picker);
 
-        mPicker = (NumberPicker) findViewById(R.id.number_picker);
-        mPicker.setMaxValue(200);
-        mPicker.setMinValue(0);
-        mPicker.setFocusable(true);
-        mPicker.setFocusableInTouchMode(true);
+        mBookVolumePicker.setMaxValue(200);
+        mBookVolumePicker.setMinValue(0);
+        mBookVolumePicker.setFocusable(true);
+        mBookVolumePicker.setFocusableInTouchMode(true);
 
-        // DBから情報取得
-        refreshData();
-        // 作品の情報を元に、レイアウトを反映
-        initLayout();
+        // Apply book series data to layout
+        applyBookSeriesData2Layout();
 
         setClickListener();
-        
+
         // 広告の初期化処理
         Util.initAdview(this, (ViewGroup)findViewById(R.id.banner));
     }
@@ -95,49 +135,49 @@ public class SeriesDetailActivity extends BaseActivity {
 				SeriesDetailActivity.this.finish();
 			}
 		});
-    	// 編集ボタン    	
+    	// 編集ボタン
     	findViewById(R.id.btn_edit).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = EditSeriesDialogActivity.getIntent(SeriesDetailActivity.this, "作品情報を編集", "保存", mSeriesId);
+				Intent intent = EditSeriesDialogActivity.getIntent(SeriesDetailActivity.this, "作品情報を編集", "保存", mShowBookSeriesId);
                 startActivityForResult(intent, G.REQUEST_CODE_EDIT_SERIES_DETAIL);
 			}
 		});
-    	
+
     	// 巻情報を追加
     	findViewById(R.id.btn_add).setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				int value = mPicker.getValue();
-				if(mBookSeriesData.getVolumeList() != null && mBookSeriesData.getVolumeList().contains(value)) {
+				int value = mBookVolumePicker.getValue();
+				if(mShowBookSeriesData.getVolumeList() != null && mShowBookSeriesData.getVolumeList().contains(value)) {
 					ToastUtil.show(SeriesDetailActivity.this, value + "巻は既に所持しています");
 				} else {
-					mBookSeriesData.addVolume(value);
-					mBookVolumeDao.saveBookVolume(mSeriesId, value);
+					mShowBookSeriesData.addVolume(value);
+					mBookVolumeDao.saveBookVolume(mShowBookSeriesId, value);
 					initLayout();
 				}
 			}
 		});
-    	
+
     	// 巻情報を削除
     	findViewById(R.id.btn_delete).setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				int value = mPicker.getValue();
-				if(mBookSeriesData.getVolumeList() != null && !mBookSeriesData.getVolumeList().contains(value)) {
+				int value = mBookVolumePicker.getValue();
+				if(mShowBookSeriesData.getVolumeList() != null && !mShowBookSeriesData.getVolumeList().contains(value)) {
 					ToastUtil.show(SeriesDetailActivity.this, value + "巻は所持していません");
 				} else {
-					mBookSeriesData.removeVolume(value);
-					mBookVolumeDao.deleteBookVolume(mSeriesId, value);
+					mShowBookSeriesData.removeVolume(value);
+					mBookVolumeDao.deleteBookVolume(mShowBookSeriesId, value);
 					initLayout();
 				}
 			}
 		});
-    	
+
     	// 画像登録・編集
-    	mImageView.setOnClickListener(new OnClickListener() {
+    	mBookCoverImageView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = SimpleDialogActivity.getIntent(SeriesDetailActivity.this, "画像変更", "作品の画像を変更しますか？", "はい", "いいえ");
@@ -150,73 +190,81 @@ public class SeriesDetailActivity extends BaseActivity {
     /**
      * DBから最新情報を取得
      */
-    private void refreshData() {
-        mBookSeriesData = mBookSeriesDao.loadBookSeriesData(mSeriesId);
+    private void updateShowBookSeriesData(int bookSeriesId) {
+        mShowBookSeriesData = mBookSeriesDao.loadBookSeriesData(bookSeriesId);
+    }
+
+    /**
+     * Set text and visibility of textView given
+     * If text is empty, visibility will be set as Gone
+     * If text is not empyty, visibility will be set as Visible
+     *
+     * @oaram textView
+     * @param text Text to set in TextView
+     */
+    private void setTextAndVisibility(@NonNull TextView textView, @NonNull String text) {
+        textView.setText(text);
+        textView.setVisibility(Util.isEmpty(text)
+                ? View.GONE
+                : View.VISIBLE);
     }
 
     /**
      * 本の情報をレイアウトに反映させる
      */
-    private void initLayout() {
-    	if(mBookSeriesData != null) {
-	        ((TextView)findViewById(R.id.title)).setText(mBookSeriesData.getTitle());
-            if(!Util.isEmpty(mBookSeriesData.getTitlePronunciation())) {
-                ((TextView) findViewById(R.id.title_pronuncitation)).setText("（" + mBookSeriesData.getTitlePronunciation() + "）");
-                findViewById(R.id.title_pronuncitation).setVisibility(View.VISIBLE);
-            } else {
-                findViewById(R.id.title_pronuncitation).setVisibility(View.GONE);
-            }
+    private void applyBookSeriesData2Layout() {
+        if(mShowBookSeriesData == null) {
+            throw new NullPointerException("Trying to apply null BookSeriesData instance to layout");
+        }
 
-	        ((TextView)findViewById(R.id.author)).setText(mBookSeriesData.getAuthor());
-            if(!Util.isEmpty(mBookSeriesData.getAuthorPronunciation())) {
-                ((TextView) findViewById(R.id.author_pronunciation)).setText("（" + mBookSeriesData.getAuthorPronunciation() + "）");
-                findViewById(R.id.author_pronunciation).setVisibility(View.VISIBLE);
-            } else {
-                findViewById(R.id.author_pronunciation).setVisibility(View.GONE);
-            }
+        // Basic data
+        setTextAndVisibility(mBookTitleTextView, mShowBookSeriesData.getTitle());
+        setTextAndVisibility(mBookAuthorTextView, mShowBookSeriesData.getAuthor());
+        setTextAndVisibility(mBookMagazineTextView, mShowBookSeriesData.getMagazine());
+        setTextAndVisibility(mBookCompanyTextView, mShowBookSeriesData.getCompany());
 
-	        ((TextView)findViewById(R.id.magazine)).setText(mBookSeriesData.getMagazine());
-            if(!Util.isEmpty(mBookSeriesData.getMagazinePronunciation())) {
-                ((TextView)findViewById(R.id.magazine_pronunciation)).setText("（" + mBookSeriesData.getMagazinePronunciation()+"）");
-                findViewById(R.id.magazine_pronunciation).setVisibility(View.VISIBLE);
-            } else {
-                findViewById(R.id.magazine_pronunciation).setVisibility(View.GONE);
-            }
-            ((TextView)findViewById(R.id.company)).setText(mBookSeriesData.getCompany());
-	        ((TextView)findViewById(R.id.memo)).setText(mBookSeriesData.getMemo());
-	        ((TextView)findViewById(R.id.volume)).setText(mBookSeriesData.getVolumeText());
-            final View plus = findViewById(R.id.plus);
-            Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
-            if(cacheImage != null) {
-                mImageView.setImageBitmap(cacheImage);
-                plus.setVisibility(View.GONE);
-            } else {
-                mBookSeriesData.loadImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
-                    @Override
-                    public void onFinish(Bitmap bitmap) {
-                        if (bitmap != null) {
-                            mImageView.setImageBitmap(bitmap);
-                            ImageUtil.setImageCache(mSeriesId, bitmap);
-                            plus.setVisibility(View.GONE);
-                        } else {
-                            plus.setVisibility(View.VISIBLE);
+        // pronunciation
+        setTextAndVisibility(mBookTitlePronunceTextView, mShowBookSeriesData.getTitlePronunciation());
+        setTextAndVisibility(mBookAuthorPronunceTextView, mShowBookSeriesData.getAuthorPronunciation());
+        setTextAndVisibility(mBookMagazinePronunceTextView, mShowBookSeriesData.getMagazinePronunciation());
+
+        // extra data
+        setTextAndVisibility(mBookMemoTextView, mShowBookSeriesData.getMemo();
+        setTextAndVisibility(mBookVolumeTextView, mShowBookSeriesData.getVolumeText());
+
+        //tag
+        mBookTagViewGroup.removeAllViews();
+
+
+        // image
+        mPlusIconInBookCoverView.setVisibility(View.GONE);
+        Bitmap imageCache =ImageUtil.getImageCache(mShowBookSeriesData.getSeriesId());
+        if(imageCache != null) {
+            mBookCoverImageView.setImageBitmap(imageCache);
+        } else {
+            mShowBookSeriesData.loadImage(
+                    mHandler, this, new ListenerUtil.LoadBitmapListener() {
+                        @Override
+                        public void onFinish(@NonNull Bitmap bitmap) {
+                            mBookCoverImageView.setImageBitmap(bitmap);
+                            ImageUtil.setImageCache(mShowBookSeriesData.getSeriesId(), bitmap);
                         }
-                    }
 
-                    @Override
-                    public void onError() {
-                        plus.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
+                        @Override
+                        public void onError() {
+                            // only show plus icon then Image is null
+                            mPlusIconInBookCoverView.setVisibility(View.VISIBLE);
+                        }
+                    });
+        }
+
             // タグ情報の設定
             ViewGroup tagContainer = (ViewGroup)findViewById(R.id.tag_container);
             tagContainer.removeAllViews();
-            ViewUtil.setTagInfoNormal(SeriesDetailActivity.this, mBookSeriesData.getTagsAsList(), tagContainer);
+            ViewUtil.setTagInfoNormal(SeriesDetailActivity.this, mShowBookSeriesData.getTagsAsList(), tagContainer);
             tagContainer.invalidate();
-    	}
     }
-    
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -225,7 +273,7 @@ public class SeriesDetailActivity extends BaseActivity {
         	// 作品情報編集から戻ったとき
             case G.REQUEST_CODE_EDIT_SERIES_DETAIL:
                 if(resultCode == G.RESULT_POSITIVE) {
-                    refreshData();
+                    reloadBookSeriesData();
                     initLayout();
                 } else if(resultCode == G.RESULT_SPECIAL) {
                     SeriesDetailActivity.this.finish();
@@ -248,7 +296,7 @@ public class SeriesDetailActivity extends BaseActivity {
                 } else if(resultCode == G.RESULT_NEGATIVE){
                 	Intent i = new Intent();
                 	i.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(i, G.REQUEST_CODE_IMAGE_CAMERA);                	
+                    startActivityForResult(i, G.REQUEST_CODE_IMAGE_CAMERA);
                 }
                 break;
             // 画像取得後
@@ -257,26 +305,26 @@ public class SeriesDetailActivity extends BaseActivity {
             		try {
 	            		Bitmap bitmap = (Bitmap)data.getExtras().get("data");
 	            		String filePath = ImageUtil.saveBitmap2LocalStorage(SeriesDetailActivity.this, bitmap);
-                        mBookSeriesData.setImagePath(filePath);
-                        ImageUtil.setImageCache(mSeriesId, bitmap);
+                        mShowBookSeriesData.setImagePath(filePath);
+                        ImageUtil.setImageCache(mShowBookSeriesId, bitmap);
             		} catch(OutOfMemoryError e) {
                  	   ToastUtil.show(SeriesDetailActivity.this, "メモリ不足のため画像の取得に失敗しました");
                        ImageUtil.clearCache();
                  	   e.printStackTrace();
                     }
-            		mBookSeriesDao.saveSeries(mBookSeriesData);
+            		mBookSeriesDao.saveSeries(mShowBookSeriesData);
                     final View plus = findViewById(R.id.plus);
 
-                    Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
+                    Bitmap cacheImage = ImageUtil.getImageCache(mShowBookSeriesId);
                     if(cacheImage != null) {
-                        mImageView.setImageBitmap(cacheImage);
+                        mBookCoverImageView.setImageBitmap(cacheImage);
                         plus.setVisibility(View.GONE);
                     } else {
-                        mBookSeriesData.loadImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                        mShowBookSeriesData.loadImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
                             @Override
-                            public void onFinish(Bitmap bitmap) {
+                            public void onFinish(@NonNull Bitmap bitmap) {
                                 if (bitmap != null) {
-                                    mImageView.setImageBitmap(bitmap);
+                                    mBookCoverImageView.setImageBitmap(bitmap);
                                     plus.setVisibility(View.GONE);
                                 } else {
                                     plus.setVisibility(View.VISIBLE);
@@ -297,8 +345,8 @@ public class SeriesDetailActivity extends BaseActivity {
 				try {
 					Bitmap bitmap = getImage(data);
 					String filePath = ImageUtil.saveBitmap2LocalStorage(SeriesDetailActivity.this, bitmap);
-					mBookSeriesData.setImagePath(filePath);
-                    ImageUtil.setImageCache(mSeriesId, bitmap);
+					mShowBookSeriesData.setImagePath(filePath);
+                    ImageUtil.setImageCache(mShowBookSeriesId, bitmap);
                     // bitmap.recycle();
 					// bitmap = null;
 				} catch (NullPointerException e) {
@@ -318,18 +366,18 @@ public class SeriesDetailActivity extends BaseActivity {
 						}
 					}
 				}
-				mBookSeriesDao.saveSeries(mBookSeriesData);
+				mBookSeriesDao.saveSeries(mShowBookSeriesData);
                 final View plus = findViewById(R.id.plus);
-                Bitmap cacheImage = ImageUtil.getImageCache(mSeriesId);
+                Bitmap cacheImage = ImageUtil.getImageCache(mShowBookSeriesId);
                 if(cacheImage != null) {
-                    mImageView.setImageBitmap(cacheImage);
+                    mBookCoverImageView.setImageBitmap(cacheImage);
                     plus.setVisibility(View.GONE);
                 } else {
-                    mBookSeriesData.loadImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
+                    mShowBookSeriesData.loadImage(mHandler, SeriesDetailActivity.this, new ListenerUtil.LoadBitmapListener() {
                         @Override
-                        public void onFinish(Bitmap bitmap) {
+                        public void onFinish(@NonNull Bitmap bitmap) {
                             if (bitmap != null) {
-                                mImageView.setImageBitmap(bitmap);
+                                mBookCoverImageView.setImageBitmap(bitmap);
                                 findViewById(R.id.plus).setVisibility(View.GONE);
                             } else {
                                 findViewById(R.id.plus).setVisibility(View.VISIBLE);

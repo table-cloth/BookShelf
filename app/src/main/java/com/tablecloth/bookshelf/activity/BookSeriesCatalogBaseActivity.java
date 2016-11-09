@@ -616,7 +616,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
         } else {
             bookSeriesData.loadImage(mHandler, this, new ListenerUtil.LoadBitmapListener() {
                 @Override
-                public void onFinish(Bitmap bitmap) {
+                public void onFinish(@NonNull Bitmap bitmap) {
                     if(bitmap != null) {
                         if(Util.isEqual(bookSeriesData.getTitle(),
                                 String.valueOf(bookCoverImageView.getTag()))) {

@@ -112,6 +112,7 @@ public class RecentTagRelativeLayout extends BaseTagRelativeLayout {
 
             ArrayList<String> tagInList = BookData.convertTagsRawText2TagsList(getTagData());
 
+
             // tag is already added
             if(tagInList.contains(newTag)) {
                 ToastUtil.show(mContext, R.string.tag_error_already_added);

@@ -32,6 +32,7 @@
     <string name="series_data_volume_conjunction_symbol">〜</string>
     <string name="series_data_volume_separator_symbol">、</string>
 
+    <string name="series_data_error_failed_2_get_data">本の情報の取得に失敗しました</string>
     <string name="series_data_error_load_image_by_memory">メモリー不足のため、画像の取得に失敗しました</string>
     <string name="series_data_error_load_image">予期せぬエラーのため、画像の取得に失敗しました</string>
 
