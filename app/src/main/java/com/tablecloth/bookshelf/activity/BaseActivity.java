@@ -1,6 +1,7 @@
 package com.tablecloth.bookshelf.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Handler;
@@ -12,6 +13,8 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.tablecloth.bookshelf.BookShelfApplication;
+import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
+import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.VersionUtil;
 
@@ -136,5 +139,76 @@ public abstract class BaseActivity extends Activity {
 
         // do send data to GoogleAnalytics
         getGoogleAnalyticsTracker().send(eventBuilder.build());
+    }
+
+    /**
+     * Checks whether given resultCode is positive
+     *
+     * @param resultCode resultCode
+     * @return is resultCode positive
+     */
+    protected boolean isResultPositive(int resultCode) {
+        return resultCode == G.RESULT_POSITIVE
+                || resultCode == RESULT_OK;
+    }
+
+    /**
+     * Checks whether given resultCode is negative
+     *
+     * @param resultCode resultCode
+     * @return is resultCode negative
+     */
+    protected boolean isResultNegative(int resultCode) {
+        return resultCode == G.RESULT_NEGATIVE;
+    }
+
+    /**
+     * Sets result to activity
+     *
+     * @param resultCode Result Code
+     * @param resultDataKey Result Data Key, put in Intent.purExtra(...)
+     * @param resultDataValue Result Data Value, put in Intent.putExtra(...)
+     */
+    protected void setResult(int resultCode, String resultDataKey, String resultDataValue) {
+        Intent data = new Intent();
+        data.putExtra(resultDataKey, resultDataValue);
+        setResult(resultCode, data);
+    }
+
+    /**
+     * Sets result to activity
+     *
+     * @param resultCode Result Code
+     * @param resultDataKey Result Data Key, put in Intent.purExtra(...)
+     * @param resultDataValue Result Data Value, put in Intent.putExtra(...)
+     */
+    protected void setResult(int resultCode, String resultDataKey, int resultDataValue) {
+        Intent data = new Intent();
+        data.putExtra(resultDataKey, resultDataValue);
+        setResult(resultCode, data);
+    }
+
+    /**
+     * Gets result data set in given Intent
+     *
+     * @param data Intent with data
+     * @param resultDataKey Result Data Key, put in Intent.purExtra(...)
+     * @return resultDataValue
+     */
+    @Nullable
+    protected String getIntentExtraStr(Intent data, String resultDataKey) {
+        return data.getStringExtra(resultDataKey);
+    }
+
+    /**
+     * Gets result data set in given Intent
+     *
+     * @param data Intent with data
+     * @param resultDataKey Result Data Key, put in Intent.purExtra(...)
+     * @return resultDataValue
+     */
+    @Nullable
+    protected int getIntentExtraInt(Intent data, String resultDataKey) {
+        return data.getIntExtra(resultDataKey, G.RESULT_DATA_VALUE_DEFAULT_INT);
     }
 }

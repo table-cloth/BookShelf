@@ -14,7 +14,7 @@ import java.util.ArrayList;
 /**
  * View related Util class.
  * Class for setting up & generating views
- * 
+ *
  * Created by Minami on 2015/04/05.
  */
 public class ViewUtil {
@@ -51,6 +51,8 @@ public class ViewUtil {
 
             tagViewList.add(tagView);
         }
+
+        return tagViewList;
     }
 
     /**

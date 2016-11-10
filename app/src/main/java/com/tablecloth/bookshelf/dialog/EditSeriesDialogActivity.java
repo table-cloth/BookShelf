@@ -129,7 +129,8 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
 //                setRowContents(findViewById(R.id.data_detail_row_title), "タイトル", mBookSeriesData.);
 
                         mBookSeriesDao.saveSeries(mBookSeriesData);
-                        setResult(G.RESULT_POSITIVE);
+
+                        setResult(G.RESULT_POSITIVE, G.RESULT_DATA_KEY_EDIT_SERIES, G.RESULT_DATA_VALUE_EDIT_SERIES_EDIT);
                         EditSeriesDialogActivity.this.finish();
                     }
                 });
@@ -195,8 +196,8 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
                 if(resultCode == G.RESULT_POSITIVE) {
                     if(mBookSeriesDao.deleteBookSeries(mSeriesId)) {
                         ToastUtil.show(EditSeriesDialogActivity.this, "作品の情報を削除しました");
-                        EditSeriesDialogActivity.this.setResult(G.RESULT_SPECIAL);
-                        EditSeriesDialogActivity.this.finish();
+                        setResult(G.RESULT_POSITIVE, G.RESULT_DATA_KEY_EDIT_SERIES, G.RESULT_DATA_VALUE_EDIT_SERIES_DELETE);
+                        finish();
                     } else {
                         ToastUtil.show(EditSeriesDialogActivity.this, "作品の情報の削除に失敗しました");
                     }

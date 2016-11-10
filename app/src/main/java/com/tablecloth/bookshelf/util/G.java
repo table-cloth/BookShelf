@@ -11,13 +11,18 @@ public class G {
     final public static int RESULT_NONE = 0;
     final public static int RESULT_POSITIVE = 1;
     final public static int RESULT_NEGATIVE = 2;
-    final public static int RESULT_SPECIAL = 3; // 特殊な導線用
+//    final public static int RESULT_SPECIAL = 3; // 特殊な導線用
 
     final public static String RESULT_DATA_SELECTED_ID = "selected_id"; // intを返す
     final public static int RESULT_DATA_SELECTED_BTN_SEARCH = 0;
     final public static int RESULT_DATA_SELECTED_BTN_MANUAL = 1;
     final public static String RESULT_DATA_SELECTED_KEY = "selected_key"; // Stringを返す
     final public static String RESULT_DATA_SELECTED_VALUE = "selected_value"; // Stringを返す
+
+    final public static int RESULT_DATA_VALUE_DEFAULT_INT = -1; // default and invalid value
+    final public static String RESULT_DATA_KEY_EDIT_SERIES = "key_edit_series"; // intを返す
+    final public static int RESULT_DATA_VALUE_EDIT_SERIES_EDIT = 0;
+    final public static int RESULT_DATA_VALUE_EDIT_SERIES_DELETE = 1;
 
 
 //    final public static int REQUEST_CODE_LIST_ROW_DELETE_SERIES = 1;
