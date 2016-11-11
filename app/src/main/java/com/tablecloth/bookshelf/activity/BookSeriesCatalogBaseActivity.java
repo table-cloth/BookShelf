@@ -39,7 +39,6 @@ import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
-import com.tablecloth.bookshelf.util.VersionUtil;
 import com.tablecloth.bookshelf.util.ViewUtil;
 
 import org.json.JSONArray;
@@ -54,10 +53,14 @@ import java.util.List;
  *
  * Created by Minami on 2015/03/15.
  */
-public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
+public abstract class BookSeriesCatalogBaseActivity extends BaseActivity implements View.OnClickListener {
 
-    // number of book series item shown in a single row, for grid layout
-    final private int BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID = 4;
+    // Number of book series item shown in a page, for API search result
+    private final int API_SEARCH_RESULT_SERIES_PER_PAGE = 30;
+    // Number of book series item shown in a single row, for grid layout
+    private final int BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID = 4;
+
+
     // BookSeriesData list to show in list / grid
     protected ArrayList<BookSeriesData> mBookSeriesDataList = new ArrayList<>();
     // Progress Dialog Util instance
@@ -69,6 +72,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
     // Search related
     protected int mSearchMode = G.SEARCH_MODE_ALL;
     protected String mSearchContent = "";
+//    private String mSearchResultJsonText;
+    private ArrayList<BookSeriesData> mSearchResultBookSeriesCache = new ArrayList<>();
 
     // Data accessor
     BookSeriesDao mBookSeriesDao;
@@ -79,6 +84,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
     View mHeaderModeAreaView;
     View mHeaderSearchAreaView;
     View mHeaderApiSearchAreaView;
+    EditText mSearchContentEditText;
+    Spinner mSearchContentSpinnerView;
 
     /**
      * Constructor
@@ -101,70 +108,69 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
         mHeaderModeAreaView = mHeaderAreaView.findViewById(R.id.header_area_mode_view);
         mHeaderSearchAreaView = mHeaderAreaView.findViewById(R.id.header_area_mode_search);
         mHeaderApiSearchAreaView = mHeaderAreaView.findViewById(R.id.header_area_mode_api_search);
-        setClickListener();
-        setOtherListener();
+        mSearchContentEditText = (EditText)findViewById(R.id.search_content);
+        mSearchContentSpinnerView = ((Spinner)findViewById(R.id.spinner_search_content));
+
+        initializeCallbackEvents();
 
         mProgress = ProgressDialogUtil.getInstance(this);
 
-
         // initialize Ad
         Util.initAdview(this, (ViewGroup) findViewById(R.id.banner));
-
     }
 
     /**
-     * 一覧表示・検索表示等のモードを切り替える
+     * Switch mode status
      *
-     * @param newMode
+     * @param newMode mode type
      */
     private void switchMode(int newMode) {
         switch (newMode) {
             case G.MODE_VIEW:
             default:
-                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_VIEW);
+                sendGoogleAnalyticsEvent(
+                        GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_VIEW);
                 mHeaderModeAreaView.setVisibility(View.VISIBLE);
                 mHeaderSearchAreaView.setVisibility(View.GONE);
                 mHeaderApiSearchAreaView.setVisibility(View.GONE);
-//                findViewById(R.id.btn_search).setVisibility(View.VISIBLE);
                 break;
 
             case G.MODE_SEARCH:
-                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_SEARCH);
+                sendGoogleAnalyticsEvent(
+                        GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_SEARCH);
                 mHeaderModeAreaView.setVisibility(View.GONE);
                 mHeaderSearchAreaView.setVisibility(View.VISIBLE);
                 mHeaderApiSearchAreaView.setVisibility(View.GONE);
-                boolean flag = findViewById(R.id.search_content).requestFocus();
-                findViewById(R.id.search_content).setVisibility(View.VISIBLE);
-//                findViewById(R.id.btn_search).setVisibility(View.VISIBLE);
+                mSearchContentEditText.requestFocus();
                 break;
+
             case G.MODE_API_SEARCH_RESULT:
-                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_API_SEARCH_RESULT);
+                sendGoogleAnalyticsEvent(
+                        GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_API_SEARCH_RESULT);
                 mHeaderModeAreaView.setVisibility(View.GONE);
                 mHeaderSearchAreaView.setVisibility(View.GONE);
                 mHeaderApiSearchAreaView.setVisibility(View.VISIBLE);
-//                findViewById(R.id.btn_search).setVisibility(View.GONE);
                 break;
         }
         mShowMode = newMode;
     }
 
     /**
-     * 一覧情報を再取得・再表示する
+     * Refresh data list shown in catalog
      */
     private void refreshData() {
 
         switch (mShowMode) {
-            case G.MODE_VIEW:
-                mBookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
-                break;
+
             case G.MODE_SEARCH:
                 mBookSeriesDataList = mBookSeriesDao.loadBookSeriesDataList(mSearchMode, mSearchContent);
                 break;
-            // 検索結果を表示する。
+
             case G.MODE_API_SEARCH_RESULT:
-                mBookSeriesDataList = mApiSearchResultArrayList;
+                mBookSeriesDataList = mSearchResultBookSeriesCache;
                 break;
-            // Safety net. Show everything if mode is invalid
+
+            case G.MODE_VIEW: // default view mode
             default:
                 mBookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
                 break;
@@ -174,250 +180,168 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
     }
 
     /**
-     * データに変動があり、notifyDataSetChanged()が呼び出される必要があるときに呼ばれる
+     * Called when needs to refresh catalog views
      */
     protected abstract void notifyDataSetChanged();
 
+    /**
+     * Called on resume
+     */
     @Override
     public void onResume() {
         super.onResume();
-        if(!isShowTypeCorrect()) {
-            // 設定に合っている画面を開き、この画面を閉じる
-            String value = mSettings.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, getShowType());
-            if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
-                startActivity(new Intent(this, ListBaseActivity.class));
-                BookSeriesCatalogBaseActivity.this.finish();
-            } else {
-                startActivity(new Intent(this, GridBaseActivity.class));
-                BookSeriesCatalogBaseActivity.this.finish();
-            }
+        if(!isCurrentShowTypeSameWithSetting()) {
+            // activate right activity according to show type setting
+            String value = mSettingsDao.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, getCurrentShowType());
+            startActivity(new Intent(this,
+                    Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID.equals(value)
+                            ? GridBaseActivity.class
+                            : ListBaseActivity.class));
+            finish();
         } else {
-            // DBから情報取得＋ビュー更新
+            // Refresh in case something is updated while in background
             refreshData();
         }
     }
 
     /**
-     * 現在の表示形式設定と、表示されている画面が一致するかを確認
-     * @return
-     */
-    protected abstract boolean isShowTypeCorrect();
-
-    /**
-     * 現在表示している画面の種類を返す
-     */
-    protected abstract String getShowType();
-
-    /**
-     * Viewモード以外の時はViewモードに戻す
+     * Whether current show type (grid / list) is equivalent with setting's show type
      *
-     * @param keyCode
-     * @param event
-     * @return
+     * @return whether is equivalent with setting's show type
+     */
+    protected abstract boolean isCurrentShowTypeSameWithSetting();
+
+    /**
+     * Get current show type
+     *
+     * @return current show type
+     */
+    protected abstract String getCurrentShowType();
+
+    /**
+     * Called on key down
+     *
+     * @param keyCode key code
+     * @param event event
+     * @return false if current mode is not view mode
      */
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mShowMode != G.MODE_VIEW) {
-                switchMode(G.MODE_VIEW);
-                return false;
-            } else {
-                return super.onKeyDown(keyCode, event);
-            }
+        if (keyCode == KeyEvent.KEYCODE_BACK
+                && mShowMode == G.MODE_VIEW) {
+            switchMode(G.MODE_VIEW);
+            return false;
         }
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * Called on activty result
+     *
+     * @param requestCode request code
+     * @param resultCode result code
+     * @param data intent data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-//            // リストのアイテム内の削除ボタン押下
-//            case G.REQUEST_CODE_LIST_ROW_DELETE_SERIES:
-//                if(resultCode == G.RESULT_POSITIVE) {
-//                    if (mSelectSeriesIds != null) {
-//                        for (int i = 0; i < mSelectSeriesIds.length; i++) {
-//                            FilterDao.deleteSeries(mSelectSeriesIds[i]);
-//                            ToastUtil.show(BookSeriesCatalogBaseActivity.this, "作品を削除しました");
-//                        }
-//                    }
-//                    refreshData();
-//                }
-//                break;
-            // 作品情報追加画面から戻ったとき
-            // 基本的な保存処理は「作品情報追加画面」に任せる
-            case G.REQUEST_CODE_LIST_ADD_SERIES:
+            case G.REQUEST_CODE_LIST_ADD_SERIES: // Return from book series add screen
                 if(resultCode == G.RESULT_POSITIVE) {
                     switchMode(G.MODE_VIEW);
                     refreshData();
-                    ToastUtil.show(BookSeriesCatalogBaseActivity.this, "作品を追加しました");
+                    ToastUtil.show(this, R.string.seires_data_done_add_series);
                     sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.ADD_SERIES);
 
                 }
                 break;
 
-            // アップデートダイアログ
-            case G.REQUEST_CODE_UPDATE_DIALOG:
+            case G.REQUEST_CODE_UPDATE_DIALOG: // Return from update dialog
                 if(resultCode == G.RESULT_POSITIVE) {
-                    // マーケットへ飛ばす
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketUriStr(BookSeriesCatalogBaseActivity.this.getPackageName(), "update_dialog")));
-                    if(intent != null) {
-                        startActivity(intent);
-                    }
+                    // Activate GooglePlay marker
+                    startActivity(new Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(Util.getMarketUriStr(getPackageName(),
+                                    getString(R.string.referrer_update_dialog)))));
                 }
                 break;
-            // 作品の登録方法を選択
-            case G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE:
+
+            case G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE: // Return from "select how to book series" dialog
                 if(resultCode == G.RESULT_POSITIVE) {
                     Intent intent;
-                    int selectedId = data.getIntExtra(G.RESULT_DATA_SELECTED_ID, G.RESULT_DATA_SELECTED_BTN_SEARCH);
-                    switch (selectedId) {
-                        // 検索結果からの登録画面
-                        case G.RESULT_DATA_SELECTED_BTN_SEARCH:
+                    int selectedBtnId = data.getIntExtra(G.RESULT_DATA_SELECTED_ID, G.RESULT_DATA_SELECTED_BTN_SEARCH);
+                    switch (selectedBtnId) {
+                        case G.RESULT_DATA_SELECTED_BTN_SEARCH: // search using API
                         default:
-                            intent = SearchDialogActivity.getIntent(BookSeriesCatalogBaseActivity.this, "作品を検索", "作品を検索する項目を選択してください", "検索", "キャンセル");
+                            intent = SearchDialogActivity.getIntent(
+                                    this,
+                                    getString(R.string.series_data_search),
+                                    getString(R.string.series_data_search_select_topic),
+                                    getString(R.string.search),
+                                    getString(R.string.cancel));
                             startActivityForResult(intent, G.REQUEST_CODE_LIST_SEARCH_RAKUTEN);
                             sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_SEARCH_BTN);
                             break;
-                        // 作品手動登録画面
-                        case G.RESULT_DATA_SELECTED_BTN_MANUAL:
-                            intent = EditSeriesDialogActivity.getIntent(BookSeriesCatalogBaseActivity.this, "作品情報を追加", "追加", -1);
+
+                        case G.RESULT_DATA_SELECTED_BTN_MANUAL: // register manually
+                            intent = EditSeriesDialogActivity.getIntent(
+                                    this,
+                                    getString(R.string.seires_data_add_series_data),
+                                    getString(R.string.add),
+                                    -1);
                             startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
                             sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_MANUAL_BTN);
                             break;
                     }
                 }
                 break;
-            // 楽天APIを使用して検索
-            case G.REQUEST_CODE_LIST_SEARCH_RAKUTEN:
+
+            case G.REQUEST_CODE_LIST_SEARCH_RAKUTEN: // Return from search with Rakuten API
                 if(resultCode == G.RESULT_POSITIVE) {
-                    mProgress.start("検索中…", null);
 
-                    // 検索対象、及び検索内容を取得
-                    final String key = data.getStringExtra(G.RESULT_DATA_SELECTED_KEY);
-                    final String value = data.getStringExtra(G.RESULT_DATA_SELECTED_VALUE);
+                    mProgress.show(getString(R.string.searching_now), null);
 
-                    // HTTPアクセスが入るので別スレッドで回す
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
+                    String selectKey = data.getStringExtra(G.RESULT_DATA_SELECTED_KEY);
+                    String selectValue = data.getStringExtra(G.RESULT_DATA_SELECTED_VALUE);
 
-                            // 楽天APIを利用してJSONを取得する。
-                            String url = Rakuten.getRakutenBooksBookURI(BookSeriesCatalogBaseActivity.this, key, value);
-                            Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(BookSeriesCatalogBaseActivity.this, url);
-
-                            final String jsonStr = loader.loadInBackground();
-
-                            // JSONを取得後に検索結果一覧・または補完済みの作品登録画面を表示
-                            // 検索結果が0件の場合：「取得できる作品がありませんでした。内容を変更しもう一度お試しください。」という通知を表示
-                            // 検索結果が1件の場合：作品登録画面を開き、取得できている全ての情報を入力済みの状態で表示する
-                            // 検索結果が2件以上の場合：作品一覧画面を開き、求めている作品を選んでもらう。選択後は「検索結果が1件の場合」と同じ流れになる
-                            mHandler.post(new Runnable() {
+                    Rakuten.searchFromRakutenAPI(this, mHandler, selectKey, selectValue,
+                            new Rakuten.SearchResultListener() {
                                 @Override
-                                public void run() {
+                                public void onSearchSuccess(@NonNull String searchResults) {
+                                    mSearchResultBookSeriesCache = Rakuten.convertJsonText2BookSeriesDataList(
+                                            BookSeriesCatalogBaseActivity.this,
+                                            searchResults,
+                                            API_SEARCH_RESULT_SERIES_PER_PAGE);
 
-                                    if(Util.isEmpty(jsonStr)) {
-                                        // 取得失敗した場合は書籍全般として再建策するする
-                                        new Thread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                // 楽天APIを利用してJSONを取得する。
-                                                String url = Rakuten.getRakutenBooksTotalUri(BookSeriesCatalogBaseActivity.this, key, value);
-                                                Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(BookSeriesCatalogBaseActivity.this, url);
+                                    mProgress.dismiss();
 
-                                                final String jsonRetryStr = loader.loadInBackground();
+                                    switchMode(G.MODE_API_SEARCH_RESULT);
+                                    refreshData();
+                                }
 
-                                                mHandler.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        if(Util.isEmpty(jsonRetryStr)) {
-                                                            mProgress.close();
-                                                            // 検索結果が空の場合はトースト通知でお知らせ
-                                                            ToastUtil.show(BookSeriesCatalogBaseActivity.this, "取得できる作品がありませんでした。内容を変更しもう一度お試しください。");
-                                                        } else {
-                                                            convertJsonStr2JsonArrayObject(jsonStr);
-                                                            mProgress.close();
-                                                            switchMode(G.MODE_API_SEARCH_RESULT);
-                                                            refreshData();
-                                                        }
-                                                    }
-                                                });
-
-                                            }
-                                        }).start();
-                                    } else {
-                                        convertJsonStr2JsonArrayObject(jsonStr);
-                                        mProgress.close();
-                                        switchMode(G.MODE_API_SEARCH_RESULT);
-                                        refreshData();
-                                    }
+                                @Override
+                                public void onSearchError(@NonNull String errorContent) {
+                                    ToastUtil.show(
+                                            BookSeriesCatalogBaseActivity.this,
+                                            R.string.series_data_error_no_search_result_found_please_retry);
                                 }
                             });
-                        }
-                    }).start();
-
                 }
                 break;
         }
     }
 
     /**
-     * Json文字列から検索結果一覧情報を取得・メンバ変数に保持する
-     * @param jsonStr
+     * Get ArrayAdapter for spinner
+     * Referenced: http://techbooster.jpn.org/andriod/ui/606/
+     *
+     * @return String ArrayAdapter for spinner
      */
-    private void convertJsonStr2JsonArrayObject(String jsonStr) {
-        mApiSearchResultArrayList = new ArrayList<BookSeriesData>();
-
-        // JSON情報を分析する
-        mAPISearchResultJsonObject = JsonUtil.getJsonObject(jsonStr);
-        JSONArray jsonArray = JsonUtil.getJsonArray(mAPISearchResultJsonObject, Rakuten.Key.ITEM_LIST);
-        List<JSONObject> jsonObjList = JsonUtil.getJsonObjectsList(jsonArray);
-
-        String count = JsonUtil.getJsonObjectData(mAPISearchResultJsonObject, Rakuten.Key.SEARCH_RESULT_COUNT);
-        int countVal = -1;
-        try {
-            countVal = Integer.valueOf(count);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if(countVal > 30) {
-            ToastUtil.show(BookSeriesCatalogBaseActivity.this, "30件以上の作品がヒットしました");
-        } else {
-            ToastUtil.show(BookSeriesCatalogBaseActivity.this, count+"件の作品がヒットしました");
-        }
-
-        // 取得した結果を作品情報一覧へと分解する
-        for(int i = 0 ; i < jsonObjList.size() ; i ++ ) {
-            JSONObject detailData = JsonUtil.getJsonObject(jsonObjList.get(i), Rakuten.Key.ITEM_DETAIL);
-            BookSeriesData data = new BookSeriesData(this);
-
-            data.setTitle(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME));
-            data.setTitlePronunciation(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.TITLE_NAME_KANA));
-            data.setAuthor(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME));
-            data.setAuthorPronunciation(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.AUTHOR_NAME_KANA));
-            data.setMagazine(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME));
-            data.setMagazinePronunciation(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.MAGAZINE_NAME_KANA));
-            data.setCompany(JsonUtil.getJsonObjectData(detailData, Rakuten.Key.COMPANY_NAME));
-            // 画像は現在未対応（そのうち対応入れる）
-            // URLを保持できる用に機能の変更が必要
-            String imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_LARGE);
-            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_MEDIUM);
-            if(Util.isEmpty(imageUrl)) imageUrl = JsonUtil.getJsonObjectData(detailData, Rakuten.Key.IMAGE_URL_SMALL);
-            // URLの取得に成功した場合は登録する
-            if(!Util.isEmpty(imageUrl)) {
-                data.setImagePath(imageUrl);
-            }
-
-            mApiSearchResultArrayList.add(data);
-        }
-    }
-
-    // Spinnerアアプターについて
-    // http://techbooster.jpn.org/andriod/ui/606/
     private ArrayAdapter<String> getSpinnerAdapter() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(BookSeriesCatalogBaseActivity.this, android.R.layout.simple_spinner_item);
+        ArrayAdapter<String> adapter
+                = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
 
-        // 検索用Spinner選択肢
+        // Lists to show in spinner
         for(int i = 0 ; i < G.SEARCH_MODE_LIST.length ; i ++) {
             adapter.add(G.SEARCH_MODE_LIST[i]);
         }
@@ -427,100 +351,90 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
     }
 
     /**
-     * タッチイベントを設定
+     * Handles all click event within this Activity
+     * @param view
      */
-    protected void setClickListener() {
-        // 新規追加ボタン
-        findViewById(R.id.add_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 登録種類を詮索
-                Intent intent = BtnListDialogActivity.getIntent(BookSeriesCatalogBaseActivity.this, "作品登録方法を選択", "作品を登録する方法を選択してください", "決定", "キャンセル");
-                startActivityForResult(intent, G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE);
+    @Override
+    public void onClick(View view) {
+        int viewId = view.getId();
+        switch (viewId) {
+            case R.id.add_button: // Add book series
+                startActivityForResult(
+                        BtnListDialogActivity.getIntent(
+                                this,
+                                "作品登録方法を選択",
+                                "作品を登録する方法を選択してください",
+                                "決定",
+                                getString(R.string.cancel)),
+                        G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE);
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
-            }
-        });
+                break;
 
-        // 検索ボタン
-        mHeaderModeAreaView.findViewById(R.id.btn_search).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SEARCH_BTN);
+            case R.id.btn_search: // Search book series registered
                 switchMode(G.MODE_SEARCH);
                 refreshData();
-            }
-        });
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SEARCH_BTN);
+                break;
 
-        // 検索キャンセルボタン
-        mHeaderSearchAreaView.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            case R.id.btn_cancel: // Cancel search book series registered / cancel API search
                 switchMode(G.MODE_VIEW);
                 refreshData();
-            }
-        });
+                break;
 
-        mHeaderApiSearchAreaView.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switchMode(G.MODE_VIEW);
-                refreshData();
-            }
-        });
-
-        // 設定ボタン
-        findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(BookSeriesCatalogBaseActivity.this, SettingsActivity.class));
+            case R.id.btn_settings:
+                startActivity(SettingsActivity.getIntent(this));
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SETTINGS_BTN);
+                break;
 
-            }
-        });
+        }
+    }
 
+    /**
+     * Initialize all callbacks
+     */
+    protected void initializeCallbackEvents() {
 
+        findViewById(R.id.add_button).setOnClickListener(this);
+        mHeaderModeAreaView.findViewById(R.id.btn_search).setOnClickListener(this);
+        mHeaderSearchAreaView.findViewById(R.id.btn_cancel).setOnClickListener(this); //
+        mHeaderApiSearchAreaView.findViewById(R.id.btn_cancel).setOnClickListener(this);
+        findViewById(R.id.btn_settings).setOnClickListener(this);
 
-
-        // 検索対象選択スピナーボタン
-        Spinner spinnerView;
-        spinnerView = ((Spinner)findViewById(R.id.spinner_search_content));
-        spinnerView.setAdapter(getSpinnerAdapter());
-        spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        // Search type select spinner
+        mSearchContentSpinnerView.setAdapter(getSpinnerAdapter());
+        mSearchContentSpinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Spinnerの選択肢の順番=検索モードの並び順となっていることを確認すること
+                // Update search mode depending on item selected
+                // Do make sure selection list in spinner, is shown in same order as value of each mode
                 mSearchMode = position;
-                // 検索対象変化後に再度情報を読み込む
                 refreshData();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                // Do nothing
             }
         });
-    }
 
-    /**
-     * その他各種リスナー登録
-     */
-    protected void setOtherListener() {
-        EditText searchEditText = (EditText) findViewById(R.id.search_content);
-        searchEditText.addTextChangedListener(new TextWatcher() {
+        // Search content edit text
+        ((EditText)findViewById(R.id.search_content)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // do nothing
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Update catalog every time text is changed
                 if(s == null) mSearchContent = "";
                 else mSearchContent = String.valueOf(s);
                 refreshData();
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
             public void afterTextChanged(Editable s) {
+                // do nothing
             }
         });
     }
@@ -528,16 +442,12 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
     /**
      * Initializes view for bookSeries in listView / gridView
      *
-     * @return initialized View
-     */
-    /**
-     *
      * @param position position of the item in list / grid
      * @param convertView View for list / grid item
      * @param parentView Parent view of convertView
      * @param bookSeriesData BookSeriesData instance to show
      * @param isGridView whether the view is for grid or list
-     * @return
+     * @return initialized View
      */
     @NonNull
     protected View initializeBookSeriesItemView(int position, @Nullable View convertView, @Nullable ViewGroup parentView, @NonNull final BookSeriesData bookSeriesData, boolean isGridView) {
@@ -605,8 +515,12 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
 
         // set tag data
         tagContainer.removeAllViews();
-        tagContainer = ViewUtil.setTagInfoSmall(
-                this, bookSeriesData.getTagsAsList(), tagContainer);
+        ArrayList<ViewGroup> tagViewList = ViewUtil.getTagViewList(
+                this, bookSeriesData.getTagsAsList(), ViewUtil.TAGS_LAYOUT_TYPE_SMALL);
+        for(ViewGroup tagView : tagViewList) {
+            tagContainer.addView(tagView);
+        }
+
         // TODO check whether this invalidate is necessary
         tagContainer.invalidate();
 
@@ -617,13 +531,11 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
             bookSeriesData.loadImage(mHandler, this, new ListenerUtil.LoadBitmapListener() {
                 @Override
                 public void onFinish(@NonNull Bitmap bitmap) {
-                    if(bitmap != null) {
-                        if(Util.isEqual(bookSeriesData.getTitle(),
-                                String.valueOf(bookCoverImageView.getTag()))) {
-                            bookCoverImageView.setImageBitmap(bitmap);
-                            if(doUseImageCache) {
-                                ImageUtil.setImageCache(bookSeriesData.getSeriesId(), bitmap);
-                            }
+                    if(Util.isEqual(bookSeriesData.getTitle(),
+                            String.valueOf(bookCoverImageView.getTag()))) {
+                        bookCoverImageView.setImageBitmap(bitmap);
+                        if(doUseImageCache) {
+                            ImageUtil.setImageCache(bookSeriesData.getSeriesId(), bitmap);
                         }
                     }
                 }
@@ -634,8 +546,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
             });
         }
 
-        // set click listener
-        // when current mode is search mode, move to adding series screen
+        // Set click listener
+        // When current mode is search mode, move to adding series screen
         // else, move to check series detail screen
         convertView.setOnClickListener(isAPISearchMode
                 ? getOnClick4AddSeriesConfirmScreen(bookSeriesData)
@@ -681,7 +593,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity {
                         // intent
                         EditSeriesDialogActivity.getIntent(
                                 BookSeriesCatalogBaseActivity.this,
-                                getString(R.string.series_data_add_confirm_content),
+                                getString(R.string.series_data_confirm_add_series),
                                 getString(R.string.add),
                                 bookSeriesData),
                         // request code

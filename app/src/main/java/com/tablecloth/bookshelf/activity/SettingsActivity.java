@@ -1,6 +1,7 @@
 package com.tablecloth.bookshelf.activity;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.widget.SpinnerAdapter;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.SettingsDao;
+import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.ToastUtil;
@@ -32,6 +34,16 @@ import java.security.MessageDigest;
 public class SettingsActivity extends BaseActivity {
 
     private SettingsDao mSettingsDao;
+
+    /**
+     * Get Intent instance to activate this activity
+     *
+     * @param context context
+     * @return intent instance
+     */
+    public static Intent getIntent(Context context) {
+        return new Intent(context, SettingsActivity.class);
+    }
 
     /**
      * Get layout ID to show in the activity

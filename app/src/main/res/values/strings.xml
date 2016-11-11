@@ -4,6 +4,8 @@
     <string name="app_name">本棚管理</string>
     <string name="email">table.cloth.03@gmail.com</string>
 
+    <string name="referrer_update_dialog">update_dialog</string>
+
     <string name="email_inquiry_line1_title">＊＊お問い合わせ情報＊＊\n</string>
     <string name="email_inquiry_line2_id">お問い合わせID：%1$s\n</string>
     <string name="email_inquiry_line3_app_version">アプリバージョン：%1$s\n</string>
@@ -15,10 +17,13 @@
     <string name="save">保存</string>
     <string name="yes">はい</string>
     <string name="no">いいえ</string>
+    <string name="cancel">キャンセル</string>
+    <string name="search">検索</string>
 
     <string name="add_detail"><u>情報を追加する</u></string>
     <string name="edit_book_series_detail">作品情報を編集</string>
     <string name="change_image">画像変更</string>
+    <string name="searching_now">検索中…</string>
 
     <string name="id_google_analytics_tracking">UA-44238770-2</string>
     <string name="id_rakuten_app_id">1019452313987815323</string>
@@ -44,6 +49,7 @@
     <string name="series_data_error_failed_2_update_data">本の情報の更新に失敗しました</string>
     <string name="series_data_error_load_image_by_memory">メモリー不足のため、画像の取得に失敗しました</string>
     <string name="series_data_error_load_image">予期せぬエラーのため、画像の取得に失敗しました</string>
+    <string name="series_data_error_no_search_result_found_please_retry">取得できる作品がありませんでした。内容を変更しもう一度お試しください。</string>
 
     <string name="tag_error_enter_tag_2_add">追加するタグを入力してください</string>
     <string name="tag_error_failed_2_delete">タグの削除に失敗しました</string>
@@ -52,9 +58,18 @@
     <string name="series_data_error_invalid_series_id_found">不正な作品IDを検出しました。時間を置いて再度お試しください。</string>
     <string name="series_data_confirm_add_series">この作品を追加しますか？</string>
     <string name="series_data_confirm_change_book_cover">作品の画像を変更しますか？？</string>
+    <string name="seires_data_done_add_series">作品を追加しました</string>
+
+    <string name="seires_data_add_series_data">作品情報を追加</string>
+
+    <string name="series_data_search">作品を検索</string>
+    <string name="series_data_search_select_topic">作品を検索する項目を選択してください</string>
 
     <string name="image_select_method">画像の選択方法</string>
     <string name="image_select_choose_image_select_method">画像の選択方法を選択してください</string>
     <string name="image_select_select_from_gallery">ギャラリーから選択</string>
     <string name="image_select_select_from_camera">カメラで撮影</string>
+
+    <string name="apu_search_hit_count_over">%1$d件以上の作品がヒットしました</string>
+    <string name="apu_search_hit_count">%1$d件の作品がヒットしました</string>
 </resources>

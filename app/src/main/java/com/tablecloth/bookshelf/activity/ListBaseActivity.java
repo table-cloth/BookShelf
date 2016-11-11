@@ -96,7 +96,7 @@ public class ListBaseActivity extends BookSeriesCatalogBaseActivity {
      * 現在の表示形式設定と、表示されている画面が一致するかを確認
      * @return
      */
-    protected boolean isShowTypeCorrect() {
+    protected boolean isCurrentShowTypeSameWithSetting() {
         String value = mSettings.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
         if(Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST.equals(value)) {
             return true;
@@ -107,7 +107,7 @@ public class ListBaseActivity extends BookSeriesCatalogBaseActivity {
     /**
      * 現在表示している画面の種類を返す
      */
-    protected String getShowType() {
+    protected String getCurrentShowType() {
         return Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST;
     }
 
