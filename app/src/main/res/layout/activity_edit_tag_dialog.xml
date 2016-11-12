@@ -171,7 +171,7 @@
                             android:paddingRight="10dp"
                             android:paddingTop="15dp">
 
-                            <com.tablecloth.bookshelf.view.CurrentTagContainerLayout
+                            <com.tablecloth.bookshelf.view.TagContainerLayout
                                 android:id="@+id/tag_container"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" />
@@ -217,7 +217,7 @@
                             android:paddingRight="10dp"
                             android:paddingTop="15dp">
 
-                        <com.tablecloth.bookshelf.view.RecentTagContainerLayout
+                        <com.tablecloth.bookshelf.view.TagContainerLayout
                             android:id="@+id/tag_recent_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

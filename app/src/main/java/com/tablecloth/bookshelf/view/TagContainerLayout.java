@@ -17,46 +17,52 @@ import com.tablecloth.bookshelf.util.Util;
  *
  * Created by Minami on 2015/04/10.
  */
-public class BaseTagContainerLayout extends RelativeLayout implements View.OnClickListener {
+public class TagContainerLayout extends RelativeLayout {
 
     protected Context mContext = null;
-    protected OnCurrentTagUpdateListener mOnCurrentTagUpdateListener = null;
-    protected TagHistoryDao mTagHistoryDao;
+//    protected OnCurrentTagUpdateListener mOnCurrentTagUpdateListener = null;
+//    protected TagHistoryDao mTagHistoryDao;
 
-    private String mTagData = null;
+//    private String mTagData = null;
     private boolean mNeedsReDraw = true;
 
-    public BaseTagContainerLayout(Context context) {
+    private OnClickListener mOnTagClickListener = null;
+
+    public TagContainerLayout(Context context) {
         super(context);
         initialize(context);
     }
 
-    public BaseTagContainerLayout(Context context, AttributeSet attrs) {
+    public TagContainerLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initialize(context);
     }
 
-    public BaseTagContainerLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public TagContainerLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initialize(context);
     }
 
     private void initialize(@NonNull Context context) {
         mContext = context;
-        mTagHistoryDao = new TagHistoryDao(mContext);
+//        mTagHistoryDao = new TagHistoryDao(mContext);
 
         setWillNotDraw(false);
         setWillNotCacheDrawing(false);
     }
 
-    public void setTagData(@Nullable String tagData) {
-        mTagData = tagData;
+    public void setOnTagClickListener(OnClickListener listener) {
+        mOnTagClickListener = listener;
     }
 
-    @Nullable
-    public String getTagData() {
-        return mTagData;
-    }
+//    public void setTagData(@Nullable String tagData) {
+//        mTagData = tagData;
+//    }
+//
+//    @Nullable
+//    public String getTagData() {
+//        return mTagData;
+//    }
 
     /**
      * Sets flag to re-draw
@@ -91,7 +97,7 @@ public class BaseTagContainerLayout extends RelativeLayout implements View.OnCli
                 tagChild.setVisibility(View.VISIBLE);
 
                 // タップによるタグの登録処理
-//                tagChild.setOnClickListener(this);
+                tagChild.setOnClickListener(mOnTagClickListener);
 
                 // ビューの設定
                 measuredWidth += tagChild.getWidth();
@@ -134,22 +140,22 @@ public class BaseTagContainerLayout extends RelativeLayout implements View.OnCli
         mNeedsReDraw = false;
     }
 
-    /**
-     * Handles all click event within this Activity
-     *
-     * @param view clicked view
-     */
-    @Override
-    public void onClick(View view) {
-        // to be declared in derived class
-    }
-
-    public interface OnCurrentTagUpdateListener {
-        void onUpdate(String currentTags);
-    }
-
-    public void setTagUpdateListener(OnCurrentTagUpdateListener listener) {
-        mOnCurrentTagUpdateListener = listener;
-    }
+//    /**
+//     * Handles all click event within this Activity
+//     *
+//     * @param view clicked view
+//     */
+//    @Override
+//    public void onClick(View view) {
+//        // to be declared in derived class
+//    }
+//
+//    public interface OnCurrentTagUpdateListener {
+//        void onUpdate(String currentTags);
+//    }
+//
+//    public void setTagUpdateListener(OnCurrentTagUpdateListener listener) {
+//        mOnCurrentTagUpdateListener = listener;
+//    }
 
 }

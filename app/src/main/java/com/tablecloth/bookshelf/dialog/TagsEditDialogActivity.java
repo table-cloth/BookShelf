@@ -19,9 +19,7 @@ import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
-import com.tablecloth.bookshelf.view.BaseTagContainerLayout;
-import com.tablecloth.bookshelf.view.CurrentTagContainerLayout;
-import com.tablecloth.bookshelf.view.RecentTagContainerLayout;
+import com.tablecloth.bookshelf.view.TagContainerLayout;
 
 import java.util.ArrayList;
 
@@ -33,8 +31,8 @@ import java.util.ArrayList;
 public class TagsEditDialogActivity extends DialogBaseActivity {
 
     String mRawTagsText;
-    CurrentTagContainerLayout mCurrentTagContainer;
-    RecentTagContainerLayout mRecentTagContainer;
+    TagContainerLayout mCurrentTagContainer;
+    TagContainerLayout mRecentTagContainer;
     EditText mAddTagEditText;
 
     TagHistoryDao mTagHistoryDao;
@@ -81,8 +79,8 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
         setTitleText(R.id.title);
         setBtnPositiveText(R.id.btn_positive);
 
-        mCurrentTagContainer = (CurrentTagContainerLayout) findViewById(R.id.tag_container);
-        mRecentTagContainer = (RecentTagContainerLayout) findViewById(R.id.tag_recent_container);
+        mCurrentTagContainer = (TagContainerLayout) findViewById(R.id.tag_container);
+        mRecentTagContainer = (TagContainerLayout) findViewById(R.id.tag_recent_container);
         mAddTagEditText = (EditText) findViewById(R.id.data_content);
 
         mTagHistoryDao = new TagHistoryDao(this);
@@ -93,30 +91,24 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
 
         mAddTagEditText.setOnEditorActionListener(getEditorActionListener());
 
-        BaseTagContainerLayout.OnCurrentTagUpdateListener tagUpdateListener
-                = getTagUpdateListener();
-        mCurrentTagContainer.setTagUpdateListener(tagUpdateListener);
-        mRecentTagContainer.setTagUpdateListener(tagUpdateListener);
+        // Set listener for each child views within container
+        mCurrentTagContainer.setOnTagClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String deleteTag = (String) v.findViewById(R.id.tag_name).getTag();
+                UpdateWithDeleteTag(deleteTag);
+            }
+        });
+        mRecentTagContainer.setOnTagClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newTag = (String) v.findViewById(R.id.tag_name).getTag();
+                UpdateWithNewTag(newTag);
+            }
+        });
 
         updateCurrentTags();
         updateRecentTags();
-    }
-
-    /**
-     * Get tag update listener
-     *
-     * @return OnCurrentTagUpdateListener for all tag container
-     */
-    @NonNull
-    private BaseTagContainerLayout.OnCurrentTagUpdateListener getTagUpdateListener() {
-        return new BaseTagContainerLayout.OnCurrentTagUpdateListener() {
-            @Override
-            public void onUpdate(String currentTags) {
-                mRawTagsText = currentTags;
-                updateRecentTags();
-                updateCurrentTags();
-            }
-        };
     }
 
     /**
@@ -133,6 +125,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     UpdateWithNewTag(mAddTagEditText.getText().toString());
                     mAddTagEditText.setText("");
+                    return true;
                 }
                 return false;
             }
@@ -214,7 +207,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
      * @param tagList New tag info in list
      * @param tagsLayoutType TagView type
      */
-    private void updateTagContainer(@NonNull BaseTagContainerLayout container, @Nullable ArrayList<String> tagList, int tagsLayoutType) {
+    private void updateTagContainer(@NonNull TagContainerLayout container, @Nullable ArrayList<String> tagList, int tagsLayoutType) {
         container.removeAllViews();
 
         ArrayList<ViewGroup> tagViewList = ViewUtil.getTagViewList(this, tagList, tagsLayoutType);
@@ -222,7 +215,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
             container.addView(tagView);
         }
 
-        container.setTagData(BookData.convertTagsList2TagsRawText(tagList));
+//        container.setTagData(BookData.convertTagsList2TagsRawText(tagList));
         container.setReDrawFlag(true);
     }
 
@@ -235,10 +228,28 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
     private void UpdateWithNewTag(String newTag2Add) {
         if(addNewTag(newTag2Add)) {
             mTagHistoryDao.saveTag(newTag2Add);
+            updateCurrentTags();
+            updateRecentTags();
         }
+    }
+
+    /**
+     * Delete from current tag & update if necessary
+     *
+     * @param deleteTag tag to delete
+     */
+    private void UpdateWithDeleteTag(String deleteTag) {
+        ArrayList<String> tagsInList = BookData.convertTagsRawText2TagsList(mRawTagsText);
+        // fail if tag with same name is not found
+        if(!tagsInList.contains(deleteTag)) {
+            ToastUtil.show(this, R.string.tag_error_failed_2_delete);
+            return;
+        }
+
+        tagsInList.remove(deleteTag);
+        mRawTagsText = BookData.convertTagsList2TagsRawText(tagsInList);
         updateCurrentTags();
         updateRecentTags();
     }
-
 }
 
