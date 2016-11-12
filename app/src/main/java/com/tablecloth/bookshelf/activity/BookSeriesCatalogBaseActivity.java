@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -33,7 +34,6 @@ import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.IntentUtil;
-import com.tablecloth.bookshelf.util.JsonUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
@@ -41,11 +41,7 @@ import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Base class for Activity showing catalog of BookSeries
@@ -60,7 +56,9 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     // Number of book series item shown in a single row, for grid layout
     private final int BOOK_SERIES_ITEM_COUNT_PER_COLUM_GRID = 4;
 
-
+    // Catalog adapter
+    // Needs to be set to catalog collection view instance in derived class
+    protected BookSeriesCatalogAdapter mCatalogAdapter = null;
     // BookSeriesData list to show in list / grid
     protected ArrayList<BookSeriesData> mBookSeriesDataList = new ArrayList<>();
     // Progress Dialog Util instance
@@ -72,7 +70,6 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     // Search related
     protected int mSearchMode = G.SEARCH_MODE_ALL;
     protected String mSearchContent = "";
-//    private String mSearchResultJsonText;
     private ArrayList<BookSeriesData> mSearchResultBookSeriesCache = new ArrayList<>();
 
     // Data accessor
@@ -182,7 +179,12 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     /**
      * Called when needs to refresh catalog views
      */
-    protected abstract void notifyDataSetChanged();
+    private void notifyDataSetChanged() {
+        if(mCatalogAdapter == null) {
+            return ;
+        }
+        mCatalogAdapter.notifyDataSetChanged();
+    }
 
     /**
      * Called on resume
@@ -190,33 +192,44 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     @Override
     public void onResume() {
         super.onResume();
-        if(!isCurrentShowTypeSameWithSetting()) {
-            // activate right activity according to show type setting
-            String value = mSettingsDao.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, getCurrentShowType());
-            startActivity(new Intent(this,
-                    Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID.equals(value)
-                            ? GridBaseActivity.class
-                            : ListBaseActivity.class));
-            finish();
-        } else {
+        if(getCurrentShowTypeText().equals(
+                getSettingsShowTypeText())) {
             // Refresh in case something is updated while in background
             refreshData();
+        } else {
+            // activate right activity according to show type setting
+            String value = mSettingsDao.load(Const.DB.Settings.KEY.SERIES_SHOW_TYPE, getCurrentShowTypeText());
+            startActivity(new Intent(this,
+                    Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID.equals(value)
+                            ? BookSeriesGridCatalogActivity.class
+                            : BookSeriesListCatalogActivity.class));
+            finish();
         }
     }
 
     /**
-     * Whether current show type (grid / list) is equivalent with setting's show type
+     * Get show type from Settings
      *
-     * @return whether is equivalent with setting's show type
+     * @return show type name in Settings
      */
-    protected abstract boolean isCurrentShowTypeSameWithSetting();
+    @NonNull
+    private String getSettingsShowTypeText() {
+        return mSettingsDao.load(
+                Const.DB.Settings.KEY.SERIES_SHOW_TYPE,
+                Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
+    }
 
     /**
      * Get current show type
      *
-     * @return current show type
+     * @return current show type name
      */
-    protected abstract String getCurrentShowType();
+    @NonNull
+    private String getCurrentShowTypeText() {
+        return isGridCatalog()
+                ? Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID
+                : Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST;
+    }
 
     /**
      * Called on key down
@@ -225,6 +238,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
      * @param event event
      * @return false if current mode is not view mode
      */
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK
                 && mShowMode == G.MODE_VIEW) {
@@ -242,7 +256,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
      * @param data intent data
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
@@ -337,6 +351,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
      *
      * @return String ArrayAdapter for spinner
      */
+    @NonNull
     private ArrayAdapter<String> getSpinnerAdapter() {
         ArrayAdapter<String> adapter
                 = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
@@ -352,7 +367,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
 
     /**
      * Handles all click event within this Activity
-     * @param view
+     * @param view Clicked view
      */
     @Override
     public void onClick(View view) {
@@ -392,7 +407,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     /**
      * Initialize all callbacks
      */
-    protected void initializeCallbackEvents() {
+    private void initializeCallbackEvents() {
 
         findViewById(R.id.add_button).setOnClickListener(this);
         mHeaderModeAreaView.findViewById(R.id.btn_search).setOnClickListener(this);
@@ -450,7 +465,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
      * @return initialized View
      */
     @NonNull
-    protected View initializeBookSeriesItemView(int position, @Nullable View convertView, @Nullable ViewGroup parentView, @NonNull final BookSeriesData bookSeriesData, boolean isGridView) {
+    private View initializeBookSeriesItemView(int position, @Nullable View convertView, @Nullable ViewGroup parentView, @NonNull final BookSeriesData bookSeriesData, boolean isGridView) {
         if(convertView == null) {
             LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(
@@ -601,5 +616,38 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
             }
         };
     }
+
+    /**
+     * Adapter for catalog collection
+     */
+    private class BookSeriesCatalogAdapter extends BaseAdapter {
+        @Override
+        public int getCount() {
+            return mBookSeriesDataList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mBookSeriesDataList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return initializeBookSeriesItemView(position, convertView, parent,
+                    mBookSeriesDataList.get(position), isGridCatalog());
+        }
+    }
+
+    /**
+     * Check if current catalog is shown in Grid format
+     *
+     * @return whether is Grid format
+     */
+    abstract protected boolean isGridCatalog();
 
 }

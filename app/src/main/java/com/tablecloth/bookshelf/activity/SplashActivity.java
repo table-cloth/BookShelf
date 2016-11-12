@@ -43,8 +43,8 @@ public class SplashActivity extends BaseActivity {
                 Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
         startActivity(new Intent(this,
                 Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID.equals(nextActivity)
-                        ? GridBaseActivity.class
-                        : ListBaseActivity.class));
+                        ? BookSeriesGridCatalogActivity.class
+                        : BookSeriesListCatalogActivity.class));
 
         // Finish this activity after starting next activity
         SplashActivity.this.finish();

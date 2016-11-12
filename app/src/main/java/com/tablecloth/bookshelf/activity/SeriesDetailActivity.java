@@ -35,8 +35,9 @@ import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
 
 /**
+ * Activity to see detail info of Book Series
+ *
  * Created by minami on 14/09/07.
- * １作品の詳細表示画面
  */
 public class SeriesDetailActivity extends BaseActivity implements OnClickListener {
 
