@@ -64,7 +64,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
     }
 
     /**
-     * Constructor
+     * OnCreate
      *
      * @param savedInstanceState savedInstanceState
      */
@@ -105,9 +105,9 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
                 startActivityForResult(
                         TagsEditDialogActivity.getIntent(
                                 this,
-                                getString(R.string.tag_edit),
-                                mBookSeriesData.getTagsAsList(),
-                                getString(R.string.finish)),
+                                R.string.tag_edit,
+                                R.string.finish,
+                                mBookSeriesData.getRawTags()),
                         G.REQUEST_CODE_TAGS_EDIT);
                 break;
 
@@ -205,7 +205,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
 
             case G.REQUEST_CODE_TAGS_EDIT: // Return from tag edit screen
                 if(data != null) {
-                    String tagsStr = data.getStringExtra(TagsEditDialogActivity.KEY_TAGS);
+                    String tagsStr = data.getStringExtra(TagsEditDialogActivity.KEY_RAW_TAGS);
                     mBookSeriesData.setRawTags(tagsStr);
                     updateTagContainer();
                 }

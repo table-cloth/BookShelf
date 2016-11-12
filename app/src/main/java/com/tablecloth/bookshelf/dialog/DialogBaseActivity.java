@@ -2,6 +2,7 @@ package com.tablecloth.bookshelf.dialog;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
@@ -22,6 +23,8 @@ public abstract class DialogBaseActivity extends BaseActivity implements View.On
     final protected static String KEY_BTN_NEGATIVE_STR_ID = "btn_negative";
     final protected static String KEY_DATA_TYPE_STR_ID = "data_type";
     final protected static String KEY_BOOK_SERIES_ID = "id";
+    final protected static String KEY_RAW_TAGS = "raw_tags";
+
 
     // Default values for Intent extras
     final protected static int VALUE_DEFAULT_STR_ID = -1;
@@ -49,6 +52,16 @@ public abstract class DialogBaseActivity extends BaseActivity implements View.On
     protected int getBookSeriesId() {
         return mIntentData.getIntExtra(
                 KEY_BOOK_SERIES_ID, BookData.BOOK_SERIES_ERROR_VALUE);
+    }
+
+    /**
+     * Get tags in text format
+     *
+     * @return raw tags in text
+     */
+    @NonNull
+    protected String getRawTags() {
+        return mIntentData.getStringExtra(KEY_RAW_TAGS);
     }
 
     /**

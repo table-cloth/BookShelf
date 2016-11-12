@@ -3,6 +3,8 @@ package com.tablecloth.bookshelf.dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,158 +26,219 @@ import com.tablecloth.bookshelf.view.RecentTagRelativeLayout;
 import java.util.ArrayList;
 
 /**
- * タグの編集用ダイアログ
+ * Dialog activity for editing tags
+ *
  * Created by Minami on 2015/04/02.
  */
 public class TagsEditDialogActivity extends DialogBaseActivity {
 
-    final public static String KEY_TAGS = "tags_data";
-    CurrentTagRelativeLayout tagContainer;
-    RecentTagRelativeLayout recentTagContainer;
-    String tagsData;
-    EditText addTagEditText;
+    String mRawTagsText;
+    CurrentTagRelativeLayout mCurrentTagContainer;
+    RecentTagRelativeLayout mRecentTagContainer;
+    EditText mAddTagEditText;
 
     TagHistoryDao mTagHistoryDao;
 
+    /**
+     * Get layout ID to show in the activity
+     *
+     * @return layout ID
+     */
+    @Override
+    protected int getContentViewID() {
+        return R.layout.activity_edit_tag_dialog;
+    }
+
+    /**
+     * Get intent with given extra data
+     *
+     * @param context          context
+     * @param titleStrId       string id for title
+     * @param btnPositiveStrId string id for positive button
+     * @param rawTags          raw tags in text
+     * @return Intent instance
+     */
+    @NonNull
+    public static Intent getIntent(@NonNull Context context, int titleStrId, int btnPositiveStrId, @Nullable String rawTags) {
+        Intent intent = new Intent(context, TagsEditDialogActivity.class);
+
+        intent.putExtra(KEY_TITLE_STR_ID, titleStrId);
+        intent.putExtra(KEY_BTN_POSITIVE_STR_ID, btnPositiveStrId);
+        intent.putExtra(KEY_RAW_TAGS, rawTags);
+
+        return intent;
+    }
+
+    /**
+     * OnCreate
+     *
+     * @param savedInstanceState savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = getIntent();
+        setTitleText(R.id.title);
+        setBtnPositiveText(R.id.btn_positive);
 
-        ((TextView)findViewById(R.id.title)).setText(intent.getStringExtra(KEY_TITLE_STR_ID));
-        ((TextView)findViewById(R.id.btn_positive)).setText(intent.getStringExtra(KEY_BTN_POSITIVE_STR_ID));
+        mCurrentTagContainer = (CurrentTagRelativeLayout) findViewById(R.id.tag_container);
+        mRecentTagContainer = (RecentTagRelativeLayout) findViewById(R.id.tag_recent_container);
+        mAddTagEditText = (EditText) findViewById(R.id.data_content);
 
         mTagHistoryDao = new TagHistoryDao(this);
-        tagsData = intent.getStringExtra(KEY_TAGS);
-        tagContainer = (CurrentTagRelativeLayout)findViewById(R.id.tag_container);
-        recentTagContainer = (RecentTagRelativeLayout)findViewById(R.id.tag_recent_container);
-        findViewById(R.id.btn_positive).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent data = new Intent();
-                data.putExtra(KEY_TAGS, tagsData);
-                setResult(G.RESULT_POSITIVE, data);
-                finish();
-            }
-        });
+        mRawTagsText = getRawTags();
 
-        // テキスト入力によるタグ追加
-        addTagEditText = (EditText)findViewById(R.id.data_content);
-        addTagEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                // Action of enter key is set as "DONE" in xml
-                if(actionId == EditorInfo.IME_ACTION_DONE) {
-                    addTag(addTagEditText.getText().toString());
-                    addTagEditText.setText("");
+        findViewById(R.id.btn_positive).setOnClickListener(this);
+        findViewById(R.id.btn_add_tag).setOnClickListener(this);
 
-                    updateCurrentTags();
-                    updateRecentTags();
-                    return true;
-                }
-                return false;
-            }
-        });
+        mAddTagEditText.setOnEditorActionListener(getEditorActionListener());
 
-        findViewById(R.id.btn_add_tag).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String newTag = addTagEditText.getText().toString();
-                addTagEditText.setText("");
-                addTag(newTag);
-
-                updateCurrentTags();
-                updateRecentTags();
-            }
-        });
+        BaseTagRelativeLayout.OnCurrentTagUpdateListener tagUpdateListener
+                = getTagUpdateListener();
+        mCurrentTagContainer.setTagUpdateListener(tagUpdateListener);
+        mRecentTagContainer.setTagUpdateListener(tagUpdateListener);
 
         updateCurrentTags();
         updateRecentTags();
     }
 
-    private void addTag(String newTag) {
-        ArrayList<String> tagsTmp = BookData.convertTagsRawText2TagsList(tagsData);
-
-        // 登録失敗
-        if(Util.isEmpty(newTag)) {
-            ToastUtil.show(TagsEditDialogActivity.this, "追加するタグを入力してください");
-            return;
-        } else if(tagsTmp != null && tagsTmp.contains(newTag)) {
-            ToastUtil.show(TagsEditDialogActivity.this, "既に登録済みのタグです");
-            return;
-        }
-
-        // 登録成功
-        tagsTmp.add(newTag);
-        tagsData = BookData.convertTagsList2TagsRawText(tagsTmp);
-
-        // save newly added tag to history DB
-        mTagHistoryDao.saveTag(newTag);
-    }
-
-    private void updateCurrentTags() {
-        updateTagContainer(
-                tagContainer,
-                BookData.convertTagsRawText2TagsList(tagsData),
-                ViewUtil.TAGS_LAYOUT_TYPE_LARGE_WITH_DELETE);
-
-        tagContainer.setTagData(tagsData);
-        tagContainer.setTagUpdateListener(new BaseTagRelativeLayout.OnCurrentTagUpdateListener() {
+    /**
+     * Get tag update listener
+     *
+     * @return OnCurrentTagUpdateListener for all tag container
+     */
+    @NonNull
+    private BaseTagRelativeLayout.OnCurrentTagUpdateListener getTagUpdateListener() {
+        return new BaseTagRelativeLayout.OnCurrentTagUpdateListener() {
             @Override
             public void onUpdate(String currentTags) {
-                tagsData = currentTags;
+                mRawTagsText = currentTags;
                 updateRecentTags();
                 updateCurrentTags();
             }
-        });
-        tagContainer.setReLayoutFlag(true);
+        };
     }
 
-    private void updateTagContainer(ViewGroup container, ArrayList<String> tagList, int tagsLayoutType) {
-        container.removeAllViews();
+    /**
+     * Get editor action listener for tag edit text
+     *
+     * @return OnEditorActionListener for tag edit text
+     */
+    @NonNull
+    private TextView.OnEditorActionListener getEditorActionListener() {
+        return new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                // Action of enter key is set as "EditorInfo.IME_ACTION_DONE" in xml
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    UpdateWithNewTag(mAddTagEditText.getText().toString());
+                    mAddTagEditText.setText("");
+                }
+                return false;
+            }
+        };
+    }
 
-        ArrayList<ViewGroup> tagViewList = ViewUtil.getTagViewList(this, tagList, tagsLayoutType);
-        for(ViewGroup tagView : tagViewList) {
-            container.addView(tagView);
+    /**
+     * Handles all click event within this Activity
+     *
+     * @param view Clicked view
+     */
+    @Override
+    public void onClick(View view) {
+        int viewId = view.getId();
+        switch (viewId) {
+            case R.id.btn_positive: // Decide btn. Pass tag data back to prev Activity
+                finishWithResult(G.RESULT_POSITIVE,
+                        new Intent().putExtra(KEY_RAW_TAGS, mRawTagsText));
+                break;
+
+            case R.id.btn_add_tag: // Add new tags to current & history
+                UpdateWithNewTag(mAddTagEditText.getText().toString());
+                mAddTagEditText.setText("");
+                break;
         }
     }
 
+    /**
+     * Add new tag to current tags
+     *
+     * @param newTag Tag to add
+     * @return Is tag added successfully
+     */
+    private boolean addNewTag(@Nullable String newTag) {
+        ArrayList<String> tagsInList = BookData.convertTagsRawText2TagsList(mRawTagsText);
+
+        // Return if failed to add for some reason
+        if (Util.isEmpty(newTag)) {
+            ToastUtil.show(this, R.string.tag_error_enter_tag_2_add);
+            return false;
+        } else if (tagsInList.contains(newTag)) {
+            ToastUtil.show(this, R.string.tag_error_already_added);
+            return false;
+        }
+
+        tagsInList.add(newTag);
+        mRawTagsText = BookData.convertTagsList2TagsRawText(tagsInList);
+        return true;
+    }
+
+    /**
+     * Update current tags container
+     */
+    private void updateCurrentTags() {
+        // for current tags, use tag data of what is currently set
+        updateTagContainer(
+                mCurrentTagContainer,
+                BookData.convertTagsRawText2TagsList(mRawTagsText),
+                ViewUtil.TAGS_LAYOUT_TYPE_LARGE_WITH_DELETE);
+    }
+
+    /**
+     * Update recent tags container
+     */
     private void updateRecentTags() {
-        // タグ履歴領域に最新のタグを入れて、再描画(invalidate)を呼び出す
+        // for recent tags, re-load all from history
         ArrayList<String> tagsLog = mTagHistoryDao.loadAllTags();
 
         updateTagContainer(
-                recentTagContainer,
+                mRecentTagContainer,
                 tagsLog,
                 ViewUtil.TAGS_LAYOUT_TYPE_LARGE);
-
-        recentTagContainer.setTagData(BookData.convertTagsList2TagsRawText(tagsLog));
-        recentTagContainer.setCurrentTagData(tagsData);
-        recentTagContainer.setTagUpdateListener(new BaseTagRelativeLayout.OnCurrentTagUpdateListener() {
-            @Override
-            public void onUpdate(String currentTags) {
-                tagsData = currentTags;
-                updateRecentTags();
-                updateCurrentTags();
-            }
-        });
-        recentTagContainer.setReLayoutFlag(true);
     }
 
-        @Override
-    protected int getContentViewID() {
-        return R.layout.activity_edit_tag_dialog;
+    /**
+     * Update tags container
+     *
+     * @param container Tags container to update
+     * @param tagList New tag info in list
+     * @param tagsLayoutType TagView type
+     */
+    private void updateTagContainer(@NonNull BaseTagRelativeLayout container, @Nullable ArrayList<String> tagList, int tagsLayoutType) {
+        container.removeAllViews();
+
+        ArrayList<ViewGroup> tagViewList = ViewUtil.getTagViewList(this, tagList, tagsLayoutType);
+        for (ViewGroup tagView : tagViewList) {
+            container.addView(tagView);
+        }
+
+        container.setTagData(BookData.convertTagsList2TagsRawText(tagList));
+        container.setReLayoutFlag(true);
     }
 
-    public static Intent getIntent(Context context, String title, ArrayList<String> tags, String btnPositive) {
-        Intent intent = new Intent(context, TagsEditDialogActivity.class);
 
-        intent.putExtra(KEY_TITLE_STR_ID, title);
-        intent.putExtra(KEY_TAGS, BookData.convertTagsList2TagsRawText(tags));
-        intent.putExtra(KEY_BTN_POSITIVE_STR_ID, btnPositive);
-
-        return intent;
+    /**
+     * Add new tag & update if necessary
+     *
+     * @param newTag2Add new tag to add
+     */
+    private void UpdateWithNewTag(String newTag2Add) {
+        if(addNewTag(newTag2Add)) {
+            mTagHistoryDao.saveTag(newTag2Add);
+        }
+        updateCurrentTags();
+        updateRecentTags();
     }
+
 }
+
