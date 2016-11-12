@@ -61,6 +61,18 @@ public class Rakuten {
             "ISBN",
     };
 
+    // Rakuten API search key, related with "SEARCH_CONTENT_LIST"
+    final public static String[] SEARCH_KEY_LIST = {
+            Key.TITLE_NAME,
+            Key.TITLE_NAME_KANA,
+            Key.AUTHOR_NAME,
+            Key.AUTHOR_NAME_KANA,
+            Key.MAGAZINE_NAME,
+            Key.MAGAZINE_NAME_KANA,
+            Key.COMPANY_NAME,
+            Key.ISBN
+    };
+
     /**
      * 楽天API・書籍検索専用のURLを返す
      * 一番細かく情報が取れるので、可能であればこちらを使う

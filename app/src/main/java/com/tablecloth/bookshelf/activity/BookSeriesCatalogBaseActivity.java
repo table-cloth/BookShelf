@@ -28,7 +28,7 @@ import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity;
 import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
-import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
+import com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.GAEvent;
@@ -288,12 +288,12 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                     switch (selectedBtnId) {
                         case G.RESULT_DATA_SELECTED_BTN_SEARCH: // search using API
                         default:
-                            intent = SearchDialogActivity.getIntent(
+                            intent = SearchContentInputDialogActivity.getIntent(
                                     this,
-                                    getString(R.string.series_data_search),
-                                    getString(R.string.series_data_search_select_topic),
-                                    getString(R.string.search),
-                                    getString(R.string.cancel));
+                                    R.string.series_data_search,
+                                    R.string.series_data_search_select_topic,
+                                    R.string.search,
+                                    R.string.cancel);
                             startActivityForResult(intent, G.REQUEST_CODE_LIST_SEARCH_RAKUTEN);
                             sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_SEARCH_BTN);
                             break;

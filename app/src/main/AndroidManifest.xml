@@ -64,7 +64,7 @@
             android:theme="@style/Theme.CustomDialog"
             />
         <activity
-            android:name="com.tablecloth.bookshelf.dialog.SearchDialogActivity"
+            android:name="com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CustomDialog"
             />
