@@ -136,7 +136,7 @@ public class SearchContentInputDialogActivity extends DialogBaseActivity {
 
         // init with list to show in spinner
         for(int i = 0 ; i < Rakuten.SEARCH_CONTENT_LIST.length ; i ++) {
-            adapter.add(Rakuten.SEARCH_CONTENT_LIST[i]);
+            adapter.add(getString(Rakuten.SEARCH_CONTENT_LIST[i]));
         }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 

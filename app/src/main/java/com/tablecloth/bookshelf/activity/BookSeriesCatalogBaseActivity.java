@@ -33,7 +33,6 @@ import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.ImageUtil;
-import com.tablecloth.bookshelf.util.IntentUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
@@ -114,7 +113,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         switchMode(G.MODE_VIEW);
 
         // initialize Ad
-        Util.initAdview(this, (ViewGroup) findViewById(R.id.banner));
+        Util.initAdView(this, (ViewGroup) findViewById(R.id.banner));
     }
 
     /**
@@ -587,7 +586,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
             public void onClick(View v) {
                 // start activity or show error text if invalid seriesId
                 if(mBookSeriesDao.isBookSeriesRegistered(seriesId)) {
-                    startActivity(IntentUtil.getSeriesDetailIntent(BookSeriesCatalogBaseActivity.this, seriesId));
+                    startActivity(SeriesDetailActivity.getIntent(BookSeriesCatalogBaseActivity.this, seriesId));
                 } else {
                     ToastUtil.show(BookSeriesCatalogBaseActivity.this, R.string.series_data_error_invalid_series_id_found);
                 }

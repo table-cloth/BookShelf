@@ -108,4 +108,14 @@
     <string name="delete_book_series_warning">削除した作品は復元することが出来ません。\n本当に削除してもよろしいでしょうか？</string>
     <string name="delete_book_series_done">作品の情報を削除しました</string>
     <string name="delete_book_series_done_fail">作品の情報の削除に失敗しました</string>
+
+    <string name="search_category_title">タイトル名</string>
+    <string name="search_category_title_pronunciation">タイトル名（カナ入力）</string>
+    <string name="search_category_author">作者名</string>
+    <string name="search_category_author_pronunciation">作者名（カナ入力）</string>
+    <string name="search_category_magazine">掲載誌名</string>
+    <string name="search_category_magazine_pronunciation">掲載誌名（カナ入力）</string>
+    <string name="search_category_company">出版社名</string>
+    <string name="search_category_isbn">ISBN</string>
+
 </resources>

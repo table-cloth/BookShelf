@@ -66,7 +66,7 @@ public class SettingsActivity extends BaseActivity {
         mSettingsDao = new SettingsDao(this);
 
         // init ad
-        Util.initAdview(this, (ViewGroup) findViewById(R.id.banner));
+        Util.initAdView(this, (ViewGroup) findViewById(R.id.banner));
 
         // init settings UI
         initCatalogShowTypeSettingUI();

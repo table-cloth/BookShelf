@@ -3,28 +3,78 @@ package com.tablecloth.bookshelf.util;
 import android.content.Context;
 import android.widget.Toast;
 
+/**
+ * Util class for toast
+ *
+ * Created by Minami on 2014/08/17.
+ */
 public class ToastUtil {
 
 	private static Toast sToast;
 	final public static int GRAVITY_NONE = -1;
-	
+
+	/**
+	 * Show toast
+	 *
+	 * @param context context
+	 * @param text toast string
+	 * @param gravity gravity
+     */
 	public static void show(Context context, String text, int gravity) {
 		show(context, text, Toast.LENGTH_SHORT, gravity);
 	}
+
+	/**
+	 * Show toast
+	 *
+	 * @param context context
+	 * @param strId toast string id
+	 * @param gravity gravity
+	 */
 	public static void show(Context context, int strId, int gravity) {
 		show(context, strId, Toast.LENGTH_SHORT, gravity);
 	}
-	
+
+	/**
+	 * Show toast
+	 *
+	 * @param context context
+	 * @param text toast string
+     */
 	public static void show(Context context, String text) {
 		show(context, text, Toast.LENGTH_SHORT, GRAVITY_NONE);
 	}
+
+	 /**
+	 * Show toast
+	 *
+	 * @param context context
+	 * @param strId toast string id
+     */
 	public static void show(Context context, int strId) {
 		show(context, strId, Toast.LENGTH_SHORT, GRAVITY_NONE);
 	}
-	
+
+	/**
+	 * Show toast
+	 *
+	 * @param context context
+	 * @param strId toast string id
+	 * @param duration toast show duration
+     * @param gravity gravity
+     */
 	public static void show(Context context, int strId, int duration, int gravity) {
-		show(context, context.getString(strId), duration);
+		show(context, context.getString(strId), duration, gravity);
 	}
+
+	/**
+	 * Show toast
+	 *
+	 * @param context context
+	 * @param text toast string
+	 * @param duration toast show duration
+	 * @param gravity gravity
+     */
 	public static void show(Context context, String text, int duration, int gravity) {
 		if(sToast == null) {
 			sToast = Toast.makeText(context, text, duration);

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -77,6 +78,20 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
     }
 
     /**
+     * Get intent with given extra data
+     *
+     * @param context context
+     * @param seriesId book series id
+     * @return Intent instance
+     */
+    @NonNull
+    public static Intent getIntent(@NonNull Context context, int seriesId) {
+        Intent intent = new Intent(context, SeriesDetailActivity.class);
+        intent.putExtra(G.INTENT_SERIES_ID,seriesId);
+        return intent;
+    }
+
+    /**
      * Constructor
      *
      * @param savedInstanceState savedInstanceState
@@ -126,7 +141,7 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
         initializeClickListeners();
 
         // Init ad
-        Util.initAdview(this, (ViewGroup)findViewById(R.id.banner));
+        Util.initAdView(this, (ViewGroup)findViewById(R.id.banner));
     }
 
     /**
