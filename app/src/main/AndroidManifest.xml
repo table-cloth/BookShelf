@@ -59,7 +59,7 @@
             android:theme="@style/Theme.CustomDialog"
             />
         <activity
-            android:name="com.tablecloth.bookshelf.dialog.BtnListDialogActivity"
+            android:name="com.tablecloth.bookshelf.dialog.BookSeriesAddTypeSelectDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CustomDialog"
             />

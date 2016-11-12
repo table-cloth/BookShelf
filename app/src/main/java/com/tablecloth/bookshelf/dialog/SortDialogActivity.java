@@ -21,10 +21,10 @@ public class SortDialogActivity extends DialogBaseActivity {
         Intent intent = getIntent();
 
         // テキスト設定
-        ((TextView)findViewById(R.id.title)).setText(intent.getStringExtra(KEY_TITLE));
-        ((TextView)findViewById(R.id.message)).setText(intent.getStringExtra(KEY_MESSAGE));
-        ((TextView)findViewById(R.id.btn_positive)).setText(intent.getStringExtra(KEY_BTN_POSITIVE));
-        ((TextView)findViewById(R.id.btn_negative)).setText(intent.getStringExtra(KEY_BTN_NEGATIVE));
+        ((TextView)findViewById(R.id.title)).setText(intent.getStringExtra(KEY_TITLE_STR_ID));
+        ((TextView)findViewById(R.id.message)).setText(intent.getStringExtra(KEY_MESSAGE_STR_ID));
+        ((TextView)findViewById(R.id.btn_positive)).setText(intent.getStringExtra(KEY_BTN_POSITIVE_STR_ID));
+        ((TextView)findViewById(R.id.btn_negative)).setText(intent.getStringExtra(KEY_BTN_NEGATIVE_STR_ID));
 
         ((TextView)findViewById(R.id.btn_positive)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,10 +50,10 @@ public class SortDialogActivity extends DialogBaseActivity {
     public static Intent getIntent(Context context, String title, String message, String btnPositive, String btnNegative) {
         Intent intent = new Intent(context, SortDialogActivity.class);
 
-        intent.putExtra(KEY_TITLE, title);
-        intent.putExtra(KEY_MESSAGE, message);
-        intent.putExtra(KEY_BTN_POSITIVE, btnPositive);
-        intent.putExtra(KEY_BTN_NEGATIVE, btnNegative);
+        intent.putExtra(KEY_TITLE_STR_ID, title);
+        intent.putExtra(KEY_MESSAGE_STR_ID, message);
+        intent.putExtra(KEY_BTN_POSITIVE_STR_ID, btnPositive);
+        intent.putExtra(KEY_BTN_NEGATIVE_STR_ID, btnNegative);
 
         return intent;
     }

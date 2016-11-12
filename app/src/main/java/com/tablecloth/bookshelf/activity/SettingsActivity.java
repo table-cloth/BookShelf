@@ -14,11 +14,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.db.SettingsDao;
-import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.ToastUtil;

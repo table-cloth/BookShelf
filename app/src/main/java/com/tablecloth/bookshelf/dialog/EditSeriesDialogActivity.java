@@ -62,8 +62,8 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
 
 
         // テキスト設定
-        ((TextView)findViewById(R.id.title)).setText(intent.getStringExtra(KEY_TITLE));
-        ((TextView)findViewById(R.id.btn_positive)).setText(intent.getStringExtra(KEY_BTN_POSITIVE));
+        ((TextView)findViewById(R.id.title)).setText(intent.getStringExtra(KEY_TITLE_STR_ID));
+        ((TextView)findViewById(R.id.btn_positive)).setText(intent.getStringExtra(KEY_BTN_POSITIVE_STR_ID));
 //        ((TextView)findViewById(R.id.btn_negative)).setText(intent.getStringExtra(KEY_BTN_NEGATIVE));
 
         // ヒント設定
@@ -162,8 +162,8 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
     public static Intent getIntent(Context context, String title, String btnPositive, int seriesId) {
         Intent intent = new Intent(context, EditSeriesDialogActivity.class);
 
-        intent.putExtra(KEY_TITLE, title);
-        intent.putExtra(KEY_BTN_POSITIVE, btnPositive);
+        intent.putExtra(KEY_TITLE_STR_ID, title);
+        intent.putExtra(KEY_BTN_POSITIVE_STR_ID, btnPositive);
         intent.putExtra(KEY_ID, seriesId);
 
         return intent;
@@ -172,8 +172,8 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
     public static Intent getIntent(Context context, String title, String btnPositive, BookSeriesData bookSeriesData) {
         Intent intent = new Intent(context, EditSeriesDialogActivity.class);
 
-        intent.putExtra(KEY_TITLE, title);
-        intent.putExtra(KEY_BTN_POSITIVE, btnPositive);
+        intent.putExtra(KEY_TITLE_STR_ID, title);
+        intent.putExtra(KEY_BTN_POSITIVE_STR_ID, btnPositive);
         sTmpBookSeriesData = bookSeriesData;
 
         return intent;

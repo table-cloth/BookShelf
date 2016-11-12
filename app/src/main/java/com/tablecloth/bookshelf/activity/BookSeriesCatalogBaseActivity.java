@@ -26,7 +26,7 @@ import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SettingsDao;
-import com.tablecloth.bookshelf.dialog.BtnListDialogActivity;
+import com.tablecloth.bookshelf.dialog.BookSeriesAddTypeSelectDialogActivity;
 import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
@@ -376,12 +376,12 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         switch (viewId) {
             case R.id.add_button: // Add book series
                 startActivityForResult(
-                        BtnListDialogActivity.getIntent(
+                        BookSeriesAddTypeSelectDialogActivity.getIntent(
                                 this,
-                                "作品登録方法を選択",
-                                "作品を登録する方法を選択してください",
-                                "決定",
-                                getString(R.string.cancel)),
+                                R.string.series_data_add_select_how_short,
+                                R.string.series_data_add_select_how_long,
+                                R.string.decide,
+                                R.string.cancel),
                         G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE);
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
                 break;

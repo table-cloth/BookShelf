@@ -132,7 +132,8 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
 
     /**
      * Handles all click event within this Activity
-     * @param view
+     *
+     * @param view clicked view
      */
     @Override
     public void onClick(View view) {

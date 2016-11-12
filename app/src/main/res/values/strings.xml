@@ -13,6 +13,7 @@
     <string name="email_inquiry_line5_device">機種名：%1$s\n</string>
     <string name="email_inquiry_line6_closing">＊＊＊＊＊＊＊＊＊＊＊＊\n\n</string>
 
+    <string name="decide">決定</string>
     <string name="add">追加</string>
     <string name="save">保存</string>
     <string name="yes">はい</string>
@@ -61,6 +62,8 @@
     <string name="seires_data_done_add_series">作品を追加しました</string>
 
     <string name="seires_data_add_series_data">作品情報を追加</string>
+    <string name="series_data_add_select_how_short">作品登録方法を選択</string>
+    <string name="series_data_add_select_how_long">作品を登録する方法を選択してください</string>
 
     <string name="series_data_search">作品を検索</string>
     <string name="series_data_search_select_topic">作品を検索する項目を選択してください</string>
@@ -72,4 +75,5 @@
 
     <string name="apu_search_hit_count_over">%1$d件以上の作品がヒットしました</string>
     <string name="apu_search_hit_count">%1$d件の作品がヒットしました</string>
+
 </resources>

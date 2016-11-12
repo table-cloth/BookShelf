@@ -1,0 +1,125 @@
+package com.tablecloth.bookshelf.dialog;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.view.View;
+import android.widget.RadioGroup;
+
+import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.util.G;
+
+/**
+ * 縦にボタンが並んだダイアログ
+ * ボタンの数は可変に変更したい（現状は内容も個数も固定＠2015/02/21）
+ * Created by Minami on 2015/02/21.
+ */
+public class BookSeriesAddTypeSelectDialogActivity extends DialogBaseActivity {
+
+    RadioGroup radioGroup;
+
+    /**
+     * Get layout ID to show in the activity
+     *
+     * @return layout ID
+     */
+    @Override
+    protected int getContentViewID() {
+        return R.layout.activity_btn_list_dialog;
+    }
+
+    /**
+     * Get intent with given extra data
+     *
+     * @param context context
+     * @param titleStrId string id for title
+     * @param messageStrId string id for message content
+     * @param btnPositiveStrId string id for positive butotn
+     * @param btnNegativeStrId string id for negative button
+     * @return Intent instance
+     */
+    @NonNull
+    public static Intent getIntent(@NonNull Context context, int titleStrId, int messageStrId, int btnPositiveStrId, int btnNegativeStrId) {
+        Intent intent = new Intent(context, BookSeriesAddTypeSelectDialogActivity.class);
+
+        intent.putExtra(KEY_TITLE_STR_ID, titleStrId);
+        intent.putExtra(KEY_MESSAGE_STR_ID, messageStrId);
+        intent.putExtra(KEY_BTN_POSITIVE_STR_ID, btnPositiveStrId);
+        intent.putExtra(KEY_BTN_NEGATIVE_STR_ID, btnNegativeStrId);
+
+        return intent;
+    }
+
+    /**
+     * OnCreate
+     *
+     * @param savedInstanceState savedInstanceState
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+        setDefaultRadioCheck();
+
+        setTitleText(R.id.title);
+        setMessageText(R.id.message);
+        setBtnPositiveText(R.id.btn_positive);
+        setBtnNegativeText(R.id.btn_negative);
+
+        findViewById(R.id.btn_positive).setOnClickListener(this);
+        findViewById(R.id.btn_negative).setOnClickListener(this);
+    }
+
+    /**
+     * Handles all click event within this Activity
+     *
+     * @param view clicked view
+     */
+    @Override
+    public void onClick(View view) {
+        int viewId = view.getId();
+        switch (viewId) {
+            case R.id.btn_positive: // add book series btn
+                // default select value will be
+                int selectedCheckBoxType = getDefaultRadioType();
+                switch (radioGroup.getCheckedRadioButtonId()) {
+                    default:
+                    case R.id.radio_0: // Search with API
+                        selectedCheckBoxType =G.RESULT_DATA_SELECTED_BTN_SEARCH;
+                        break;
+
+                    case R.id.radio_1: // Search manually
+                        selectedCheckBoxType =G.RESULT_DATA_SELECTED_BTN_MANUAL;
+                        break;
+                }
+
+                finishWithResult(G.RESULT_POSITIVE,
+                        new Intent().putExtra(
+                                G.RESULT_DATA_SELECTED_ID,
+                                selectedCheckBoxType));
+                break;
+
+            case R.id.btn_negative: // cancel add book series
+                finishWithResult(G.RESULT_NEGATIVE);
+                break;
+        }
+    }
+
+    /**
+     * Set check on default radio
+     */
+    private void setDefaultRadioCheck() {
+        radioGroup.check(R.id.radio_0);
+    }
+
+    /**
+     * Get type for default radio check
+     *
+     * @return default select type
+     */
+    private int getDefaultRadioType() {
+        return G.RESULT_DATA_SELECTED_BTN_SEARCH;
+    }
+}
