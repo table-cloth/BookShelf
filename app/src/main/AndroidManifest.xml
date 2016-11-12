@@ -26,11 +26,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.tablecloth.bookshelf.activity.ListActivity"
+            android:name="com.tablecloth.bookshelf.activity.BookSeriesListCatalogActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name="com.tablecloth.bookshelf.activity.GridActivity"
+            android:name="com.tablecloth.bookshelf.activity.BookSeriesGridCatalogActivity"
             android:screenOrientation="portrait"
             />
         <activity
@@ -49,7 +49,7 @@
             android:theme="@style/Theme.CustomDialog"
             />
         <activity
-            android:name="com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity"
+            android:name="com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CustomDialog"
             />
@@ -59,12 +59,12 @@
             android:theme="@style/Theme.CustomDialog"
             />
         <activity
-            android:name="com.tablecloth.bookshelf.dialog.BtnListDialogActivity"
+            android:name="com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CustomDialog"
             />
         <activity
-            android:name="com.tablecloth.bookshelf.dialog.SearchDialogActivity"
+            android:name="com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CustomDialog"
             />
