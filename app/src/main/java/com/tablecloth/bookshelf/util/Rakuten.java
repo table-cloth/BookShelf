@@ -182,66 +182,6 @@ public class Rakuten {
                     listener.onSearchError("No valid results found");
                 }
 
-//
-//                    mProgress.close();
-//                    // 検索結果が空の場合はトースト通知でお知らせ
-//                    ToastUtil.show(BookSeriesCatalogBaseActivity.this, "取得できる作品がありませんでした。内容を変更しもう一度お試しください。");
-//                } else {
-//                    convertJsonStr2JsonArrayObject(jsonText);
-//                    mProgress.close();
-//                    switchMode(G.MODE_API_SEARCH_RESULT);
-//                    refreshData();
-//                }
-
-
-//
-//                // if result fail
-//
-//                // JSONを取得後に検索結果一覧・または補完済みの作品登録画面を表示
-//                // 検索結果が0件の場合：「取得できる作品がありませんでした。内容を変更しもう一度お試しください。」という通知を表示
-//                // 検索結果が1件の場合：作品登録cd画面を開き、取得できている全ての情報を入力済みの状態で表示する
-//                // 検索結果が2件以上の場合：作品一覧画面を開き、求めている作品を選んでもらう。選択後は「検索結果が1件の場合」と同じ流れになる
-//                mHandler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                        if(Util.isEmpty(jsonText)) {
-//                            // 取得失敗した場合は書籍全般として再建策するする
-//                            new Thread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    // 楽天APIを利用してJSONを取得する。
-//                                    String url = Rakuten.getRakutenBooksTotalUri(BookSeriesCatalogBaseActivity.this, selectKey, selectValue);
-//                                    Rakuten.RakutenAPIAsyncLoader loader = new Rakuten.RakutenAPIAsyncLoader(BookSeriesCatalogBaseActivity.this, url);
-//
-//                                    final String jsonRetryStr = loader.loadInBackground();
-//
-//                                    mHandler.post(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//                                            if(Util.isEmpty(jsonRetryStr)) {
-//                                                mProgress.close();
-//                                                // 検索結果が空の場合はトースト通知でお知らせ
-//                                                ToastUtil.show(BookSeriesCatalogBaseActivity.this, "取得できる作品がありませんでした。内容を変更しもう一度お試しください。");
-//                                            } else {
-//                                                convertJsonStr2JsonArrayObject(jsonText);
-//                                                mProgress.close();
-//                                                switchMode(G.MODE_API_SEARCH_RESULT);
-//                                                refreshData();
-//                                            }
-//                                        }
-//                                    });
-//
-//                                }
-//                            }).start();
-//                        } else {
-//                            convertJsonStr2JsonArrayObject(jsonText);
-//                            mProgress.close();
-//                            switchMode(G.MODE_API_SEARCH_RESULT);
-//                            refreshData();
-//                        }
-//                    }
-//                });
             }
         }).start();
     }

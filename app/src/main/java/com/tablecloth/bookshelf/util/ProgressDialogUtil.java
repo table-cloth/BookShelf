@@ -78,7 +78,7 @@ public class ProgressDialogUtil {
     }
 
     /**
-     * Close prog
+     * Close progress dialog
      */
     public void dismiss() {
         if(mProgressDialog.isShowing()) mProgressDialog.dismiss();

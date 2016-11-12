@@ -23,7 +23,7 @@ public class VersionUtil {
     public VersionUtil(Activity activity) {
         mActivity = activity;
         mAppContext = mActivity.getApplicationContext();
-        mPref = new PrefUtil(mAppContext);
+        mPref = PrefUtil.getInstance(mAppContext);
     }
 
     /**
@@ -113,7 +113,7 @@ public class VersionUtil {
      * @return
      */
     private int loadInitialVersionCode() {
-        return mPref.load(PrefUtil.CONSTANT.INIT_VERSION_CODE);
+        return mPref.load(Const.PREF_KEYS.INIT_VERSION_CODE);
     }
 
     /**
@@ -121,14 +121,14 @@ public class VersionUtil {
      * @return
      */
     private int loadLastShownVersionCode() {
-        return mPref.load(PrefUtil.CONSTANT.VERSION_CODE);
+        return mPref.load(Const.PREF_KEYS.VERSION_CODE);
     }
 
     /**
      * 最後に起動したバージョン情報を保存
      */
     private void updateVersionInfo() {
-        mPref.save(PrefUtil.CONSTANT.VERSION_CODE, getCurrentVersionCode(mAppContext));
+        mPref.save(Const.PREF_KEYS.VERSION_CODE, getCurrentVersionCode(mAppContext));
     }
 
 

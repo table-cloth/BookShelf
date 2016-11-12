@@ -7,6 +7,11 @@ package com.tablecloth.bookshelf.util;
  */
 public class Const {
 
+    public static class PREF_KEYS {
+        final public static String INIT_VERSION_CODE = "INIT_VERSION_CODE"; // 始めにインストールしたバージョン情報
+        final public static String VERSION_CODE = "VERSION_CODE"; // 最後に表示したバージョン情報
+    }
+
     /**
      * API related constants
      */
