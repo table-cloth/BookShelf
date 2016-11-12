@@ -137,8 +137,8 @@ public class SettingsActivity extends BaseActivity {
                         GAEvent.Type.USER_ACTION,
                         GAEvent.Event.SETTINGS_SET_SHOW_TYPE,
                         isGridViewTypeSelected
-                                ? GAEvent.Param.GRID
-                                : GAEvent.Param.LIST);
+                                ? GAEvent.Param.SETTINGS_SET_SHOW_TYPE_GRID
+                                : GAEvent.Param.SETTINGS_SET_SHOW_TYPE_LIST);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {

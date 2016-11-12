@@ -428,6 +428,11 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
         }
 
         String savedImageFilePath = ImageUtil.saveBitmap2LocalStorage(SeriesDetailActivity.this, bitmap);
+        if(Util.isEmpty(savedImageFilePath)) {
+            ToastUtil.show(this, R.string.series_data_error_failed_2_update_data);
+            return;
+        }
+
         mShowBookSeriesData.setImagePath(savedImageFilePath);
         mBookSeriesDao.saveSeries(mShowBookSeriesData);
         ImageUtil.setImageCache(mShowBookSeriesData.getSeriesId(), bitmap);
