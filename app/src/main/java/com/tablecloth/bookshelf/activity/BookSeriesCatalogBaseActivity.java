@@ -58,7 +58,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
 
     // Catalog adapter
     // Needs to be set to catalog collection view instance in derived class
-    protected BookSeriesCatalogAdapter mCatalogAdapter = null;
+    protected BookSeriesCatalogAdapter mCatalogAdapter;
     // BookSeriesData list to show in list / grid
     protected ArrayList<BookSeriesData> mBookSeriesDataList = new ArrayList<>();
     // Progress Dialog Util instance
@@ -93,9 +93,6 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // book catalog activity always starts with View Mode
-        switchMode(G.MODE_VIEW);
-
         // initialize dao
         mBookSeriesDao = new BookSeriesDao(this);
         mSettingsDao = new SettingsDao(this);
@@ -111,6 +108,10 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         initializeCallbackEvents();
 
         mProgress = ProgressDialogUtil.getInstance(this);
+        mCatalogAdapter = new BookSeriesCatalogAdapter();
+
+        // book catalog activity always starts with View Mode
+        switchMode(G.MODE_VIEW);
 
         // initialize Ad
         Util.initAdview(this, (ViewGroup) findViewById(R.id.banner));
@@ -313,7 +314,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
             case G.REQUEST_CODE_LIST_SEARCH_RAKUTEN: // Return from search with Rakuten API
                 if(resultCode == G.RESULT_POSITIVE) {
 
-                    mProgress.show(getString(R.string.searching_now), null);
+                    mProgress.show(mHandler, getString(R.string.searching_now), null);
 
                     String selectKey = data.getStringExtra(G.RESULT_DATA_SELECTED_KEY);
                     String selectValue = data.getStringExtra(G.RESULT_DATA_SELECTED_VALUE);

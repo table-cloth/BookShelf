@@ -3,6 +3,7 @@ package com.tablecloth.bookshelf.util;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -42,8 +43,8 @@ public class ProgressDialogUtil {
      * @param message Message to show in progress dialog
      * @param listener OnDismissListener instance
      */
-    public void show(@Nullable String message, @Nullable DialogInterface.OnDismissListener listener) {
-        show(message, listener, ProgressDialog.STYLE_SPINNER);
+    public void show(Handler handler, @Nullable String message, @Nullable DialogInterface.OnDismissListener listener) {
+        show(handler, message, listener, ProgressDialog.STYLE_SPINNER);
     }
 
     /**
@@ -55,20 +56,25 @@ public class ProgressDialogUtil {
      * @param listener OnDismissListener instance
      * @param progressDialogStyle Style of progress dialog. Set ProgresDialog.xxx
      */
-    public void show(@Nullable String message, @Nullable DialogInterface.OnDismissListener listener, int progressDialogStyle) {
-        // ensure progress dialog is dismissed before showing
-        dismiss();
+    public void show(Handler handler, @Nullable final String message, @Nullable final DialogInterface.OnDismissListener listener, final int progressDialogStyle) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                // ensure progress dialog is dismissed before showing
+                dismiss();
 
-        // init progress dialog
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setProgressStyle(progressDialogStyle);
-        mProgressDialog.setMessage(Util.isEmpty(message)
-                ? "" // set empty text if message is null
-                : message);
-        mProgressDialog.setOnDismissListener(listener); // listener may be null
+                // init progress dialog
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.setProgressStyle(progressDialogStyle);
+                mProgressDialog.setMessage(Util.isEmpty(message)
+                        ? "" // set empty text if message is null
+                        : message);
+                mProgressDialog.setOnDismissListener(listener); // listener may be null
 
-        // show dialog
-        mProgressDialog.show();
+                // show dialog
+                mProgressDialog.show();
+            }
+        });
     }
 
     /**

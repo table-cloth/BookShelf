@@ -6,7 +6,7 @@ package com.tablecloth.bookshelf.util;
  */
 public class G {
 
-//	final public static String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
+	final public static String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
 	
     final public static int RESULT_NONE = 0;
     final public static int RESULT_POSITIVE = 1;

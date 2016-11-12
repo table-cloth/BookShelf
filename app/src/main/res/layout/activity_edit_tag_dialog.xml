@@ -135,6 +135,8 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:textColor="@color/black"
+                        android:maxLines="1"
+                        android:inputType="text"
                         android:textSize="14sp" />
 
                 </RelativeLayout>

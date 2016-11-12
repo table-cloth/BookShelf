@@ -16,6 +16,8 @@ import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
 
+import java.util.ArrayList;
+
 /**
  * タイトル・メッセージ・YES/NOボタンの要素を持ったダイアログ拡張クラス
  * Created by Minami on 2014/08/17.
@@ -216,7 +218,10 @@ public class EditSeriesDialogActivity extends DialogBaseActivity {
     private void updateTags() {
         // タグ
         tagContainer.removeAllViews();
-        tagContainer = ViewUtil.setTagInfoNormal(EditSeriesDialogActivity.this, mBookSeriesData.getTagsAsList(), tagContainer);
+        ArrayList<ViewGroup> tagViewList = ViewUtil.getTagViewList(this, mBookSeriesData.getTagsAsList(), ViewUtil.TAGS_LAYOUT_TYPE_NORMAL);
+        for(ViewGroup tagView : tagViewList) {
+            tagContainer.addView(tagView);
+        }
         tagContainer.invalidate();
     }
 }

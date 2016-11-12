@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import com.tablecloth.bookshelf.view.BaseTagRelativeLayout;
 import com.tablecloth.bookshelf.view.CurrentTagRelativeLayout;
 import com.tablecloth.bookshelf.view.RecentTagRelativeLayout;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -94,11 +96,11 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
     }
 
     private void updateCurrentTags() {
-        tagContainer.removeAllViews();
+        updateTagContainer(
+                tagContainer,
+                BookData.convertTagsRawText2TagsList(tagsData),
+                ViewUtil.TAGS_LAYOUT_TYPE_LARGE_WITH_DELETE);
 
-        tagContainer = (CurrentTagRelativeLayout)ViewUtil.setTagInfoLargeDelete(
-                TagsEditDialogActivity.this, BookData.convertTagsRawText2TagsList(tagsData),
-                tagContainer, View.INVISIBLE);
         tagContainer.setTagData(tagsData);
         tagContainer.setTagUpdateListener(new BaseTagRelativeLayout.OnCurrentTagUpdateListener() {
             @Override
@@ -111,12 +113,24 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
         tagContainer.setReLayoutFlag(true);
     }
 
-    private void updateRecentTags() {
-        recentTagContainer.removeAllViews();
+    private void updateTagContainer(ViewGroup container, ArrayList<String> tagList, int tagsLayoutType) {
+        container.removeAllViews();
 
+        ArrayList<ViewGroup> tagViewList = ViewUtil.getTagViewList(this, tagList, tagsLayoutType);
+        for(ViewGroup tagView : tagViewList) {
+            container.addView(tagView);
+        }
+    }
+
+    private void updateRecentTags() {
         // タグ履歴領域に最新のタグを入れて、再描画(invalidate)を呼び出す
         ArrayList<String> tagsLog = mTagHistoryDao.loadAllTags();
-        recentTagContainer = (RecentTagRelativeLayout)ViewUtil.setTagInfoLarge(TagsEditDialogActivity.this, tagsLog, recentTagContainer, View.INVISIBLE);
+
+        updateTagContainer(
+                recentTagContainer,
+                tagsLog,
+                ViewUtil.TAGS_LAYOUT_TYPE_LARGE);
+
         recentTagContainer.setTagData(BookData.convertTagsList2TagsRawText(tagsLog));
         recentTagContainer.setCurrentTagData(tagsData);
         recentTagContainer.setTagUpdateListener(new BaseTagRelativeLayout.OnCurrentTagUpdateListener() {

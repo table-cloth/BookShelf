@@ -263,8 +263,17 @@ public class Rakuten {
             ToastUtil.show(context, context.getString(R.string.apu_search_hit_count, count));
         }
 
+        int showStartInex = 0;
+        int showEndIndex = count >= maxCount
+                ? maxCount
+                : count;
+
         // 取得した結果を作品情報一覧へと分解する
-        for(int i = 0 ; i < maxCount ; i ++) {
+        for(int i = showStartInex ; i < showEndIndex ; i ++) {
+            if(i >= jsonObjList.size()) {
+                continue;
+            }
+
             BookSeriesData seriesData = Rakuten.createSeriesDataFromJsonDetailData(
                     context, JsonUtil.getJsonObject(jsonObjList.get(i), Rakuten.Key.ITEM_DETAIL));
 
