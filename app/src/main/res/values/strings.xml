@@ -2,9 +2,46 @@
 <resources>
 
     <string name="app_name">本棚管理</string>
+    <string name="email">table.cloth.03@gmail.com</string>
 
+    <string name="referrer_update_dialog">update_dialog</string>
+
+    <string name="email_inquiry_line1_title">＊＊お問い合わせ情報＊＊\n</string>
+    <string name="email_inquiry_line2_id">お問い合わせID：%1$s\n</string>
+    <string name="email_inquiry_line3_app_version">アプリバージョン：%1$s\n</string>
+    <string name="email_inquiry_line4_os_version">OSバージョン：%1$s\n</string>
+    <string name="email_inquiry_line5_device">機種名：%1$s\n</string>
+    <string name="email_inquiry_line6_closing">＊＊＊＊＊＊＊＊＊＊＊＊\n\n</string>
+
+    <string name="update_dialog_title">お知らせ</string>
+    <string name="update_dialog_do_review">レビューする</string>
+    <string name="update_dialog_do_not_review">しない</string>
+    <string name="update_dialog_content">
+        ■作品の検索時に、正しくない画像が表示される不具合を修正しました。\n
+        ■設定画面の項目の表示を修正しました。\n\n
+        ご迷惑をおかけし申し訳ございませんでした。\n
+        今後ともよろしくお願い致します。\n\n
+        ーーーーー\n
+        少しでも良いアプリになるよう改善を行っております。\n
+        ★5のレビューを頂けますと励みになります！\n
+        宜しくお願い致します (*- -)(*_ _)ペコリ</string>
+
+    <string name="decide">決定</string>
+    <string name="finish">完了</string>
     <string name="add">追加</string>
+    <string name="delete">削除</string>
+    <string name="save">保存</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
+    <string name="cancel">キャンセル</string>
+    <string name="search">検索</string>
+
+    <string name="hint_must">※必須</string>
+
     <string name="add_detail"><u>情報を追加する</u></string>
+    <string name="edit_book_series_detail">作品情報を編集</string>
+    <string name="change_image">画像変更</string>
+    <string name="searching_now">検索中…</string>
 
     <string name="id_google_analytics_tracking">UA-44238770-2</string>
     <string name="id_rakuten_app_id">1019452313987815323</string>
@@ -23,14 +60,69 @@
     <string name="series_data_volume_symbol">巻</string>
     <string name="series_data_volume_conjunction_symbol">〜</string>
     <string name="series_data_volume_separator_symbol">、</string>
+    <string name="series_data_volume_error_already_registered">%1$d巻は既に所持しています</string>
+    <string name="series_data_volume_error_not_registered">%1$d巻は所持していません</string>
 
+    <string name="series_data_error_failed_2_get_data">本の情報の取得に失敗しました</string>
+    <string name="series_data_error_failed_2_update_data">本の情報の更新に失敗しました</string>
     <string name="series_data_error_load_image_by_memory">メモリー不足のため、画像の取得に失敗しました</string>
     <string name="series_data_error_load_image">予期せぬエラーのため、画像の取得に失敗しました</string>
+    <string name="series_data_error_no_search_result_found_please_retry">取得できる作品がありませんでした。内容を変更しもう一度お試しください。</string>
 
     <string name="tag_error_enter_tag_2_add">追加するタグを入力してください</string>
     <string name="tag_error_failed_2_delete">タグの削除に失敗しました</string>
     <string name="tag_error_already_added">すでに登録済みのタグです</string>
 
+    <string name="series_data_error_title_is_empty">タイトルが未入力です</string>
     <string name="series_data_error_invalid_series_id_found">不正な作品IDを検出しました。時間を置いて再度お試しください。</string>
-    <string name="series_data_add_confirm_content">この作品を追加しますか？</string>
+    <string name="series_data_confirm_add_series">この作品を追加しますか？</string>
+    <string name="series_data_confirm_change_book_cover">作品の画像を変更しますか？</string>
+    <string name="series_data_done_add_series">作品を追加しました</string>
+
+    <string name="seires_data_add_series_data">作品情報を追加</string>
+    <string name="series_data_add_select_how_short">作品登録方法を選択</string>
+    <string name="series_data_add_select_how_long">作品を登録する方法を選択してください</string>
+
+    <string name="series_data_search">作品を検索</string>
+    <string name="series_data_search_select_topic">作品を検索する項目を選択してください</string>
+
+    <string name="image_select_method">画像の選択方法</string>
+    <string name="image_select_choose_image_select_method">画像の選択方法を選択してください</string>
+    <string name="image_select_select_from_gallery">ギャラリーから選択</string>
+    <string name="image_select_select_from_camera">カメラで撮影</string>
+
+    <string name="apu_search_hit_count_over">%1$d件以上の作品がヒットしました</string>
+    <string name="apu_search_hit_count">%1$d件の作品がヒットしました</string>
+
+    <string name="book_series_data_title">タイトル</string>
+    <string name="book_series_data_author">作者</string>
+    <string name="book_series_data_magazine">掲載誌</string>
+    <string name="book_series_data_company">出版社</string>
+    <string name="book_series_data_memo">メモ</string>
+    <string name="book_series_data_title_pronunciation">タイトル（カナ）</string>
+    <string name="book_series_data_author_pronunciation">作者（カナ）</string>
+    <string name="book_series_data_magazine_pronunciation">掲載誌（カナ）</string>
+
+    <string name="tag_edit">タグを編集</string>
+    <string name="delete_book_series">作品を削除します</string>
+    <string name="delete_book_series_warning">削除した作品は復元することが出来ません。\n本当に削除してもよろしいでしょうか？</string>
+    <string name="delete_book_series_done">作品の情報を削除しました</string>
+    <string name="delete_book_series_done_fail">作品の情報の削除に失敗しました</string>
+
+    <string name="search_category_title">タイトル名</string>
+    <string name="search_category_title_pronunciation">タイトル名（カナ入力）</string>
+    <string name="search_category_author">作者名</string>
+    <string name="search_category_author_pronunciation">作者名（カナ入力）</string>
+    <string name="search_category_magazine">掲載誌名</string>
+    <string name="search_category_magazine_pronunciation">掲載誌名（カナ入力）</string>
+    <string name="search_category_company">出版社名</string>
+    <string name="search_category_isbn">ISBN</string>
+
+    <string name="search_mode_all">全て</string>
+    <string name="search_mode_title">タイトル名</string>
+    <string name="search_mode_author">作者名</string>
+    <string name="search_mode_magazine">掲載誌名</string>
+    <string name="search_mode_company">出版社名</string>
+    <string name="search_mode_tag">タグ</string>
+
 </resources>

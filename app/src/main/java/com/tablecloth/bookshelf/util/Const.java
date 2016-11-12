@@ -1,10 +1,102 @@
 package com.tablecloth.bookshelf.util;
 
 /**
+ * Manages global constant values
+ *
  * Created by Minami on 2016/11/04.
  */
-
 public class Const {
+
+    public static class AD {
+        final public static String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
+    }
+
+    public static class PREF_KEYS {
+        final public static String INIT_VERSION_CODE = "INIT_VERSION_CODE"; // 始めにインストールしたバージョン情報
+        final public static String VERSION_CODE = "VERSION_CODE"; // 最後に表示したバージョン情報
+    }
+
+    /**
+     * API related constants
+     */
+    public static class API {
+        public static final String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
+    }
+
+    /**
+     * Activity request code related constants
+     */
+    public static class REQUEST_CODE {
+        public static final int SERIES_LIST_ADD_SERIES = 1;
+        public static final int EDIT_SERIES_DETAIL = 2;
+        public static final int IMAGE_CHANGE_CONFIRM_1 = 3;
+        public static final int IMAGE_CHANGE_CONFIRM_2 = 4;
+        public static final int IMAGE_GALLERY = 5;
+        public static final int IMAGE_CAMERA = 6;
+        public static final int SELECT_ADD_SERIES_TYPE = 7;
+        public static final int LIST_SEARCH_RAKUTEN = 8;
+        public static final int SIMPLE_CHECK = 9; // 簡易的な確認用
+        public static final int TAGS_EDIT = 10;
+
+        public static final int UPDATE_DIALOG = 100;
+    }
+
+    /**
+     * Activity result code related constants
+     */
+    public static class RESULT_CODE {
+        // Normal result code
+        public static final int NONE = 0; // When there is no result to return
+        public static final int POSITIVE = 1; // When result is positive / valid
+        public static final int NEGATIVE = 2; // When result is negative / invalid
+
+        // Unique results
+        // Check if this values are really needed
+        // Delete if they can be replaced with POSITIVE / NEGATIVE
+        public static final int DELETE_SERIES = 3; // 特殊な導線用
+    }
+
+    /**
+     * Activity result data related constants
+     */
+    public static class INTENT_EXTRA {
+        // keys
+        public static final String KEY_INT_SELECTED_ID = "selected_id";
+        public static final String KEY_STR_SELECTED_KEY = "selected_key";
+        public static final String KEY_STR_SELECTED_VALUE = "selected_value";
+        public static final String KEY_INT_EDIT_SERIES = "key_edit_series";
+
+
+        // values
+        public static final int VALUE_DEFAULT_ERROR = -1;
+        public static final int VALUE_SELECTED_BTN_SEARCH = 0;
+        public static final int VALUE_SELECTED_BTN_MANUAL = 1;
+        public static final int VALUE_EDIT_SERIES_EDIT = 0;
+        public static final int VALUE_EDIT_SERIES_DELETE = 1;
+    }
+
+    /**
+     * Search mode
+     */
+    public static class SEARCH_MODE {
+        public static final int ALL = 0;
+        public static final int TITLE = 1;
+        public static final int AUTHOR = 2;
+        public static final int MAGAZINE = 3;
+        public static final int COMPANY = 4;
+        public static final int TAG = 5;
+    }
+
+    /**
+     * View mode
+     */
+    public static class VIEW_MODE {
+        public static final int VIEW = 0;
+        public static final int DELETE = 1;
+        public static final int SEARCH_DB = 2;
+        public static final int SEARCH_API = 3;
+    }
+
     /**
      * DB related constants
      */
@@ -32,12 +124,12 @@ public class Const {
 
             // 設定項目はこちらのクラスにて管理する
             public static class KEY {
-                final public static String SERIES_SHOW_TYPE = "series_show_type"; // 作品一覧の表示タイプ
+                public static final String SERIES_SHOW_TYPE = "series_show_type"; // 作品一覧の表示タイプ
             }
             // 設定値ははこちらのクラスにて管理する
             public static class VALUE {
-                final public static String SERIES_SHOW_TYPE_GRID = "grid"; // 作品一覧の表示タイプ
-                final public static String SERIES_SHOW_TYPE_LIST = "list"; // 作品一覧の表示タイプ
+                public static final String SERIES_SHOW_TYPE_GRID = "grid"; // 作品一覧の表示タイプ
+                public static final String SERIES_SHOW_TYPE_LIST = "list"; // 作品一覧の表示タイプ
             }
         }
 

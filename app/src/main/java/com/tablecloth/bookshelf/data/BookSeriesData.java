@@ -44,7 +44,7 @@ public class BookSeriesData extends BookData {
     private String mMagazinePronunciation;
 
     //Additional info
-    private ArrayList<Integer> mVolumeList;
+    private ArrayList<Integer> mVolumeList = new ArrayList<>();
     private String mRawTags; // raw data of tags, same format as saved in DB
     private String mMemo;
     private boolean mIsSeriesComplete = false;
@@ -61,7 +61,6 @@ public class BookSeriesData extends BookData {
      */
     public BookSeriesData(@NonNull Context context) {
         mContext = context;
-        mVolumeList = new ArrayList<>();
         mVolumeTextCache = null;
     }
 
@@ -363,6 +362,7 @@ public class BookSeriesData extends BookData {
      *
      * @return volumeList
      */
+    @NonNull
     public ArrayList<Integer> getVolumeList() {
         return mVolumeList;
     }
@@ -430,7 +430,7 @@ public class BookSeriesData extends BookData {
         // Try loading image from file path
         getImageByPath(activity, new ListenerUtil.LoadBitmapListener() {
             @Override
-            public void onFinish(final Bitmap bitmap) {
+            public void onFinish(@NonNull final Bitmap bitmap) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -444,7 +444,7 @@ public class BookSeriesData extends BookData {
                 // If failed to load image from file path, re-try loading image from url
                 getImageByUrl(new ListenerUtil.LoadBitmapListener() {
                     @Override
-                    public void onFinish(final Bitmap bitmap) {
+                    public void onFinish(@NonNull final Bitmap bitmap) {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {

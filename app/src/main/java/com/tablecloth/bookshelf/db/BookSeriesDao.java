@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.util.Const;
-import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.Util;
 
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ public class BookSeriesDao extends BookDaoBase {
      */
     @Nullable
     public ArrayList<BookSeriesData> loadAllBookSeriesDataList() {
-        return loadBookSeriesDataList(G.SEARCH_MODE_ALL, "");
+        return loadBookSeriesDataList(Const.SEARCH_MODE.ALL, "");
     }
 
     /**
@@ -96,8 +95,8 @@ public class BookSeriesDao extends BookDaoBase {
             searchContent = new String[] {rawSearchText};
         }
 
-        int[] searchMode = rawSearchMode == G.SEARCH_MODE_ALL
-                ? new int[] {G.SEARCH_MODE_TITLE, G.SEARCH_MODE_AUTHOR, G.SEARCH_MODE_COMPANY, G.SEARCH_MODE_MAGAZINES , G.SEARCH_MODE_TAG}
+        int[] searchMode = rawSearchMode == Const.SEARCH_MODE.ALL
+                ? new int[] {Const.SEARCH_MODE.TITLE, Const.SEARCH_MODE.AUTHOR, Const.SEARCH_MODE.COMPANY, Const.SEARCH_MODE.MAGAZINE , Const.SEARCH_MODE.TAG}
                 : new int[] {rawSearchMode};
 
         Cursor cursor = openCursor(SqlText.createSearchBookSeriesSQL(searchMode, searchContent));
