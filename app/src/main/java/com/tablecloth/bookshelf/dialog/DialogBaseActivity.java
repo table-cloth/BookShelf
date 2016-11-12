@@ -42,18 +42,6 @@ public abstract class DialogBaseActivity extends BaseActivity implements View.On
     }
 
     /**
-     * Handles all click event within this Activity
-     *
-     * @param view clicked view
-     */
-    @Override
-    public void onClick(View view) {
-        int viewId = view.getId();
-        switch (viewId) {
-        }
-    }
-
-    /**
      * Get book series id set in intent data
      *
      * @return book series id

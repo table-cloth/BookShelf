@@ -3,6 +3,7 @@ package com.tablecloth.bookshelf.dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -43,7 +44,8 @@ public class SearchContentInputDialogActivity extends DialogBaseActivity {
      * @param btnNegativeStrId string id for negative button
      * @return Intent instance
      */
-    public static Intent getIntent(Context context, int titleStrId, int messageStrId, int btnPositiveStrId, int btnNegativeStrId) {
+    @NonNull
+    public static Intent getIntent(@NonNull Context context, int titleStrId, int messageStrId, int btnPositiveStrId, int btnNegativeStrId) {
         Intent intent = new Intent(context, SearchContentInputDialogActivity.class);
 
         intent.putExtra(KEY_TITLE_STR_ID, titleStrId);
@@ -55,7 +57,7 @@ public class SearchContentInputDialogActivity extends DialogBaseActivity {
     }
 
     /**
-     * Constructor
+     * OnCreate
      *
      * @param savedInstanceState savedInstanceState
      */
@@ -128,6 +130,7 @@ public class SearchContentInputDialogActivity extends DialogBaseActivity {
      *
      * @return Spinner adapter instance
      */
+    @NonNull
     private ArrayAdapter<String> getSpinnerAdapter() {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
 

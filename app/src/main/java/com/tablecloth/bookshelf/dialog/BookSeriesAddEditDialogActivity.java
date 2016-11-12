@@ -115,10 +115,10 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
                 startActivityForResult(
                         SimpleDialogActivity.getIntent(
                                 this,
-                                getString(R.string.delete_book_series),
-                                getString(R.string.delete_book_series_warning),
-                                getString(R.string.delete),
-                                getString(R.string.cancel)),
+                                R.string.delete_book_series,
+                                R.string.delete_book_series_warning,
+                                R.string.delete,
+                                R.string.cancel),
                         G.REQUEST_CODE_SIMPLE_CHECK);
                 break;
 
