@@ -13,56 +13,51 @@ import com.tablecloth.bookshelf.db.TagHistoryDao;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
- * Base class for tag container view
+ * Container view for tags
  *
  * Created by Minami on 2015/04/10.
  */
 public class TagContainerLayout extends RelativeLayout {
 
     protected Context mContext = null;
-//    protected OnCurrentTagUpdateListener mOnCurrentTagUpdateListener = null;
-//    protected TagHistoryDao mTagHistoryDao;
-
-//    private String mTagData = null;
     private boolean mNeedsReDraw = true;
-
     private OnClickListener mOnTagClickListener = null;
 
-    public TagContainerLayout(Context context) {
+    public TagContainerLayout(@NonNull Context context) {
         super(context);
         initialize(context);
     }
 
-    public TagContainerLayout(Context context, AttributeSet attrs) {
+    public TagContainerLayout(@NonNull Context context, @NonNull AttributeSet attrs) {
         super(context, attrs);
         initialize(context);
     }
 
-    public TagContainerLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public TagContainerLayout(@NonNull Context context, @NonNull AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initialize(context);
     }
 
+    /**
+     * Initialize
+     *
+     * @param context context
+     */
     private void initialize(@NonNull Context context) {
         mContext = context;
-//        mTagHistoryDao = new TagHistoryDao(mContext);
-
         setWillNotDraw(false);
         setWillNotCacheDrawing(false);
     }
 
-    public void setOnTagClickListener(OnClickListener listener) {
+    /**
+     * Set on click listener
+     * This listener will be set to all tag views in container
+     *
+     * @param listener OnClickListener instance
+     */
+    public void setOnTagClickListener(@NonNull OnClickListener listener) {
         mOnTagClickListener = listener;
     }
-
-//    public void setTagData(@Nullable String tagData) {
-//        mTagData = tagData;
-//    }
-//
-//    @Nullable
-//    public String getTagData() {
-//        return mTagData;
-//    }
 
     /**
      * Sets flag to re-draw
@@ -73,62 +68,60 @@ public class TagContainerLayout extends RelativeLayout {
         mNeedsReDraw = flag;
     }
 
-
-    // 描画関数
+    /**
+     * OnDraw
+     *
+     * @param canvas canvas to draw
+     */
     @Override
     protected void onDraw(Canvas canvas) {
         if(!mNeedsReDraw) {
             super.onDraw(canvas);
             return;
         }
+        mNeedsReDraw = false;
 
-        // 描画領域の情報を取得
+        // boundary info
         int maxWidth = this.getWidth();
         int maxChild = this.getChildCount();
         int lineStartIndex = 0;
         int currentWidth = 0;
-        int measuredWidth = 0;
         int currentHeight = 0;
+
         ViewGroup tagChild = null;
-
         for(int i = 0 ; i < maxChild ; i ++) {
-            try {
-                tagChild = (ViewGroup)this.getChildAt(i);
-                tagChild.setVisibility(View.VISIBLE);
+            tagChild = (ViewGroup)this.getChildAt(i);
+            tagChild.setOnClickListener(mOnTagClickListener);
 
-                // タップによるタグの登録処理
-                tagChild.setOnClickListener(mOnTagClickListener);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)tagChild.getLayoutParams();
 
-                // ビューの設定
-                measuredWidth += tagChild.getWidth();
-
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)tagChild.getLayoutParams();
-                // その行の１つ目 or 横幅に余裕がある場合
-                if(lineStartIndex != i && measuredWidth + tagChild.getWidth() >= maxWidth) {
-                    lineStartIndex = i;
-                    currentWidth = 0;
-                    measuredWidth = 0;
-                    currentHeight += tagChild.getHeight() + Util.convertDp2Px(mContext, 10);
-                }
-                params.leftMargin = currentWidth;
-                params.topMargin = currentHeight;
-
-                tagChild.setLayoutParams(params);
-
-                currentWidth += tagChild.getWidth();
-            } catch (Exception e) {
-                e.printStackTrace();
+            // If this child view is not the first one in horizontal line,
+            // and if this child view does not fit in the remaining space
+            // start new line
+            if(lineStartIndex != i && currentWidth + tagChild.getWidth() >= maxWidth) {
+                lineStartIndex = i;
+                currentWidth = 0;
+                currentHeight += tagChild.getHeight() + Util.convertDp2Px(mContext, 10);
             }
+
+            params.leftMargin = currentWidth;
+            params.topMargin = currentHeight;
+
+            tagChild.setLayoutParams(params);
+
+            // update starting point x
+            currentWidth += tagChild.getWidth();
         }
 
-        // レイアウト生成完了時のリスナーを登録し、再描画を行う
+        // Update layout params, since height & other params may have changed
         ViewGroup.LayoutParams parentParams = this.getLayoutParams();
         if(tagChild != null) {
             parentParams.height = currentHeight + tagChild.getHeight() + Util.convertDp2Px(mContext, 10);
         }
         this.setLayoutParams(parentParams);
 
-        // TODO check what this does
+        // Set the max height as 100dp
+        // This 100dp is just set as temporary value
         if(parentParams.height > Util.convertDp2Px(mContext, 100)) {
             ViewGroup ScrollParent = (ViewGroup)(getParent()).getParent();
             ViewGroup.LayoutParams param = ScrollParent.getLayoutParams();
@@ -136,26 +129,5 @@ public class TagContainerLayout extends RelativeLayout {
             ScrollParent.setLayoutParams(param);
             ScrollParent.invalidate();
         }
-
-        mNeedsReDraw = false;
     }
-
-//    /**
-//     * Handles all click event within this Activity
-//     *
-//     * @param view clicked view
-//     */
-//    @Override
-//    public void onClick(View view) {
-//        // to be declared in derived class
-//    }
-//
-//    public interface OnCurrentTagUpdateListener {
-//        void onUpdate(String currentTags);
-//    }
-//
-//    public void setTagUpdateListener(OnCurrentTagUpdateListener listener) {
-//        mOnCurrentTagUpdateListener = listener;
-//    }
-
 }

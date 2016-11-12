@@ -1,6 +1,7 @@
 package com.tablecloth.bookshelf.view;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -12,15 +13,15 @@ import android.widget.ImageView;
  */
 public class BookCoverImageView extends ImageView {
 
-    public BookCoverImageView(Context context) {
+    public BookCoverImageView(@NonNull Context context) {
         super(context);
     }
 
-    public BookCoverImageView(Context context, AttributeSet attrs) {
+    public BookCoverImageView(@NonNull Context context, @NonNull AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public BookCoverImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BookCoverImageView(@NonNull Context context, @NonNull AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
