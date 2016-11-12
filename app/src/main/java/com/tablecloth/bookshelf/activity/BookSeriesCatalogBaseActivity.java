@@ -567,7 +567,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         // When current mode is search mode, move to adding series screen
         // else, move to check series detail screen
         convertView.setOnClickListener(isAPISearchMode
-                ? getOnClick4AddSeriesConfirmScreen(bookSeriesData.getSeriesId())
+                ? getOnClick4AddSeriesConfirmScreen(bookSeriesData)
                 : getOnClick4StartSeriesDetailIntent(bookSeriesData.getSeriesId()));
 
         return convertView;
@@ -598,11 +598,11 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     /**
      * Get OnClickListener instance for starting book series add confirm screen
      *
-     * @param seriesId id for book series. Invalid if < 0.
+     * @param bookSeriesData BookSeries data instance
      * @return OnClickListener instance
      */
     @NonNull
-    private View.OnClickListener getOnClick4AddSeriesConfirmScreen(final int seriesId) {
+    private View.OnClickListener getOnClick4AddSeriesConfirmScreen(final BookSeriesData bookSeriesData) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -612,7 +612,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                                 BookSeriesCatalogBaseActivity.this,
                                 R.string.series_data_confirm_add_series,
                                 R.string.add,
-                                seriesId),
+                                bookSeriesData),
                         // request code
                         G.REQUEST_CODE_LIST_ADD_SERIES);
             }

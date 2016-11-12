@@ -33,6 +33,10 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
 
     private ViewGroup mTagContainer = null;
 
+    // static BookData to use for API search,
+    // where there is info, but seriesId is -1
+    private static BookSeriesData sTemporaryBookSeriesData = null;
+
     /**
      * Get layout ID to show in the activity
      *
@@ -64,6 +68,27 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
     }
 
     /**
+     * Get intent with given extra data
+     *
+     * @param context context
+     * @param titleStrId string id for title
+     * @param btnPositiveStrId string id for positive button
+     * @param bookSeriesData book series instance to save in this dialog's tmp file
+     * @return Intent instance
+     */
+    @NonNull
+    public static Intent getIntent(@NonNull Context context, int titleStrId, int btnPositiveStrId, @NonNull BookSeriesData bookSeriesData) {
+        sTemporaryBookSeriesData = bookSeriesData;
+
+        Intent intent = new Intent(context, BookSeriesAddEditDialogActivity.class);
+
+        intent.putExtra(KEY_TITLE_STR_ID, titleStrId);
+        intent.putExtra(KEY_BTN_POSITIVE_STR_ID, btnPositiveStrId);
+
+        return intent;
+    }
+
+    /**
      * OnCreate
      *
      * @param savedInstanceState savedInstanceState
@@ -75,9 +100,12 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         mBookSeriesDao = new BookSeriesDao(this);
         mBookSeriesData = mBookSeriesDao.loadBookSeriesData(getBookSeriesId());
 
+
         // Add new book series
         if(mBookSeriesData == null) {
-            mBookSeriesData = new BookSeriesData(this);
+            mBookSeriesData = sTemporaryBookSeriesData == null
+                    ? new BookSeriesData(this)
+                    : sTemporaryBookSeriesData;
             initUI4AddBookSeries();
 
         // Edit registered book series
@@ -217,7 +245,11 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
      * Initialize UI for add book series
      */
     private void initUI4AddBookSeries() {
+        initUIWithBookSeries(sTemporaryBookSeriesData == null
+                ? mBookSeriesData
+                : sTemporaryBookSeriesData);
         initUI4CommonFeatures();
+        findViewById(R.id.btn_delete).setVisibility(View.GONE);
     }
 
     /**
@@ -225,43 +257,9 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
      */
     private void initUI4EditBookSeries() {
         updateTagContainer();
-
-        // Set views for book series detail
-        // title
-        setRowContents(R.id.data_detail_row_title,
-                R.string.book_series_data_title,
-                mBookSeriesData.getTitle());
-        setRowContents(R.id.data_detail_row_title_pronunciation,
-                R.string.book_series_data_title_pronunciation,
-                mBookSeriesData.getTitlePronunciation());
-
-        // author
-        setRowContents(R.id.data_detail_row_author,
-                R.string.book_series_data_author,
-                mBookSeriesData.getAuthor());
-        setRowContents(R.id.data_detail_row_author_pronunciation,
-                R.string.book_series_data_author_pronunciation,
-                mBookSeriesData.getAuthorPronunciation());
-
-        // Magazine
-        setRowContents(R.id.data_detail_row_magazine,
-                R.string.book_series_data_magazine,
-                mBookSeriesData.getMagazine());
-        setRowContents(R.id.data_detail_row_magazine_pronunctaion,
-                R.string.book_series_data_magazine_pronunciation,
-                mBookSeriesData.getMagazinePronunciation());
-
-        // Company
-        setRowContents(R.id.data_detail_row_company,
-                R.string.book_series_data_company,
-                mBookSeriesData.getCompany());
-
-        // Memo
-        setRowContents(R.id.data_detail_row_memo,
-                R.string.book_series_data_memo,
-                mBookSeriesData.getCompanyPronunciation());
-
+        initUIWithBookSeries(mBookSeriesData);
         initUI4CommonFeatures();
+        findViewById(R.id.btn_delete).setVisibility(View.VISIBLE);
     }
 
     /**
@@ -274,11 +272,47 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         // hint for book series title
         View titleViewArea = findViewById(R.id.data_detail_row_title);
         ((EditText)titleViewArea.findViewById(R.id.data_content)).setHint(R.string.hint_must);
+    }
 
-        findViewById(R.id.btn_delete).setVisibility(
-                mBookSeriesData == null
-                        ? View.GONE
-                        : View.VISIBLE);
+
+    /**
+     * Initialize UI using intent extra data
+     */
+    private void initUIWithBookSeries(BookSeriesData bookSeriesData) {
+        // Set views for book series detail
+        // title
+        setRowContents(R.id.data_detail_row_title,
+                R.string.book_series_data_title,
+                bookSeriesData.getTitle());
+        setRowContents(R.id.data_detail_row_title_pronunciation,
+                R.string.book_series_data_title_pronunciation,
+                bookSeriesData.getTitlePronunciation());
+
+        // author
+        setRowContents(R.id.data_detail_row_author,
+                R.string.book_series_data_author,
+                bookSeriesData.getAuthor());
+        setRowContents(R.id.data_detail_row_author_pronunciation,
+                R.string.book_series_data_author_pronunciation,
+                bookSeriesData.getAuthorPronunciation());
+
+        // Magazine
+        setRowContents(R.id.data_detail_row_magazine,
+                R.string.book_series_data_magazine,
+                bookSeriesData.getMagazine());
+        setRowContents(R.id.data_detail_row_magazine_pronunctaion,
+                R.string.book_series_data_magazine_pronunciation,
+                bookSeriesData.getMagazinePronunciation());
+
+        // Company
+        setRowContents(R.id.data_detail_row_company,
+                R.string.book_series_data_company,
+                bookSeriesData.getCompany());
+
+        // Memo
+        setRowContents(R.id.data_detail_row_memo,
+                R.string.book_series_data_memo,
+                bookSeriesData.getCompanyPronunciation());
     }
 
     /**

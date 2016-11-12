@@ -1,14 +1,8 @@
 package com.tablecloth.bookshelf.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import com.tablecloth.bookshelf.util.Const;
-import com.tablecloth.bookshelf.view.CustomListView;
 import com.tablecloth.bookshelf.R;
 
 /**

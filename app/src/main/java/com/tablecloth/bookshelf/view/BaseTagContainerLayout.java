@@ -2,46 +2,81 @@ package com.tablecloth.bookshelf.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.data.BookData;
-import com.tablecloth.bookshelf.util.ToastUtil;
+import com.tablecloth.bookshelf.db.TagHistoryDao;
 import com.tablecloth.bookshelf.util.Util;
 
-import java.util.ArrayList;
-
 /**
+ * Base class for tag container view
+ *
  * Created by Minami on 2015/04/10.
  */
-public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
+public class BaseTagContainerLayout extends RelativeLayout implements View.OnClickListener {
 
-    public CurrentTagRelativeLayout(Context context) {
+    protected Context mContext = null;
+    protected OnCurrentTagUpdateListener mOnCurrentTagUpdateListener = null;
+    protected TagHistoryDao mTagHistoryDao;
+
+    private String mTagData = null;
+    private boolean mNeedsReDraw = true;
+
+    public BaseTagContainerLayout(Context context) {
         super(context);
+        initialize(context);
     }
-    public CurrentTagRelativeLayout(Context context, AttributeSet attrs) {
+
+    public BaseTagContainerLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initialize(context);
     }
-    public CurrentTagRelativeLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+
+    public BaseTagContainerLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        initialize(context);
     }
+
+    private void initialize(@NonNull Context context) {
+        mContext = context;
+        mTagHistoryDao = new TagHistoryDao(mContext);
+
+        setWillNotDraw(false);
+        setWillNotCacheDrawing(false);
+    }
+
+    public void setTagData(@Nullable String tagData) {
+        mTagData = tagData;
+    }
+
+    @Nullable
+    public String getTagData() {
+        return mTagData;
+    }
+
+    /**
+     * Sets flag to re-draw
+     *
+     * @param flag whether to redraw
+     */
+    public void setReDrawFlag(boolean flag) {
+        mNeedsReDraw = flag;
+    }
+
 
     // 描画関数
     @Override
     protected void onDraw(Canvas canvas) {
-        if(!mNeedsReLayout) {
+        if(!mNeedsReDraw) {
             super.onDraw(canvas);
             return;
-
         }
 
-        Log.e("onDraw::CurrentTag", "onDraw::CurrentTag");
-        // 履歴領域の情報を取得
+        // 描画領域の情報を取得
         int maxWidth = this.getWidth();
         int maxChild = this.getChildCount();
         int lineStartIndex = 0;
@@ -54,8 +89,9 @@ public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
             try {
                 tagChild = (ViewGroup)this.getChildAt(i);
                 tagChild.setVisibility(View.VISIBLE);
+
                 // タップによるタグの登録処理
-                tagChild.setOnClickListener(onClickListener);
+//                tagChild.setOnClickListener(this);
 
                 // ビューの設定
                 measuredWidth += tagChild.getWidth();
@@ -85,6 +121,8 @@ public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
             parentParams.height = currentHeight + tagChild.getHeight() + Util.convertDp2Px(mContext, 10);
         }
         this.setLayoutParams(parentParams);
+
+        // TODO check what this does
         if(parentParams.height > Util.convertDp2Px(mContext, 100)) {
             ViewGroup ScrollParent = (ViewGroup)(getParent()).getParent();
             ViewGroup.LayoutParams param = ScrollParent.getLayoutParams();
@@ -93,30 +131,25 @@ public class CurrentTagRelativeLayout extends BaseTagRelativeLayout {
             ScrollParent.invalidate();
         }
 
-        mNeedsReLayout = false;
-
-//        super.onDraw(canvas);
+        mNeedsReDraw = false;
     }
 
-    OnClickListener onClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            // get tag to delete
-            String deleteTag = (String) view.findViewById(R.id.tag_name).getTag();
+    /**
+     * Handles all click event within this Activity
+     *
+     * @param view clicked view
+     */
+    @Override
+    public void onClick(View view) {
+        // to be declared in derived class
+    }
 
-            ArrayList<String> tagsTmp = BookData.convertTagsRawText2TagsList(getTagData());
-            if(!tagsTmp.contains(deleteTag)) {
-                ToastUtil.show(mContext, R.string.tag_error_failed_2_delete);
-                return;
-            }
+    public interface OnCurrentTagUpdateListener {
+        void onUpdate(String currentTags);
+    }
 
-            // delete tag
-            tagsTmp.remove(deleteTag);
-            setTagData(BookData.convertTagsList2TagsRawText(tagsTmp));
-
-            // update view
-            if(mOnCurrentTagUpdateListener != null) mOnCurrentTagUpdateListener.onUpdate(getTagData());
-        }
-    };
+    public void setTagUpdateListener(OnCurrentTagUpdateListener listener) {
+        mOnCurrentTagUpdateListener = listener;
+    }
 
 }
