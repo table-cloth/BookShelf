@@ -145,8 +145,8 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
             case R.id.btn_edit: // btn edit book series detail
                 Intent editIntent = BookSeriesAddEditDialogActivity.getIntent(
                         this,
-                        getString(R.string.edit_book_series_detail),
-                        getString(R.string.save),
+                        R.string.edit_book_series_detail,
+                        R.string.save,
                         mShowBookSeriesData.getSeriesId());
                 startActivityForResult(editIntent, G.REQUEST_CODE_EDIT_SERIES_DETAIL);
                 break;
@@ -190,10 +190,10 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
             case R.id.book_cover_image: // image view of book series cover
                 Intent imageIntent = SimpleDialogActivity.getIntent(
                         this,
-                        getString(R.string.change_image),
-                        getString(R.string.series_data_confirm_change_book_cover),
-                        getString(R.string.yes),
-                        getString(R.string.no));
+                        R.string.change_image,
+                        R.string.series_data_confirm_change_book_cover,
+                        R.string.yes,
+                        R.string.no);
                 startActivityForResult(imageIntent, G.REQUEST_CODE_IMAGE_CHANGE_CONFIRM_1);
                 break;
         }
@@ -317,10 +317,10 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
                 if(isResultPositive(resultCode)) {
                 	Intent confirmDialogIntent = SimpleDialogActivity.getIntent(
                             this,
-                            getString(R.string.image_select_method),
-                            getString(R.string.image_select_choose_image_select_method),
-                            getString(R.string.image_select_select_from_gallery),
-                            getString(R.string.image_select_select_from_camera));
+                            R.string.image_select_method,
+                            R.string.image_select_choose_image_select_method,
+                            R.string.image_select_select_from_gallery,
+                            R.string.image_select_select_from_camera);
                     startActivityForResult(confirmDialogIntent, G.REQUEST_CODE_IMAGE_CHANGE_CONFIRM_2);
                 }
                 break;

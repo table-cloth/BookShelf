@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 
 /**
@@ -47,7 +48,19 @@ public class VersionUtil {
         String suffix = "\n\nーーーーー\n少しでも良いアプリになるよう改善を行っております。\n★5のレビューを頂けますと励みになります！\n宜しくお願い致します (*- -)(*_ _)ペコリ";
 
         if(versionDiff == 1) {
-            Intent intent = SimpleDialogActivity.getIntent(mAppContext, "お知らせ", "■作品の検索時に、正しくない画像が表示される不具合を修正しました。\n■設定画面の項目の表示を修正しました。\n\nご迷惑をおかけし申し訳ございませんでした。\n今後ともよろしくお願い致します。" + suffix, "レビューする", "しない");
+//            Intent intent = SimpleDialogActivity.getIntent(
+//                    mAppContext,
+//                    "お知らせ",
+//                    "■作品の検索時に、正しくない画像が表示される不具合を修正しました。\n■設定画面の項目の表示を修正しました。\n\nご迷惑をおかけし申し訳ございませんでした。\n今後ともよろしくお願い致します。" + suffix,
+//                    "レビューする",
+//                    "しない");
+//            mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
+            Intent intent = SimpleDialogActivity.getIntent(
+                    mAppContext,
+                    R.string.update_dialog_title,
+                    R.string.update_dialog_content,
+                    R.string.update_dialog_do_review,
+                    R.string.update_dialog_do_not_review);
             mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
 
             // バージョン情報を更新
@@ -55,7 +68,19 @@ public class VersionUtil {
             return true;
 
         } else if(versionDiff > 1) {
-            Intent intent = SimpleDialogActivity.getIntent(mAppContext, "お知らせ", "■作品の画像の読み込み速度を改善しました。\n\n■お問い合わせ・レビューの項目を追加しました。\n　設定画面よりお問い合わせ・レビューをお願い致します。" + suffix, "レビューする", "しない");
+//            Intent intent = SimpleDialogActivity.getIntent(
+//                    mAppContext,
+//                    "お知らせ",
+//                    "■作品の画像の読み込み速度を改善しました。\n\n■お問い合わせ・レビューの項目を追加しました。\n　設定画面よりお問い合わせ・レビューをお願い致します。" + suffix,
+//                    "レビューする",
+//                    "しない");
+//            mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
+            Intent intent = SimpleDialogActivity.getIntent(
+                    mAppContext,
+                    R.string.update_dialog_title,
+                    R.string.update_dialog_content,
+                    R.string.update_dialog_do_review,
+                    R.string.update_dialog_do_not_review);
             mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
 
             // バージョン情報を更新

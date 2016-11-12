@@ -265,7 +265,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 if(resultCode == G.RESULT_POSITIVE) {
                     switchMode(G.MODE_VIEW);
                     refreshData();
-                    ToastUtil.show(this, R.string.seires_data_done_add_series);
+                    ToastUtil.show(this, R.string.series_data_done_add_series);
                     sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.ADD_SERIES);
 
                 }
