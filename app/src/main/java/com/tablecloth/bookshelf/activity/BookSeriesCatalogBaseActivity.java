@@ -26,8 +26,8 @@ import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SettingsDao;
-import com.tablecloth.bookshelf.dialog.BookSeriesAddTypeSelectDialogActivity;
-import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
+import com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity;
+import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.G;
@@ -299,11 +299,11 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                             break;
 
                         case G.RESULT_DATA_SELECTED_BTN_MANUAL: // register manually
-                            intent = EditSeriesDialogActivity.getIntent(
+                            intent = BookSeriesAddEditDialogActivity.getIntent(
                                     this,
-                                    getString(R.string.seires_data_add_series_data),
-                                    getString(R.string.add),
-                                    -1);
+                                    R.string.seires_data_add_series_data,
+                                    R.string.add,
+                                    BookData.BOOK_SERIES_ERROR_VALUE);
                             startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
                             sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_MANUAL_BTN);
                             break;
@@ -368,6 +368,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
 
     /**
      * Handles all click event within this Activity
+     *
      * @param view Clicked view
      */
     @Override
@@ -376,7 +377,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         switch (viewId) {
             case R.id.add_button: // Add book series
                 startActivityForResult(
-                        BookSeriesAddTypeSelectDialogActivity.getIntent(
+                        BookSeriesSelectAddTypeDialogActivity.getIntent(
                                 this,
                                 R.string.series_data_add_select_how_short,
                                 R.string.series_data_add_select_how_long,
@@ -566,7 +567,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         // When current mode is search mode, move to adding series screen
         // else, move to check series detail screen
         convertView.setOnClickListener(isAPISearchMode
-                ? getOnClick4AddSeriesConfirmScreen(bookSeriesData)
+                ? getOnClick4AddSeriesConfirmScreen(bookSeriesData.getSeriesId())
                 : getOnClick4StartSeriesDetailIntent(bookSeriesData.getSeriesId()));
 
         return convertView;
@@ -597,21 +598,21 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     /**
      * Get OnClickListener instance for starting book series add confirm screen
      *
-     * @param bookSeriesData BookSeriesData instance
+     * @param seriesId id for book series. Invalid if < 0.
      * @return OnClickListener instance
      */
     @NonNull
-    private View.OnClickListener getOnClick4AddSeriesConfirmScreen(@NonNull final BookSeriesData bookSeriesData) {
+    private View.OnClickListener getOnClick4AddSeriesConfirmScreen(final int seriesId) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivityForResult(
                         // intent
-                        EditSeriesDialogActivity.getIntent(
+                        BookSeriesAddEditDialogActivity.getIntent(
                                 BookSeriesCatalogBaseActivity.this,
-                                getString(R.string.series_data_confirm_add_series),
-                                getString(R.string.add),
-                                bookSeriesData),
+                                R.string.series_data_confirm_add_series,
+                                R.string.add,
+                                seriesId),
                         // request code
                         G.REQUEST_CODE_LIST_ADD_SERIES);
             }

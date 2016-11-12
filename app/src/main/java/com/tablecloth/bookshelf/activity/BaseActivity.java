@@ -210,4 +210,25 @@ public abstract class BaseActivity extends Activity {
     protected int getIntentExtraInt(Intent data, String resultDataKey) {
         return data.getIntExtra(resultDataKey, G.RESULT_DATA_VALUE_DEFAULT_INT);
     }
+
+    /**
+     * Finish activity with result
+     *
+     * @param result Result to set
+     */
+    protected void finishWithResult(int result) {
+        setResult(result);
+        finish();
+    }
+
+    /**
+     * Finish activity with result
+     *
+     * @param result Result to set
+     * @param data Intent data to set
+     */
+    protected void finishWithResult(int result, Intent data) {
+        setResult(result, data);
+        finish();
+    }
 }

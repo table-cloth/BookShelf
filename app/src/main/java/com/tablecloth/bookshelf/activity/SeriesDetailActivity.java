@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -25,7 +24,7 @@ import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.BookVolumeDao;
-import com.tablecloth.bookshelf.dialog.EditSeriesDialogActivity;
+import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.ImageUtil;
@@ -144,7 +143,7 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
                 break;
 
             case R.id.btn_edit: // btn edit book series detail
-                Intent editIntent = EditSeriesDialogActivity.getIntent(
+                Intent editIntent = BookSeriesAddEditDialogActivity.getIntent(
                         this,
                         getString(R.string.edit_book_series_detail),
                         getString(R.string.save),

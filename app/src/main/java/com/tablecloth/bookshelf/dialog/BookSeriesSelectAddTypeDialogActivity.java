@@ -11,11 +11,14 @@ import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.util.G;
 
 /**
- * 縦にボタンが並んだダイアログ
- * ボタンの数は可変に変更したい（現状は内容も個数も固定＠2015/02/21）
+ * Dialog activity for selecting type to add book series
+ * Current type:
+ *  - Add by Search API
+ *  - Add manually
+ *
  * Created by Minami on 2015/02/21.
  */
-public class BookSeriesAddTypeSelectDialogActivity extends DialogBaseActivity {
+public class BookSeriesSelectAddTypeDialogActivity extends DialogBaseActivity {
 
     RadioGroup radioGroup;
 
@@ -35,13 +38,13 @@ public class BookSeriesAddTypeSelectDialogActivity extends DialogBaseActivity {
      * @param context context
      * @param titleStrId string id for title
      * @param messageStrId string id for message content
-     * @param btnPositiveStrId string id for positive butotn
+     * @param btnPositiveStrId string id for positive button
      * @param btnNegativeStrId string id for negative button
      * @return Intent instance
      */
     @NonNull
     public static Intent getIntent(@NonNull Context context, int titleStrId, int messageStrId, int btnPositiveStrId, int btnNegativeStrId) {
-        Intent intent = new Intent(context, BookSeriesAddTypeSelectDialogActivity.class);
+        Intent intent = new Intent(context, BookSeriesSelectAddTypeDialogActivity.class);
 
         intent.putExtra(KEY_TITLE_STR_ID, titleStrId);
         intent.putExtra(KEY_MESSAGE_STR_ID, messageStrId);
