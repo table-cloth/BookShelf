@@ -136,6 +136,7 @@
                         android:paddingRight="5dp"
                         android:textColor="@color/black"
                         android:maxLines="1"
+                        android:imeOptions="actionDone"
                         android:inputType="text"
                         android:textSize="14sp" />
 

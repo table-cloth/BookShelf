@@ -3,8 +3,10 @@ package com.tablecloth.bookshelf.dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -61,38 +63,57 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
 
         // テキスト入力によるタグ追加
         addTagEditText = (EditText)findViewById(R.id.data_content);
+        addTagEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                // Action of enter key is set as "DONE" in xml
+                if(actionId == EditorInfo.IME_ACTION_DONE) {
+                    addTag(addTagEditText.getText().toString());
+                    addTagEditText.setText("");
+
+                    updateCurrentTags();
+                    updateRecentTags();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         findViewById(R.id.btn_add_tag).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String newTag = addTagEditText.getText().toString();
                 addTagEditText.setText("");
-                ArrayList<String> tagsTmp = BookData.convertTagsRawText2TagsList(tagsData);
-
-                // 登録失敗
-                if(Util.isEmpty(newTag)) {
-                    ToastUtil.show(TagsEditDialogActivity.this, "追加するタグを入力してください");
-                    return;
-                } else if(tagsTmp != null && tagsTmp.contains(newTag)) {
-                    ToastUtil.show(TagsEditDialogActivity.this, "既に登録済みのタグです");
-                    return;
-                }
-
-                // 登録成功
-                tagsTmp.add(newTag);
-                tagsData = BookData.convertTagsList2TagsRawText(tagsTmp);
-
-                // save newly added tag to history DB
-                mTagHistoryDao.saveTag(newTag);
+                addTag(newTag);
 
                 updateCurrentTags();
                 updateRecentTags();
-
             }
         });
 
         updateCurrentTags();
         updateRecentTags();
+    }
 
+    private void addTag(String newTag) {
+        ArrayList<String> tagsTmp = BookData.convertTagsRawText2TagsList(tagsData);
+
+        // 登録失敗
+        if(Util.isEmpty(newTag)) {
+            ToastUtil.show(TagsEditDialogActivity.this, "追加するタグを入力してください");
+            return;
+        } else if(tagsTmp != null && tagsTmp.contains(newTag)) {
+            ToastUtil.show(TagsEditDialogActivity.this, "既に登録済みのタグです");
+            return;
+        }
+
+        // 登録成功
+        tagsTmp.add(newTag);
+        tagsData = BookData.convertTagsList2TagsRawText(tagsTmp);
+
+        // save newly added tag to history DB
+        mTagHistoryDao.saveTag(newTag);
     }
 
     private void updateCurrentTags() {
