@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.R;
 
 /**
@@ -77,11 +77,11 @@ public class SimpleDialogActivity extends DialogBaseActivity {
         int viewId = view.getId();
         switch (viewId) {
             case R.id.btn_positive: // Positive event
-                finishWithResult(G.RESULT_POSITIVE);
+                finishWithResult(Const.RESULT_CODE.POSITIVE);
                 break;
 
             case R.id.btn_negative: // Negative event
-                finishWithResult(G.RESULT_NEGATIVE);
+                finishWithResult(Const.RESULT_CODE.NEGATIVE);
                 break;
         }
     }

@@ -1,7 +1,6 @@
 package com.tablecloth.bookshelf.db;
 
 import com.tablecloth.bookshelf.util.Const;
-import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
@@ -160,19 +159,19 @@ public class SqlText {
                 }
 
                 switch(mode) {
-                    case G.SEARCH_MODE_TITLE:
+                    case Const.SEARCH_MODE.TITLE:
                         sql.append(Const.DB.BookSeriesTable.TITLE_NAME);
                         break;
-                    case G.SEARCH_MODE_AUTHOR:
+                    case Const.SEARCH_MODE.AUTHOR:
                         sql.append(Const.DB.BookSeriesTable.AUTHOR_NAME);
                         break;
-                    case G.SEARCH_MODE_COMPANY:
+                    case Const.SEARCH_MODE.COMPANY:
                         sql.append(Const.DB.BookSeriesTable.COMPANY_NAME);
                         break;
-                    case G.SEARCH_MODE_MAGAZINES:
+                    case Const.SEARCH_MODE.MAGAZINE:
                         sql.append(Const.DB.BookSeriesTable.MAGAZINE_NAME);
                         break;
-                    case G.SEARCH_MODE_TAG:
+                    case Const.SEARCH_MODE.TAG:
                         sql.append(Const.DB.BookSeriesTable.TAGS);
                         break;
                     // safety net to avoid illegal sql

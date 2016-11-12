@@ -13,7 +13,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.tablecloth.bookshelf.BookShelfApplication;
-import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.VersionUtil;
 
@@ -25,6 +25,18 @@ import com.tablecloth.bookshelf.util.VersionUtil;
  * Created by Minami on 2015/02/19.
  */
 public abstract class BaseActivity extends Activity {
+
+    // Key values for Intent extras
+    final protected static String KEY_TITLE_STR_ID = "title";
+    final protected static String KEY_MESSAGE_STR_ID = "message";
+    final protected static String KEY_BTN_POSITIVE_STR_ID = "btn_positive";
+    final protected static String KEY_BTN_NEGATIVE_STR_ID = "btn_negative";
+    final protected static String KEY_DATA_TYPE_STR_ID = "data_type";
+    final protected static String KEY_BOOK_SERIES_ID = "series_id";
+    final protected static String KEY_RAW_TAGS = "raw_tags";
+
+    // Default values for Intent extras
+    final protected static int VALUE_DEFAULT_STR_ID = -1;
 
     protected Handler mHandler;
     final protected int CONTENT_VIEW_ID_NONE = -1;
@@ -147,7 +159,7 @@ public abstract class BaseActivity extends Activity {
      * @return is resultCode positive
      */
     protected boolean isResultPositive(int resultCode) {
-        return resultCode == G.RESULT_POSITIVE
+        return resultCode == Const.RESULT_CODE.POSITIVE
                 || resultCode == RESULT_OK;
     }
 
@@ -158,7 +170,7 @@ public abstract class BaseActivity extends Activity {
      * @return is resultCode negative
      */
     protected boolean isResultNegative(int resultCode) {
-        return resultCode == G.RESULT_NEGATIVE;
+        return resultCode == Const.RESULT_CODE.NEGATIVE;
     }
 
     /**
@@ -208,7 +220,7 @@ public abstract class BaseActivity extends Activity {
      */
     @Nullable
     protected int getIntentExtraInt(Intent data, String resultDataKey) {
-        return data.getIntExtra(resultDataKey, G.RESULT_DATA_VALUE_DEFAULT_INT);
+        return data.getIntExtra(resultDataKey, Const.INTENT_EXTRA.VALUE_DEFAULT_ERROR);
     }
 
     /**

@@ -9,10 +9,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.Rakuten;
 
 /**
@@ -93,13 +92,13 @@ public class SearchContentInputDialogActivity extends DialogBaseActivity {
                 String searchKey = Rakuten.SEARCH_KEY_LIST[selectedItemId];
                 String searchContent = ((EditText)findViewById(R.id.data_content)).getText().toString();
 
-                finishWithResult(G.RESULT_POSITIVE,
-                        new Intent().putExtra(G.RESULT_DATA_SELECTED_KEY, searchKey).
-                                putExtra(G.RESULT_DATA_SELECTED_VALUE, searchContent));
+                finishWithResult(Const.RESULT_CODE.POSITIVE,
+                        new Intent().putExtra(Const.INTENT_EXTRA.KEY_STR_SELECTED_KEY, searchKey).
+                                putExtra(Const.INTENT_EXTRA.KEY_STR_SELECTED_VALUE, searchContent));
                 break;
 
             case R.id.btn_negative: // cancel
-                finishWithResult(G.RESULT_NEGATIVE);
+                finishWithResult(Const.RESULT_CODE.NEGATIVE);
                 break;
         }
     }

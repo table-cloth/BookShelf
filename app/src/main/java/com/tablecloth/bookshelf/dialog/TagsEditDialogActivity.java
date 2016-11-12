@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.db.TagHistoryDao;
-import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -142,7 +142,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
         int viewId = view.getId();
         switch (viewId) {
             case R.id.btn_positive: // Decide btn. Pass tag data back to prev Activity
-                finishWithResult(G.RESULT_POSITIVE,
+                finishWithResult(Const.RESULT_CODE.POSITIVE,
                         new Intent().putExtra(KEY_RAW_TAGS, mRawTagsText));
                 break;
 

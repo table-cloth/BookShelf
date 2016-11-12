@@ -61,7 +61,7 @@ public class VersionUtil {
                     R.string.update_dialog_content,
                     R.string.update_dialog_do_review,
                     R.string.update_dialog_do_not_review);
-            mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
+            mActivity.startActivityForResult(intent, Const.REQUEST_CODE.UPDATE_DIALOG);
 
             // バージョン情報を更新
             updateVersionInfo();
@@ -81,7 +81,7 @@ public class VersionUtil {
                     R.string.update_dialog_content,
                     R.string.update_dialog_do_review,
                     R.string.update_dialog_do_not_review);
-            mActivity.startActivityForResult(intent, G.REQUEST_CODE_UPDATE_DIALOG);
+            mActivity.startActivityForResult(intent, Const.REQUEST_CODE.UPDATE_DIALOG);
 
             // バージョン情報を更新
             updateVersionInfo();

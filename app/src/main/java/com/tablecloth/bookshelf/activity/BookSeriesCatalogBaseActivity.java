@@ -30,7 +30,6 @@ import com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity;
 import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
-import com.tablecloth.bookshelf.util.G;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
@@ -64,10 +63,10 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     protected ProgressDialogUtil mProgress;
 
     // Current show mode
-    protected int mShowMode = G.MODE_VIEW;
+    protected int mShowMode = Const.VIEW_MODE.VIEW;
 
     // Search related
-    protected int mSearchMode = G.SEARCH_MODE_ALL;
+    protected int mSearchMode = Const.SEARCH_MODE.ALL;
     protected String mSearchContent = "";
     private ArrayList<BookSeriesData> mSearchResultBookSeriesCache = new ArrayList<>();
 
@@ -110,7 +109,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         mCatalogAdapter = new BookSeriesCatalogAdapter();
 
         // book catalog activity always starts with View Mode
-        switchMode(G.MODE_VIEW);
+        switchMode(Const.VIEW_MODE.VIEW);
 
         // initialize Ad
         Util.initAdView(this, (ViewGroup) findViewById(R.id.banner));
@@ -123,7 +122,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
      */
     private void switchMode(int newMode) {
         switch (newMode) {
-            case G.MODE_VIEW:
+            case Const.VIEW_MODE.VIEW:
             default:
                 sendGoogleAnalyticsEvent(
                         GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_VIEW);
@@ -132,7 +131,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 mHeaderApiSearchAreaView.setVisibility(View.GONE);
                 break;
 
-            case G.MODE_SEARCH:
+            case Const.VIEW_MODE.SEARCH_DB:
                 sendGoogleAnalyticsEvent(
                         GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_SEARCH);
                 mHeaderModeAreaView.setVisibility(View.GONE);
@@ -141,7 +140,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 mSearchContentEditText.requestFocus();
                 break;
 
-            case G.MODE_API_SEARCH_RESULT:
+            case Const.VIEW_MODE.SEARCH_API:
                 sendGoogleAnalyticsEvent(
                         GAEvent.Type.USER_ACTION, GAEvent.Event.SHOW_MODE_API_SEARCH_RESULT);
                 mHeaderModeAreaView.setVisibility(View.GONE);
@@ -159,15 +158,15 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
 
         switch (mShowMode) {
 
-            case G.MODE_SEARCH:
+            case Const.VIEW_MODE.SEARCH_DB:
                 mBookSeriesDataList = mBookSeriesDao.loadBookSeriesDataList(mSearchMode, mSearchContent);
                 break;
 
-            case G.MODE_API_SEARCH_RESULT:
+            case Const.VIEW_MODE.SEARCH_API:
                 mBookSeriesDataList = mSearchResultBookSeriesCache;
                 break;
 
-            case G.MODE_VIEW: // default view mode
+            case Const.VIEW_MODE.VIEW: // default view mode
             default:
                 mBookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
                 break;
@@ -241,8 +240,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK
-                && mShowMode == G.MODE_VIEW) {
-            switchMode(G.MODE_VIEW);
+                && mShowMode != Const.VIEW_MODE.VIEW) {
+            switchMode(Const.VIEW_MODE.VIEW);
             return false;
         }
         return super.onKeyDown(keyCode, event);
@@ -260,9 +259,9 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case G.REQUEST_CODE_LIST_ADD_SERIES: // Return from book series add screen
-                if(resultCode == G.RESULT_POSITIVE) {
-                    switchMode(G.MODE_VIEW);
+            case Const.REQUEST_CODE.SERIES_LIST_ADD_SERIES: // Return from book series add screen
+                if(resultCode == Const.RESULT_CODE.POSITIVE) {
+                    switchMode(Const.VIEW_MODE.VIEW);
                     refreshData();
                     ToastUtil.show(this, R.string.series_data_done_add_series);
                     sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.ADD_SERIES);
@@ -270,8 +269,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 }
                 break;
 
-            case G.REQUEST_CODE_UPDATE_DIALOG: // Return from update dialog
-                if(resultCode == G.RESULT_POSITIVE) {
+            case Const.REQUEST_CODE.UPDATE_DIALOG: // Return from update dialog
+                if(resultCode == Const.RESULT_CODE.POSITIVE) {
                     // Activate GooglePlay marker
                     startActivity(new Intent(
                             Intent.ACTION_VIEW,
@@ -280,12 +279,14 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 }
                 break;
 
-            case G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE: // Return from "select how to book series" dialog
-                if(resultCode == G.RESULT_POSITIVE) {
+            case Const.REQUEST_CODE.SELECT_ADD_SERIES_TYPE: // Return from "select how to book series" dialog
+                if(resultCode == Const.RESULT_CODE.POSITIVE) {
                     Intent intent;
-                    int selectedBtnId = data.getIntExtra(G.RESULT_DATA_SELECTED_ID, G.RESULT_DATA_SELECTED_BTN_SEARCH);
+                    int selectedBtnId = data.getIntExtra(
+                            Const.INTENT_EXTRA.KEY_INT_SELECTED_ID,
+                            Const.INTENT_EXTRA.VALUE_SELECTED_BTN_SEARCH);
                     switch (selectedBtnId) {
-                        case G.RESULT_DATA_SELECTED_BTN_SEARCH: // search using API
+                        case Const.INTENT_EXTRA.VALUE_SELECTED_BTN_SEARCH: // search using API
                         default:
                             intent = SearchContentInputDialogActivity.getIntent(
                                     this,
@@ -293,30 +294,30 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                                     R.string.series_data_search_select_topic,
                                     R.string.search,
                                     R.string.cancel);
-                            startActivityForResult(intent, G.REQUEST_CODE_LIST_SEARCH_RAKUTEN);
+                            startActivityForResult(intent, Const.REQUEST_CODE.LIST_SEARCH_RAKUTEN);
                             sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_SEARCH_BTN);
                             break;
 
-                        case G.RESULT_DATA_SELECTED_BTN_MANUAL: // register manually
+                        case Const.INTENT_EXTRA.VALUE_SELECTED_BTN_MANUAL: // register manually
                             intent = BookSeriesAddEditDialogActivity.getIntent(
                                     this,
                                     R.string.seires_data_add_series_data,
                                     R.string.add,
                                     BookData.BOOK_SERIES_ERROR_VALUE);
-                            startActivityForResult(intent, G.REQUEST_CODE_LIST_ADD_SERIES);
+                            startActivityForResult(intent, Const.REQUEST_CODE.SERIES_LIST_ADD_SERIES);
                             sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_MANUAL_BTN);
                             break;
                     }
                 }
                 break;
 
-            case G.REQUEST_CODE_LIST_SEARCH_RAKUTEN: // Return from search with Rakuten API
-                if(resultCode == G.RESULT_POSITIVE) {
+            case Const.REQUEST_CODE.LIST_SEARCH_RAKUTEN: // Return from search with Rakuten API
+                if(resultCode == Const.RESULT_CODE.POSITIVE) {
 
                     mProgress.show(mHandler, getString(R.string.searching_now), null);
 
-                    String selectKey = data.getStringExtra(G.RESULT_DATA_SELECTED_KEY);
-                    String selectValue = data.getStringExtra(G.RESULT_DATA_SELECTED_VALUE);
+                    String selectKey = data.getStringExtra(Const.INTENT_EXTRA.KEY_STR_SELECTED_KEY);
+                    String selectValue = data.getStringExtra(Const.INTENT_EXTRA.KEY_STR_SELECTED_VALUE);
 
                     Rakuten.searchFromRakutenAPI(this, mHandler, selectKey, selectValue,
                             new Rakuten.SearchResultListener() {
@@ -329,7 +330,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
 
                                     mProgress.dismiss();
 
-                                    switchMode(G.MODE_API_SEARCH_RESULT);
+                                    switchMode(Const.VIEW_MODE.SEARCH_API);
                                     refreshData();
                                 }
 
@@ -356,9 +357,18 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         ArrayAdapter<String> adapter
                 = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
 
+        String[] searchModeList = new String[] {
+                getString(R.string.search_mode_all),
+                getString(R.string.search_mode_title),
+                getString(R.string.search_mode_author),
+                getString(R.string.search_mode_magazine),
+                getString(R.string.search_mode_company),
+                getString(R.string.search_mode_tag),
+        };
+
         // Lists to show in spinner
-        for(int i = 0 ; i < G.SEARCH_MODE_LIST.length ; i ++) {
-            adapter.add(G.SEARCH_MODE_LIST[i]);
+        for(int i = 0 ; i < searchModeList.length ; i ++) {
+            adapter.add(searchModeList[i]);
         }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -382,18 +392,18 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                                 R.string.series_data_add_select_how_long,
                                 R.string.decide,
                                 R.string.cancel),
-                        G.REQUEST_CODE_SELECT_ADD_SERIES_TYPE);
+                        Const.REQUEST_CODE.SELECT_ADD_SERIES_TYPE);
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
                 break;
 
             case R.id.btn_search: // Search book series registered
-                switchMode(G.MODE_SEARCH);
+                switchMode(Const.VIEW_MODE.SEARCH_DB);
                 refreshData();
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SEARCH_BTN);
                 break;
 
             case R.id.btn_cancel: // Cancel search book series registered / cancel API search
-                switchMode(G.MODE_VIEW);
+                switchMode(Const.VIEW_MODE.VIEW);
                 refreshData();
                 break;
 
@@ -422,7 +432,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // Update search mode depending on item selected
-                // Do make sure selection list in spinner, is shown in same order as value of each mode
+                // Do make sure selection list in spinner,
+                // is shown in same order as value of each search mode
                 mSearchMode = position;
                 refreshData();
             }
@@ -479,7 +490,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         }
 
         // is showing search result on internet
-        boolean isAPISearchMode = mShowMode == G.MODE_API_SEARCH_RESULT;
+        boolean isAPISearchMode = mShowMode == Const.VIEW_MODE.SEARCH_API;
 
         // init final values
         final boolean doUseImageCache = !isAPISearchMode
@@ -613,7 +624,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                                 R.string.add,
                                 bookSeriesData),
                         // request code
-                        G.REQUEST_CODE_LIST_ADD_SERIES);
+                        Const.REQUEST_CODE.SERIES_LIST_ADD_SERIES);
             }
         };
     }

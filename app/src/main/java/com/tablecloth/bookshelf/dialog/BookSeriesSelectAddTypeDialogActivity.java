@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.RadioGroup;
 
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Const;
 
 /**
  * Dialog activity for selecting type to add book series
@@ -90,22 +90,22 @@ public class BookSeriesSelectAddTypeDialogActivity extends DialogBaseActivity {
                 switch (radioGroup.getCheckedRadioButtonId()) {
                     default:
                     case R.id.radio_0: // Search with API
-                        selectedCheckBoxType =G.RESULT_DATA_SELECTED_BTN_SEARCH;
+                        selectedCheckBoxType = Const.INTENT_EXTRA.VALUE_SELECTED_BTN_SEARCH;
                         break;
 
                     case R.id.radio_1: // Search manually
-                        selectedCheckBoxType =G.RESULT_DATA_SELECTED_BTN_MANUAL;
+                        selectedCheckBoxType = Const.INTENT_EXTRA.VALUE_SELECTED_BTN_MANUAL;
                         break;
                 }
 
-                finishWithResult(G.RESULT_POSITIVE,
+                finishWithResult(Const.RESULT_CODE.POSITIVE,
                         new Intent().putExtra(
-                                G.RESULT_DATA_SELECTED_ID,
+                                Const.INTENT_EXTRA.KEY_INT_SELECTED_ID,
                                 selectedCheckBoxType));
                 break;
 
             case R.id.btn_negative: // cancel add book series
-                finishWithResult(G.RESULT_NEGATIVE);
+                finishWithResult(Const.RESULT_CODE.NEGATIVE);
                 break;
         }
     }
@@ -123,6 +123,6 @@ public class BookSeriesSelectAddTypeDialogActivity extends DialogBaseActivity {
      * @return default select type
      */
     private int getDefaultRadioType() {
-        return G.RESULT_DATA_SELECTED_BTN_SEARCH;
+        return Const.INTENT_EXTRA.VALUE_SELECTED_BTN_SEARCH;
     }
 }

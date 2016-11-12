@@ -7,6 +7,10 @@ package com.tablecloth.bookshelf.util;
  */
 public class Const {
 
+    public static class AD {
+        final public static String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
+    }
+
     public static class PREF_KEYS {
         final public static String INIT_VERSION_CODE = "INIT_VERSION_CODE"; // 始めにインストールしたバージョン情報
         final public static String VERSION_CODE = "VERSION_CODE"; // 最後に表示したバージョン情報
@@ -34,6 +38,7 @@ public class Const {
         public static final int SIMPLE_CHECK = 9; // 簡易的な確認用
         public static final int TAGS_EDIT = 10;
 
+        public static final int UPDATE_DIALOG = 100;
     }
 
     /**
@@ -56,16 +61,41 @@ public class Const {
      */
     public static class INTENT_EXTRA {
         // keys
-        public static final String KEY_INT_SELECTED_ID = "selected_id"; // intを返す
-        public static final String KEY_STR_SELECTED_KEY = "selected_key"; // Stringを返す
-        public static final String KEY_STR_SELECTED_VALUE = "selected_value"; // Stringを返す
+        public static final String KEY_INT_SELECTED_ID = "selected_id";
+        public static final String KEY_STR_SELECTED_KEY = "selected_key";
+        public static final String KEY_STR_SELECTED_VALUE = "selected_value";
+        public static final String KEY_INT_EDIT_SERIES = "key_edit_series";
+
 
         // values
+        public static final int VALUE_DEFAULT_ERROR = -1;
         public static final int VALUE_SELECTED_BTN_SEARCH = 0;
         public static final int VALUE_SELECTED_BTN_MANUAL = 1;
+        public static final int VALUE_EDIT_SERIES_EDIT = 0;
+        public static final int VALUE_EDIT_SERIES_DELETE = 1;
     }
 
+    /**
+     * Search mode
+     */
+    public static class SEARCH_MODE {
+        public static final int ALL = 0;
+        public static final int TITLE = 1;
+        public static final int AUTHOR = 2;
+        public static final int MAGAZINE = 3;
+        public static final int COMPANY = 4;
+        public static final int TAG = 5;
+    }
 
+    /**
+     * View mode
+     */
+    public static class VIEW_MODE {
+        public static final int VIEW = 0;
+        public static final int DELETE = 1;
+        public static final int SEARCH_DB = 2;
+        public static final int SEARCH_API = 3;
+    }
 
     /**
      * DB related constants

@@ -11,10 +11,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
-import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.data.BookSeriesData;
-import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -136,7 +135,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
                                 R.string.tag_edit,
                                 R.string.finish,
                                 mBookSeriesData.getRawTags()),
-                        G.REQUEST_CODE_TAGS_EDIT);
+                        Const.REQUEST_CODE.TAGS_EDIT);
                 break;
 
             case R.id.btn_delete: // delete current series
@@ -147,19 +146,19 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
                                 R.string.delete_book_series_warning,
                                 R.string.delete,
                                 R.string.cancel),
-                        G.REQUEST_CODE_SIMPLE_CHECK);
+                        Const.REQUEST_CODE.SIMPLE_CHECK);
                 break;
 
             case R.id.btn_back: // cancel current action
-                finishWithResult(G.RESULT_NONE);
+                finishWithResult(Const.RESULT_CODE.NONE);
                 break;
 
             case R.id.btn_positive: // save current data
                 saveBookSeries();
-                finishWithResult(G.RESULT_POSITIVE,
+                finishWithResult(Const.RESULT_CODE.POSITIVE,
                         new Intent().putExtra(
-                                G.RESULT_DATA_KEY_EDIT_SERIES,
-                                G.RESULT_DATA_VALUE_EDIT_SERIES_EDIT));
+                                Const.INTENT_EXTRA.KEY_INT_EDIT_SERIES,
+                                Const.INTENT_EXTRA.VALUE_EDIT_SERIES_EDIT));
                 break;
         }
     }
@@ -184,7 +183,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
 
         String titlePronunciation =getRowContents(R.id.data_detail_row_title_pronunciation);
         String author = getRowContents(R.id.data_detail_row_author);
-        String authodPronunciation =getRowContents(R.id.data_detail_row_author_pronunciation);
+        String authorPronunciation =getRowContents(R.id.data_detail_row_author_pronunciation);
         String magazine = getRowContents(R.id.data_detail_row_magazine);
         String magazinePronunciation =getRowContents(R.id.data_detail_row_magazine_pronunctaion);
         String company = getRowContents(R.id.data_detail_row_company);
@@ -193,11 +192,11 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         mBookSeriesData.setTitle(title);
         mBookSeriesData.setTitlePronunciation(titlePronunciation);
         mBookSeriesData.setAuthor(author);
-        mBookSeriesData.setAuthorPronunciation(authodPronunciation);
-        mBookSeriesData.setAuthor(magazine);
-        mBookSeriesData.setAuthorPronunciation(magazinePronunciation);
-        mBookSeriesData.setAuthor(company);
-        mBookSeriesData.setAuthor(memo);
+        mBookSeriesData.setAuthorPronunciation(authorPronunciation);
+        mBookSeriesData.setMagazine(magazine);
+        mBookSeriesData.setMagazinePronunciation(magazinePronunciation);
+        mBookSeriesData.setCompany(company);
+        mBookSeriesData.setMemo(memo);
 
         mBookSeriesDao.saveSeries(mBookSeriesData);
     }
@@ -213,16 +212,16 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case G.REQUEST_CODE_SIMPLE_CHECK: // Return from book series delete confirm
-                if(resultCode == G.RESULT_POSITIVE) {
+            case Const.REQUEST_CODE.SIMPLE_CHECK: // Return from book series delete confirm
+                if(resultCode == Const.RESULT_CODE.POSITIVE) {
                     // success to delete
                     if(mBookSeriesDao.deleteBookSeries(mBookSeriesData.getSeriesId())) {
                         ToastUtil.show(BookSeriesAddEditDialogActivity.this,
                                 R.string.delete_book_series_done);
-                        finishWithResult(G.RESULT_POSITIVE,
+                        finishWithResult(Const.RESULT_CODE.POSITIVE,
                                 new Intent().putExtra(
-                                        G.RESULT_DATA_KEY_EDIT_SERIES,
-                                        G.RESULT_DATA_VALUE_EDIT_SERIES_DELETE));
+                                        Const.INTENT_EXTRA.KEY_INT_EDIT_SERIES,
+                                        Const.INTENT_EXTRA.VALUE_EDIT_SERIES_DELETE));
                     // fail to delete
                     } else {
                         ToastUtil.show(BookSeriesAddEditDialogActivity.this,
@@ -231,7 +230,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
                 }
                 break;
 
-            case G.REQUEST_CODE_TAGS_EDIT: // Return from tag edit screen
+            case Const.REQUEST_CODE.TAGS_EDIT: // Return from tag edit screen
                 if(data != null) {
                     String tagsStr = data.getStringExtra(TagsEditDialogActivity.KEY_RAW_TAGS);
                     mBookSeriesData.setRawTags(tagsStr);

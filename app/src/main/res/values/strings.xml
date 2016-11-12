@@ -118,4 +118,11 @@
     <string name="search_category_company">出版社名</string>
     <string name="search_category_isbn">ISBN</string>
 
+    <string name="search_mode_all">全て</string>
+    <string name="search_mode_title">タイトル名</string>
+    <string name="search_mode_author">作者名</string>
+    <string name="search_mode_magazine">掲載誌名</string>
+    <string name="search_mode_company">出版社名</string>
+    <string name="search_mode_tag">タグ</string>
+
 </resources>

@@ -16,19 +16,6 @@ import com.tablecloth.bookshelf.data.BookData;
  */
 public abstract class DialogBaseActivity extends BaseActivity implements View.OnClickListener {
 
-    // Key values for Intent extras
-    final protected static String KEY_TITLE_STR_ID = "title";
-    final protected static String KEY_MESSAGE_STR_ID = "message";
-    final protected static String KEY_BTN_POSITIVE_STR_ID = "btn_positive";
-    final protected static String KEY_BTN_NEGATIVE_STR_ID = "btn_negative";
-    final protected static String KEY_DATA_TYPE_STR_ID = "data_type";
-    final protected static String KEY_BOOK_SERIES_ID = "id";
-    final protected static String KEY_RAW_TAGS = "raw_tags";
-
-
-    // Default values for Intent extras
-    final protected static int VALUE_DEFAULT_STR_ID = -1;
-
     // Intent to handle extra data
     private Intent mIntentData;
 

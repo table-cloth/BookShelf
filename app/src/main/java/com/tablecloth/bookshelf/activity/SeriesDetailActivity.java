@@ -27,7 +27,7 @@ import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.BookVolumeDao;
 import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
 import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
-import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
@@ -87,7 +87,7 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
     @NonNull
     public static Intent getIntent(@NonNull Context context, int seriesId) {
         Intent intent = new Intent(context, SeriesDetailActivity.class);
-        intent.putExtra(G.INTENT_SERIES_ID,seriesId);
+        intent.putExtra(KEY_BOOK_SERIES_ID,seriesId);
         return intent;
     }
 
@@ -102,7 +102,7 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
 
         // Init book series id
         final int bookSeriesId = getIntent().getIntExtra(
-                G.INTENT_SERIES_ID, BookData.BOOK_SERIES_ERROR_VALUE);
+                KEY_BOOK_SERIES_ID, BookData.BOOK_SERIES_ERROR_VALUE);
         if(bookSeriesId == BookData.BOOK_SERIES_ERROR_VALUE) {
             ToastUtil.show(SeriesDetailActivity.this, R.string.series_data_error_failed_2_get_data);
             SeriesDetailActivity.this.finish();
@@ -163,7 +163,7 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
                         R.string.edit_book_series_detail,
                         R.string.save,
                         mShowBookSeriesData.getSeriesId());
-                startActivityForResult(editIntent, G.REQUEST_CODE_EDIT_SERIES_DETAIL);
+                startActivityForResult(editIntent, Const.REQUEST_CODE.EDIT_SERIES_DETAIL);
                 break;
 
             case R.id.btn_add: // btn add volume
@@ -209,7 +209,7 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
                         R.string.series_data_confirm_change_book_cover,
                         R.string.yes,
                         R.string.no);
-                startActivityForResult(imageIntent, G.REQUEST_CODE_IMAGE_CHANGE_CONFIRM_1);
+                startActivityForResult(imageIntent, Const.REQUEST_CODE.IMAGE_CHANGE_CONFIRM_1);
                 break;
         }
     }
@@ -316,19 +316,19 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case G.REQUEST_CODE_EDIT_SERIES_DETAIL: // Return from BookSeriesData edit screen
+            case Const.REQUEST_CODE.EDIT_SERIES_DETAIL: // Return from BookSeriesData edit screen
                 if(isResultPositive(resultCode)) {
-                    int resultAction = getIntentExtraInt(data, G.RESULT_DATA_KEY_EDIT_SERIES);
-                    if (G.RESULT_DATA_VALUE_EDIT_SERIES_EDIT == resultAction) {
+                    int resultAction = getIntentExtraInt(data, Const.INTENT_EXTRA.KEY_INT_EDIT_SERIES);
+                    if (Const.INTENT_EXTRA.VALUE_EDIT_SERIES_EDIT == resultAction) {
                         updateShowBookSeriesData(mShowBookSeriesData.getSeriesId());
                         applyBookSeriesData2Layout();
-                    } else if (G.RESULT_DATA_VALUE_EDIT_SERIES_DELETE == resultAction) {
+                    } else if (Const.INTENT_EXTRA.VALUE_EDIT_SERIES_DELETE == resultAction) {
                         SeriesDetailActivity.this.finish();
                     }
                 }
                 break;
 
-            case G.REQUEST_CODE_IMAGE_CHANGE_CONFIRM_1: // Return from book cover image edit dialog (1)
+            case Const.REQUEST_CODE.IMAGE_CHANGE_CONFIRM_1: // Return from book cover image edit dialog (1)
                 if(isResultPositive(resultCode)) {
                 	Intent confirmDialogIntent = SimpleDialogActivity.getIntent(
                             this,
@@ -336,26 +336,26 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
                             R.string.image_select_choose_image_select_method,
                             R.string.image_select_select_from_gallery,
                             R.string.image_select_select_from_camera);
-                    startActivityForResult(confirmDialogIntent, G.REQUEST_CODE_IMAGE_CHANGE_CONFIRM_2);
+                    startActivityForResult(confirmDialogIntent, Const.REQUEST_CODE.IMAGE_CHANGE_CONFIRM_2);
                 }
                 break;
 
-            case G.REQUEST_CODE_IMAGE_CHANGE_CONFIRM_2: // Return from book cover image edit dialog (2)
+            case Const.REQUEST_CODE.IMAGE_CHANGE_CONFIRM_2: // Return from book cover image edit dialog (2)
                 // 1st button (Gallery)
-                if(resultCode == G.RESULT_POSITIVE) {
+                if(resultCode == Const.RESULT_CODE.POSITIVE) {
                 	Intent galleryIntent = new Intent();
                     galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                     galleryIntent.setType("image/*");
-                    startActivityForResult(galleryIntent, G.REQUEST_CODE_IMAGE_GALLERYS);
+                    startActivityForResult(galleryIntent, Const.REQUEST_CODE.IMAGE_GALLERY);
                 // 2nd button (Camera)
-                } else if(resultCode == G.RESULT_NEGATIVE){
+                } else if(resultCode == Const.RESULT_CODE.NEGATIVE){
                 	Intent cameraIntent = new Intent();
                     cameraIntent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(cameraIntent, G.REQUEST_CODE_IMAGE_CAMERA);
+                    startActivityForResult(cameraIntent, Const.REQUEST_CODE.IMAGE_CAMERA);
                 }
                 break;
 
-            case G.REQUEST_CODE_IMAGE_CAMERA: // Return from capture image with camera
+            case Const.REQUEST_CODE.IMAGE_CAMERA: // Return from capture image with camera
             	if(isResultPositive(resultCode)) {
                     Bitmap cameraBitmap = (Bitmap) data.getExtras().get("data");
                     if (cameraBitmap == null) {
@@ -366,7 +366,7 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
                 }
             	break;
 
-            case G.REQUEST_CODE_IMAGE_GALLERYS: // Return from select image from gallery
+            case Const.REQUEST_CODE.IMAGE_GALLERY: // Return from select image from gallery
             	if(isResultPositive(resultCode)) {
                     Bitmap galleryBitmap = loadImageFromGalleryIntent(data);
                     if(galleryBitmap == null) {
