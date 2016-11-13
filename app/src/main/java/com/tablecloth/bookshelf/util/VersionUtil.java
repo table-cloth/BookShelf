@@ -113,7 +113,7 @@ public class VersionUtil {
      * @return
      */
     private int loadInitialVersionCode() {
-        return mPref.load(Const.PREF_KEYS.INIT_VERSION_CODE);
+        return mPref.loadInt(Const.PREF_KEYS.INIT_VERSION_CODE_INT);
     }
 
     /**
@@ -121,14 +121,14 @@ public class VersionUtil {
      * @return
      */
     private int loadLastShownVersionCode() {
-        return mPref.load(Const.PREF_KEYS.VERSION_CODE);
+        return mPref.loadInt(Const.PREF_KEYS.VERSION_CODE_INT);
     }
 
     /**
      * 最後に起動したバージョン情報を保存
      */
     private void updateVersionInfo() {
-        mPref.save(Const.PREF_KEYS.VERSION_CODE, getCurrentVersionCode(mAppContext));
+        mPref.saveInt(Const.PREF_KEYS.VERSION_CODE_INT, getCurrentVersionCode(mAppContext));
     }
 
 

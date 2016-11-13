@@ -92,11 +92,11 @@ public class Util {
     public static void initAdView(@NonNull Activity activity, @NonNull ViewGroup parentView) {
     	// Create ad view
         AdView adView = new AdView(activity);
-        adView.setAdUnitId(Const.AD.AD_UNIT_ID);
+        adView.setAdUnitId(Const.API.AD_UNIT_ID);
         adView.setAdSize(AdSize.BANNER);
         parentView.addView(adView);
 
-        // Send ad request & load
+        // Send ad request & loadInt
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
     }

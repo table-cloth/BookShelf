@@ -70,7 +70,7 @@ public class TagHistoryDao extends DaoBase {
      * Saves tag data
      *
      * @param tag tag
-     * @return is save success
+     * @return is saveInt success
      */
     public boolean saveTag(String tag) {
         boolean isUpdate = isTagRegistered(tag);

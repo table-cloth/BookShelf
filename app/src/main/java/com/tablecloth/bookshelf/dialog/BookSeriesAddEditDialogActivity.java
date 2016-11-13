@@ -72,7 +72,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
      * @param context context
      * @param titleStrId string id for title
      * @param btnPositiveStrId string id for positive button
-     * @param bookSeriesData book series instance to save in this dialog's tmp file
+     * @param bookSeriesData book series instance to saveInt in this dialog's tmp file
      * @return Intent instance
      */
     @NonNull
@@ -153,7 +153,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
                 finishWithResult(Const.RESULT_CODE.NONE);
                 break;
 
-            case R.id.btn_positive: // save current data
+            case R.id.btn_positive: // saveInt current data
                 saveBookSeries();
                 finishWithResult(Const.RESULT_CODE.POSITIVE,
                         new Intent().putExtra(
@@ -169,7 +169,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
     private void saveBookSeries() {
         String title = getRowContents(R.id.data_detail_row_title);
 
-        // fail to save if the title is empty
+        // fail to saveInt if the title is empty
         if(Util.isEmpty(title)) {
             mHandler.post(new Runnable() {
                 @Override
@@ -340,7 +340,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
     }
 
     /**
-     * Re-load tags from BookSeriesData & invalidate
+     * Re-loadInt tags from BookSeriesData & invalidate
      */
     private void updateTagContainer() {
         if(mTagContainer == null) {

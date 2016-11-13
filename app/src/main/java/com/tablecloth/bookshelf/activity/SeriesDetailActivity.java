@@ -11,11 +11,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
+import com.tablecloth.bookshelf.util.PrefUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -58,14 +61,20 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
     private ImageView mBookCoverImageView = null;
     private View mPlusIconInBookCoverView = null;
 
-    private NumberPicker mBookVolumePicker = null;
+    private View mAddVolumeByBunchCheckView = null;
+    private CheckBox mAddVolumeByBunchCheckBox = null;
+    private NumberPicker mBookVolumePickerFrom = null;
+    private View mBookVolumeConjunctionView = null;
+    private NumberPicker mBookVolumePickerTo = null;
 
+    boolean mIsAddVolumeByBunch = true; // set true as default
 
     // BookData related
-//    private final int mShowBookSeriesId;
     private BookSeriesData mShowBookSeriesData = null;
     private BookSeriesDao mBookSeriesDao;
     private BookVolumeDao mBookVolumeDao;
+
+    private PrefUtil mPrefUtil;
 
     /**
      * Get layout ID to show in the activity
@@ -128,16 +137,25 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
         mBookTagViewGroup = (ViewGroup)findViewById(R.id.tag_container);
         mBookCoverImageView = (ImageView) findViewById(R.id.book_cover_image);
         mPlusIconInBookCoverView = findViewById(R.id.plus);
-        mBookVolumePicker = (NumberPicker) findViewById(R.id.number_picker);
 
-        mBookVolumePicker.setMaxValue(200);
-        mBookVolumePicker.setMinValue(0);
-        mBookVolumePicker.setFocusable(true);
-        mBookVolumePicker.setFocusableInTouchMode(true);
+        mAddVolumeByBunchCheckView = findViewById(R.id.add_bunch_volume_touch_view);
+        mAddVolumeByBunchCheckBox = (CheckBox)findViewById(R.id.add_bunch_volume_check_view);
+        mBookVolumePickerFrom = (NumberPicker)findViewById(R.id.number_picker_from);
+        mBookVolumePickerTo = (NumberPicker)findViewById(R.id.number_picker_to);
+        mBookVolumeConjunctionView = findViewById(R.id.number_picker_conjunction);
+
+        mPrefUtil = PrefUtil.getInstance(getApplicationContext());
+        mIsAddVolumeByBunch =
+                Const.PREF_VALUES.BOOK_SERIES_ADD_TYPE_BUNCH == mPrefUtil.loadInt(
+                        Const.PREF_KEYS.BOOK_SERIES_ADD_TYPE_INT,
+                        Const.PREF_VALUES.BOOK_SERIES_ADD_TYPE_DEFAULT);
+
+        initializeAddVolumePicker();
+        updateAddVolumeStyleUI();
+
 
         // Apply book series data to layout
         applyBookSeriesData2Layout();
-
         initializeClickListeners();
 
         // Init ad
@@ -167,39 +185,66 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
                 break;
 
             case R.id.btn_add: // btn add volume
-                int registerVolume = mBookVolumePicker.getValue();
-                // failed to save (volume already registered)
-                if(mShowBookSeriesData.getVolumeList().contains(registerVolume)) {
-                    ToastUtil.show(this,
-                            getString(R.string.series_data_volume_error_already_registered, registerVolume));
-                } else {
-                    // success volume register
-                    if(mBookVolumeDao.saveBookVolume(mShowBookSeriesData.getSeriesId(), registerVolume)) {
-                        mShowBookSeriesData.addVolume(registerVolume);
-                        applyBookSeriesData2Layout();
-                    // fail volume register
-                    } else {
-                        ToastUtil.show(this, getString(R.string.series_data_error_failed_2_update_data));
+                ArrayList<Integer> addVolumes = getSelectedVolumes();
+                ArrayList<Integer> addRegisteredVolumes = mShowBookSeriesData.getVolumeList();
+                boolean newVolumeExists = false; // whether volume not yet registered exists
+                int addedVolumeCount = 0;
+
+                for(int registerVolume : addVolumes) {
+                    if(addRegisteredVolumes.contains(registerVolume)) {
+                        continue;
                     }
+                    newVolumeExists = true;
+                    if(mBookVolumeDao.saveBookVolume(
+                            mShowBookSeriesData.getSeriesId(), registerVolume)) {
+                        mShowBookSeriesData.addVolume(registerVolume);
+                        addedVolumeCount ++;
+                    }
+                }
+
+                // show toast if no volumes were added
+                if(!newVolumeExists) {
+                    ToastUtil.show(this,
+                            getString(R.string.series_data_volume_error_already_registered));
+                } else if(addedVolumeCount <= 0) {
+                    ToastUtil.show(this, getString(R.string.series_data_error_failed_2_update_data));
+
+                // update view
+                } else {
+                    applyBookSeriesData2Layout();
                 }
                 break;
 
             case R.id.btn_delete: // btn delete volume
-                int deleteVolume = mBookVolumePicker.getValue();
-                if(!mShowBookSeriesData.getVolumeList().contains(deleteVolume)) {
-                    ToastUtil.show(this,
-                            getString(R.string.series_data_volume_error_not_registered, deleteVolume));
-                } else {
-                    // success volume delete
-                    if(mBookVolumeDao.deleteBookVolume(mShowBookSeriesData.getSeriesId(), deleteVolume)) {
-                        mShowBookSeriesData.removeVolume(deleteVolume);
-                        applyBookSeriesData2Layout();
-                    // fail volume delete
-                    } else {
-                        ToastUtil.show(this, getString(R.string.series_data_error_failed_2_update_data));
-                    }
+                ArrayList<Integer> deleteVolumes = getSelectedVolumes();
+                ArrayList<Integer> deleteRegisteredVolumes = mShowBookSeriesData.getVolumeList();
+                boolean deleteVolumeExists = false;
+                int deleteVolumeCount = 0;
 
+                for(int deleteVolume : deleteVolumes) {
+                    if(!deleteRegisteredVolumes.contains(deleteVolume)) {
+                        continue;
+                    }
+                    deleteVolumeExists = true;
+                    if(mBookVolumeDao.deleteBookVolume(
+                            mShowBookSeriesData.getSeriesId(), deleteVolume)) {
+                        mShowBookSeriesData.removeVolume(deleteVolume);
+                        deleteVolumeCount ++;
+                    }
                 }
+
+                // show toast if no volumes were deleted
+                if(!deleteVolumeExists) {
+                    ToastUtil.show(this,
+                            getString(R.string.series_data_volume_error_not_registered));
+                } else if(deleteVolumeCount <= 0) {
+                    ToastUtil.show(this, getString(R.string.series_data_error_failed_2_update_data));
+
+                // update view
+                } else {
+                    applyBookSeriesData2Layout();
+                }
+
                 break;
 
             case R.id.book_cover_image: // image view of book series cover
@@ -210,6 +255,15 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
                         R.string.yes,
                         R.string.no);
                 startActivityForResult(imageIntent, Const.REQUEST_CODE.IMAGE_CHANGE_CONFIRM_1);
+                break;
+
+            case R.id.add_bunch_volume_touch_view: // check area view to add volume by bunch
+                mIsAddVolumeByBunch = !mIsAddVolumeByBunch;
+                updateAddVolumeStyleUI();
+                mPrefUtil.saveInt(Const.PREF_KEYS.BOOK_SERIES_ADD_TYPE_INT,
+                        mIsAddVolumeByBunch
+                                ? Const.PREF_VALUES.BOOK_SERIES_ADD_TYPE_BUNCH
+                                : Const.PREF_VALUES.BOOK_SERIES_ADD_TYPE_SINGELE);
                 break;
         }
     }
@@ -225,12 +279,13 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
     	findViewById(R.id.btn_add).setOnClickListener(this); // btn add book volume
     	findViewById(R.id.btn_delete).setOnClickListener(this); // btn delete book volume
     	mBookCoverImageView.setOnClickListener(this); // book cover image view
+        mAddVolumeByBunchCheckView.setOnClickListener(this); // check box to add volume by bunch
     }
 
     /**
      * Load book series data from DB and set to BookSeriesData instance
      *
-     * @param bookSeriesId Book series id to load
+     * @param bookSeriesId Book series id to loadInt
      */
     private void updateShowBookSeriesData(int bookSeriesId) {
         mShowBookSeriesData = mBookSeriesDao.loadBookSeriesData(bookSeriesId);
@@ -455,4 +510,73 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
         findViewById(R.id.plus).setVisibility(View.GONE);
         mBookCoverImageView.setImageBitmap(bitmap);
     }
+
+    /**
+     * Initialize settings for volume picker
+     */
+    private void initializeAddVolumePicker() {
+
+        int maxValue = 200;
+        int minValue = 0;
+        mBookVolumePickerFrom.setMaxValue(maxValue);
+        mBookVolumePickerFrom.setMinValue(minValue);
+        mBookVolumePickerFrom.setFocusable(true);
+        mBookVolumePickerTo.setMaxValue(maxValue);
+        mBookVolumePickerTo.setMinValue(minValue);
+        mBookVolumePickerTo.setFocusable(true);
+
+        mBookVolumePickerFrom.setValue(1); // set default value as 1
+        mBookVolumePickerTo.setValue(1); // set default value as 1
+
+        // Update data, so numbers never become FromVolume > ToVolume
+        mBookVolumePickerFrom.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                if(newVal > mBookVolumePickerTo.getValue()) {
+                    mBookVolumePickerTo.setValue(newVal);
+                }
+            }
+        });
+        mBookVolumePickerTo.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                if(mBookVolumePickerFrom.getValue() > newVal) {
+                    mBookVolumePickerFrom.setValue(newVal);
+                }
+            }
+        });
+    }
+
+    /**
+     * Update volume picker UI, depending on the flag of adding volume by bunch
+     */
+    private void updateAddVolumeStyleUI() {
+        int visibility = mIsAddVolumeByBunch
+                ? View.VISIBLE
+                : View.GONE;
+        mBookVolumeConjunctionView.setVisibility(visibility);
+        mBookVolumePickerTo.setVisibility(visibility);
+
+        mAddVolumeByBunchCheckBox.setChecked(mIsAddVolumeByBunch);
+    }
+
+    /**
+     * Get selected volumes in volume pickers
+     *
+     * @return list of selected volumes
+     */
+    private ArrayList<Integer> getSelectedVolumes() {
+        ArrayList<Integer> selectedVolumes = new ArrayList<>();
+        if(mIsAddVolumeByBunch) {
+            int startValue = mBookVolumePickerFrom.getValue();
+            int endValue = mBookVolumePickerTo.getValue();
+            for(int addValue = startValue; addValue <= endValue ; addValue ++) {
+                selectedVolumes.add(addValue);
+            }
+        } else {
+            selectedVolumes.add(mBookVolumePickerFrom.getValue());
+        }
+        return selectedVolumes;
+    }
+
 }

@@ -61,7 +61,7 @@ public class BookVolumeDao extends BookDaoBase {
      *
      * @param seriesId id for book series. Invalid if < 0.
      * @param bookVolume book volume in series
-     * @return is save success
+     * @return is saveInt success
      */
     public boolean saveBookVolume(int seriesId, int bookVolume) {
         boolean isUpdate = isBookVolumeRegistered(seriesId, bookVolume);

@@ -2,8 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_main"
-    tools:context=".MyActivity">
+    android:background="@drawable/bg_main">
 
     <RelativeLayout
         android:id="@+id/banner"
@@ -13,14 +12,7 @@
         android:background="#44000000"
         android:gravity="center">
 
-        <!--        <include
-                    layout="@layout/banner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-        -->
     </RelativeLayout>
-
-    <!-- header -->
 
     <RelativeLayout
         android:id="@+id/header"
@@ -62,16 +54,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/banner"
-        android:layout_below="@id/header">
+        android:layout_below="@id/header"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        >
 
         <!-- 基本コンテンツ -->
 
         <RelativeLayout
-            android:id="@+id/contens_basic"
+            android:id="@+id/contents_basic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="5dp">
 
             <ImageView
@@ -158,15 +151,13 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <!-- 編集領域 -->
+        <!-- 巻数の編集領域 -->
 
         <RelativeLayout
             android:id="@+id/edit_area"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp">
+            android:layout_alignParentBottom="true">
 
             <TextView
                 android:id="@+id/edit_area_title"
@@ -174,7 +165,8 @@
                 android:layout_height="wrap_content"
                 android:text="所持巻数の情報を編集"
                 android:textSize="@dimen/text_normal"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
+
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -189,6 +181,28 @@
                     android:layout_centerVertical="true"
                     android:orientation="vertical">
 
+                    <LinearLayout
+                        android:id="@+id/add_bunch_volume_touch_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <CheckBox
+                            android:id="@+id/add_bunch_volume_check_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"/>
+
+                        <TextView
+                            android:id="@+id/add_bunch_volume_text_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="一括登録"
+                            android:textSize="@dimen/text_small"/>
+
+                    </LinearLayout>
+
                     <Button
                         android:id="@+id/btn_add"
                         android:layout_width="wrap_content"
@@ -197,6 +211,7 @@
                         android:background="@drawable/btn_positive"
                         android:padding="3dp"
                         android:text="追加"
+                        android:focusable="false"
                         android:textSize="@dimen/text_small" />
 
                     <Button
@@ -207,16 +222,43 @@
                         android:background="@drawable/btn_gray"
                         android:padding="3dp"
                         android:text="削除"
+                        android:focusable="false"
                         android:textSize="@dimen/text_small" />
                 </LinearLayout>
 
-                <NumberPicker
-                    android:id="@+id/number_picker"
+
+                <LinearLayout
+                    android:layout_marginRight="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
                     android:layout_toLeftOf="@id/picker_btn_area"
-                    android:focusable="false" />
+                    android:orientation="horizontal">
+                    <NumberPicker
+                        android:id="@+id/number_picker_from"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"/>
+
+                    <TextView
+                        android:id="@+id/number_picker_conjunction"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_margin="5dp"
+                        android:text="〜"
+                        android:textSize="@dimen/text_large"/>
+
+                    <NumberPicker
+                        android:id="@+id/number_picker_to"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"/>
+
+                </LinearLayout>
             </RelativeLayout>
         </RelativeLayout>
 
@@ -226,7 +268,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@id/edit_area"
-            android:layout_below="@id/contens_basic">
+            android:layout_below="@id/contents_basic">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -362,26 +404,6 @@
                         android:textSize="@dimen/text_normal" />
                 </LinearLayout>
 
-                <!--
-                <LinearLayout
-                    android:id="@+id/tags_area"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:orientation="horizontal" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="タグ：" />
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="#ff00ff" >
-                    </RelativeLayout>
-                </LinearLayout>
-                -->
             </LinearLayout>
         </ScrollView>
     </RelativeLayout>

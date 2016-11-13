@@ -122,8 +122,8 @@ public class BookSeriesDao extends BookDaoBase {
     /**
      * Saves book series data
      *
-     * @param bookSeriesData series data to save.
-     * @return is save success
+     * @param bookSeriesData series data to saveInt.
+     * @return is saveInt success
      */
     public boolean saveSeries(BookSeriesData bookSeriesData) {
         if(bookSeriesData == null) {

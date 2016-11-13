@@ -7,22 +7,31 @@ package com.tablecloth.bookshelf.util;
  */
 public class Const {
 
-    public static class AD {
-        final public static String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
-    }
-
-    public static class PREF_KEYS {
-        final public static String INIT_VERSION_CODE = "INIT_VERSION_CODE"; // 始めにインストールしたバージョン情報
-        final public static String VERSION_CODE = "VERSION_CODE"; // 最後に表示したバージョン情報
-    }
-
     /**
      * API related constants
      */
     public static class API {
-        public static final String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
+        final public static String AD_UNIT_ID = "ca-app-pub-9740549564683244/9984495812";
     }
 
+    /**
+     * Preference keys
+     */
+    public static class PREF_KEYS {
+        final public static String INIT_VERSION_CODE_INT = "INIT_VERSION_CODE_INT"; // first version installed
+        final public static String VERSION_CODE_INT = "VERSION_CODE_INT"; // latest previous version installed
+        final public static String BOOK_SERIES_ADD_TYPE_INT = "BOOK_SERIES_ADD_TYPE"; // book series add type
+    }
+
+    /**
+     * Preference values
+     */
+    public static class PREF_VALUES {
+        final public static int BOOK_SERIES_ADD_TYPE_BUNCH = 0; // add volume "from ~ to"
+        final public static int BOOK_SERIES_ADD_TYPE_SINGELE = 1; // add volume one by one
+        final public static int BOOK_SERIES_ADD_TYPE_DEFAULT = BOOK_SERIES_ADD_TYPE_BUNCH;
+    }
+    
     /**
      * Activity request code related constants
      */
