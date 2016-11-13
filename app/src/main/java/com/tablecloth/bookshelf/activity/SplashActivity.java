@@ -3,8 +3,10 @@ package com.tablecloth.bookshelf.activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.crashlytics.android.Crashlytics;
 import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.util.Const;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Splash screen shown right after boot
@@ -31,6 +33,8 @@ public class SplashActivity extends BaseActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Fabric.with(this, new Crashlytics());
 
         // Do NOT check version updates in splash screen
         doCheckVersionUpdates =false;
