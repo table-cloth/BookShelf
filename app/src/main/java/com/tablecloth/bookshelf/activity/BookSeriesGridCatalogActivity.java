@@ -47,4 +47,14 @@ public class BookSeriesGridCatalogActivity extends BookSeriesCatalogBaseActivity
     protected boolean isGridCatalog() {
         return true;
     }
+
+    /**
+     * Get book series catalog view
+     *
+     * @return BookSeries catalog view
+     */
+    @Override
+    protected View getBookSeriesCatalogView() {
+        return findViewById(R.id.grid_view);
+    }
 }

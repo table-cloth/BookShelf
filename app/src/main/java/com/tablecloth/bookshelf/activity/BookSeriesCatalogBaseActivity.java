@@ -110,6 +110,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
 
         // book catalog activity always starts with View Mode
         switchMode(Const.VIEW_MODE.VIEW);
+        refreshData();
 
         // initialize Ad
         Util.initAdView(this, (ViewGroup) findViewById(R.id.banner));
@@ -242,6 +243,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         if (keyCode == KeyEvent.KEYCODE_BACK
                 && mShowMode != Const.VIEW_MODE.VIEW) {
             switchMode(Const.VIEW_MODE.VIEW);
+            refreshData();
             return false;
         }
         return super.onKeyDown(keyCode, event);
@@ -662,4 +664,10 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
      */
     abstract protected boolean isGridCatalog();
 
+    /**
+     * Get book series catalog view
+     *
+     * @return BookSeries catalog view
+     */
+    abstract protected View getBookSeriesCatalogView();
 }

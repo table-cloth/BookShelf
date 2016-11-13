@@ -1,6 +1,7 @@
 package com.tablecloth.bookshelf.activity;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ListView;
 
 import com.tablecloth.bookshelf.R;
@@ -42,5 +43,15 @@ public class BookSeriesListCatalogActivity extends BookSeriesCatalogBaseActivity
     @Override
     protected boolean isGridCatalog() {
         return false;
+    }
+
+    /**
+     * Get book series catalog view
+     *
+     * @return BookSeries catalog view
+     */
+    @Override
+    protected View getBookSeriesCatalogView() {
+        return findViewById(R.id.list_view);
     }
 }
