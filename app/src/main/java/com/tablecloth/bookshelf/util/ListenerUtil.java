@@ -1,14 +1,30 @@
 package com.tablecloth.bookshelf.util;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
 /**
- * Created by shnomura on 2015/03/14.
+ * Util class for custom listner
+ *
+ * Created by Minami on 2015/03/14.
  */
 public class ListenerUtil {
 
+    /**
+     * Listener for loading bitmap
+     */
     public interface LoadBitmapListener {
-        public void onFinish(Bitmap bitmap);
+
+        /**
+         * Called on loading bitmap finished successfully
+         *
+         * @param bitmap bitmap
+         */
+        public void onFinish(@NonNull Bitmap bitmap);
+
+        /**
+         * Called when loading finished with error
+         */
         public void onError();
     }
 }

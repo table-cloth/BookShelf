@@ -7,7 +7,10 @@ import com.google.android.gms.analytics.Tracker;
 import com.tablecloth.bookshelf.util.Util;
 
 /**
- * Created by shnomura on 2015/02/19.
+ * Application class of BookShelf
+ * Initialize tracking info here
+ *
+ * Created by Minami on 2015/02/19.
  */
 public class BookShelfApplication extends Application {
     Tracker mGoogleAnalyticsTracker;

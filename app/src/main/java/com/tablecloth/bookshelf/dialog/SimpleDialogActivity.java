@@ -3,58 +3,86 @@ package com.tablecloth.bookshelf.dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
-import android.widget.TextView;
 
-import com.tablecloth.bookshelf.util.G;
+import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.R;
 
 /**
- * タイトル・メッセージ・YES/NOボタンの要素を持ったダイアログ拡張クラス
- * Created by shnomura on 2014/08/17.
+ * Dialog activity for simple dialog with 2 buttons
+ * Will only handle simple events of Positive & Negative
+ *
+ * Created by Minami on 2014/08/17.
  */
 public class SimpleDialogActivity extends DialogBaseActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        Intent intent = getIntent();
-
-        // テキスト設定
-        ((TextView)findViewById(R.id.title)).setText(intent.getStringExtra(KEY_TITLE));
-        ((TextView)findViewById(R.id.message)).setText(intent.getStringExtra(KEY_MESSAGE));
-        ((TextView)findViewById(R.id.btn_positive)).setText(intent.getStringExtra(KEY_BTN_POSITIVE));
-        ((TextView)findViewById(R.id.btn_negative)).setText(intent.getStringExtra(KEY_BTN_NEGATIVE));
-
-        ((TextView)findViewById(R.id.btn_positive)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SimpleDialogActivity.this.setResult(G.RESULT_POSITIVE);
-                SimpleDialogActivity.this.finish();
-            }
-        });
-        ((TextView)findViewById(R.id.btn_negative)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SimpleDialogActivity.this.setResult(G.RESULT_NEGATIVE);
-                SimpleDialogActivity.this.finish();
-            }
-        });
-    }
-
+    /**
+     * Get layout ID to show in the activity
+     *
+     * @return layout ID
+     */
     @Override
     protected int getContentViewID() {
         return R.layout.activity_simple_dialog;
     }
 
-    public static Intent getIntent(Context context, String title, String message, String btnPositive, String btnNegative) {
+    /**
+     * Get intent with given extra data
+     *
+     * @param context context
+     * @param titleStrId string id for title
+     * @param messageStrId string id for message content
+     * @param btnPositiveStrId string id for positive button
+     * @param btnNegativeStrId string id for negative button
+     * @return Intent instance
+     */
+    @NonNull
+    public static Intent getIntent(Context context, int titleStrId, int messageStrId, int btnPositiveStrId, int btnNegativeStrId) {
         Intent intent = new Intent(context, SimpleDialogActivity.class);
 
-        intent.putExtra(KEY_TITLE, title);
-        intent.putExtra(KEY_MESSAGE, message);
-        intent.putExtra(KEY_BTN_POSITIVE, btnPositive);
-        intent.putExtra(KEY_BTN_NEGATIVE, btnNegative);
+        intent.putExtra(KEY_TITLE_STR_ID, titleStrId);
+        intent.putExtra(KEY_MESSAGE_STR_ID, messageStrId);
+        intent.putExtra(KEY_BTN_POSITIVE_STR_ID, btnPositiveStrId);
+        intent.putExtra(KEY_BTN_NEGATIVE_STR_ID, btnNegativeStrId);
 
         return intent;
+    }
+
+    /**
+     * OnCreate
+     *
+     * @param savedInstanceState savedInstanceState
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setTitleText(R.id.title);
+        setMessageText(R.id.message);
+        setBtnPositiveText(R.id.btn_positive);
+        setBtnNegativeText(R.id.btn_negative);
+
+        findViewById(R.id.btn_positive).setOnClickListener(this);
+        findViewById(R.id.btn_negative).setOnClickListener(this);
+    }
+
+    /**
+     * Handles all click event within this Activity
+     *
+     * @param view Clicked view
+     */
+    @Override
+    public void onClick(View view) {
+        int viewId = view.getId();
+        switch (viewId) {
+            case R.id.btn_positive: // Positive event
+                finishWithResult(Const.RESULT_CODE.POSITIVE);
+                break;
+
+            case R.id.btn_negative: // Negative event
+                finishWithResult(Const.RESULT_CODE.NEGATIVE);
+                break;
+        }
     }
 }

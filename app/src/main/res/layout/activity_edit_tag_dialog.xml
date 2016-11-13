@@ -135,6 +135,9 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:textColor="@color/black"
+                        android:maxLines="1"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
                         android:textSize="14sp" />
 
                 </RelativeLayout>
@@ -168,7 +171,7 @@
                             android:paddingRight="10dp"
                             android:paddingTop="15dp">
 
-                            <com.tablecloth.bookshelf.view.CurrentTagRelativeLayout
+                            <com.tablecloth.bookshelf.view.TagContainerLayout
                                 android:id="@+id/tag_container"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" />
@@ -214,7 +217,7 @@
                             android:paddingRight="10dp"
                             android:paddingTop="15dp">
 
-                        <com.tablecloth.bookshelf.view.RecentTagRelativeLayout
+                        <com.tablecloth.bookshelf.view.TagContainerLayout
                             android:id="@+id/tag_recent_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
