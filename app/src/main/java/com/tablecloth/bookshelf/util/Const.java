@@ -23,17 +23,15 @@ public class Const {
         final public static String BOOK_SERIES_ADD_TYPE_INT = "BOOK_SERIES_ADD_TYPE"; // book series add type
     }
 
+    /**
+     * Preference values
+     */
     public static class PREF_VALUES {
         final public static int BOOK_SERIES_ADD_TYPE_BUNCH = 0; // add volume "from ~ to"
         final public static int BOOK_SERIES_ADD_TYPE_SINGELE = 1; // add volume one by one
         final public static int BOOK_SERIES_ADD_TYPE_DEFAULT = BOOK_SERIES_ADD_TYPE_BUNCH;
     }
-
-
-    /**
-     * Preferenve values
-     */
-
+    
     /**
      * Activity request code related constants
      */
