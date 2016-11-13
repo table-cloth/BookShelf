@@ -1,6 +1,7 @@
 package com.tablecloth.bookshelf.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
@@ -82,8 +83,15 @@ public abstract class BaseActivity extends Activity {
         // Check for version updates
         // Show update dialog if needed
         if(doCheckVersionUpdates) {
-            VersionUtil versionUtil = new VersionUtil(this);
-            versionUtil.showUpdateDialog();
+            Context appContext = getApplicationContext();
+            VersionUtil versionUtil =VersionUtil.getInstance(appContext);
+            if(versionUtil.isVersionUpdated(appContext)) {
+                Intent updateDialogIntent = versionUtil.getUpdateDialogIntent(appContext);
+                if(updateDialogIntent != null) {
+                    startActivityForResult(updateDialogIntent, Const.REQUEST_CODE.UPDATE_DIALOG);
+                    versionUtil.updateVersionInfo(appContext);
+                }
+            }
         }
     }
 
