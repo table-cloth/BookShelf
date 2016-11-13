@@ -39,9 +39,9 @@ public class PrefUtil {
     /**
      * Save given value
      *
-     * @param value value to save
+     * @param value value to saveInt
      */
-    public boolean save(@NonNull String key, int value) {
+    public boolean saveInt(@NonNull String key, int value) {
         return mPref.edit().putInt(key, value).commit();
     }
 
@@ -51,7 +51,18 @@ public class PrefUtil {
      * @param key key to load
      * @return value related with key, or default value (-1)
      */
-    public int load(String key) {
+    public int loadInt(String key) {
         return mPref.getInt(key, DEF_INT);
+    }
+
+    /**
+     * Load value with given key
+     *
+     * @param key key to load
+     * @param defValue default value
+     * @return value related with key, or default value
+     */
+    public int loadInt(String key, int defValue) {
+        return mPref.getInt(key, defValue);
     }
 }

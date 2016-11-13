@@ -33,7 +33,7 @@ public class SettingsDao extends DaoBase {
      * @return isSaveSuccess
      */
     public boolean save(@NonNull String key, @NonNull String value) {
-        // Set save contents
+        // Set saveInt contents
         ContentValues cv = new ContentValues();
         cv.put(Const.DB.Settings.SettingsTable.KEY, key);
         cv.put(Const.DB.Settings.SettingsTable.VALUE, value);
@@ -55,7 +55,7 @@ public class SettingsDao extends DaoBase {
     /**
      * Load setting with given key
      *
-     * @param key Key for setting to load
+     * @param key Key for setting to loadInt
      * @param defValue Default value to be used if setting with given key is not registered
      * @return Value paired with given key, or defValue
      */

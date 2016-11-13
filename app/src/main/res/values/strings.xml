@@ -60,8 +60,8 @@
     <string name="series_data_volume_symbol">巻</string>
     <string name="series_data_volume_conjunction_symbol">〜</string>
     <string name="series_data_volume_separator_symbol">、</string>
-    <string name="series_data_volume_error_already_registered">%1$d巻は既に所持しています</string>
-    <string name="series_data_volume_error_not_registered">%1$d巻は所持していません</string>
+    <string name="series_data_volume_error_already_registered">既に所持している巻数です</string>
+    <string name="series_data_volume_error_not_registered">所持していない巻数です</string>
 
     <string name="series_data_error_failed_2_get_data">本の情報の取得に失敗しました</string>
     <string name="series_data_error_failed_2_update_data">本の情報の更新に失敗しました</string>

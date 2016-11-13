@@ -191,7 +191,7 @@ public class TagsEditDialogActivity extends DialogBaseActivity {
      * Update recent tags container
      */
     private void updateRecentTags() {
-        // for recent tags, re-load all from history
+        // for recent tags, re-loadInt all from history
         ArrayList<String> tagsLog = mTagHistoryDao.loadAllTags();
 
         updateTagContainer(

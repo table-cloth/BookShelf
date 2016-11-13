@@ -152,7 +152,7 @@ public class ImageUtil {
      * Set image cache with given seriesId
      *
      * @param seriesId id for book series. Invalid if < 0.
-     * @param image bitmap image to save
+     * @param image bitmap image to saveInt
      */
     public static void setImageCache(int seriesId, @NonNull Bitmap image) {
         if(mImageCache == null) {

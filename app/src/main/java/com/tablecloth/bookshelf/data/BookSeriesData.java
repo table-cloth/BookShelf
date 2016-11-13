@@ -408,7 +408,7 @@ public class BookSeriesData extends BookData {
     /**
      * Load bitmap image
      * Uses cache if available
-     * If failed to load image from file path, it will re-try loading from url
+     * If failed to loadInt image from file path, it will re-try loading from url
      *
      * @param handler handler
      * @param activity activity
@@ -441,7 +441,7 @@ public class BookSeriesData extends BookData {
 
             @Override
             public void onError() {
-                // If failed to load image from file path, re-try loading image from url
+                // If failed to loadInt image from file path, re-try loading image from url
                 getImageByUrl(new ListenerUtil.LoadBitmapListener() {
                     @Override
                     public void onFinish(@NonNull final Bitmap bitmap) {
@@ -573,7 +573,7 @@ public class BookSeriesData extends BookData {
                     default:
                         break;
                 }
-                // save cache
+                // saveInt cache
                 ImageUtil.setImageCache(mSeriesId, bitmap);
                 listener.onFinish(bitmap);
                 return;
