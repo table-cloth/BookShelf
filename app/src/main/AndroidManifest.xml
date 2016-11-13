@@ -68,6 +68,9 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CustomDialog"
             />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="376f094212a8bcbdb9e0063dfe638b107f6c4ce6" />
     </application>
 
 </manifest>
