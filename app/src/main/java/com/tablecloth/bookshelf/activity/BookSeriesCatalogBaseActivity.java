@@ -31,10 +31,12 @@ import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
+import com.tablecloth.bookshelf.util.HiraganaUtil;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
+import com.tablecloth.bookshelf.util.SortUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -114,6 +116,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
 
         // initialize Ad
         Util.initAdView(this, (ViewGroup) findViewById(R.id.banner));
+
+        HiraganaUtil.post();
     }
 
     /**
@@ -161,6 +165,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
 
             case Const.VIEW_MODE.SEARCH_DB:
                 mBookSeriesDataList = mBookSeriesDao.loadBookSeriesDataList(mSearchMode, mSearchContent);
+                SortUtil.sort(mBookSeriesDataList, 0);
                 break;
 
             case Const.VIEW_MODE.SEARCH_API:
@@ -170,6 +175,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
             case Const.VIEW_MODE.VIEW: // default view mode
             default:
                 mBookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
+                SortUtil.sort(mBookSeriesDataList, 0);
                 break;
         }
 

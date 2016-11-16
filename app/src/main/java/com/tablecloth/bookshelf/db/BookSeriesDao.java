@@ -200,6 +200,9 @@ public class BookSeriesDao extends BookDaoBase {
         data.setInitUpdateUnix(getLongFromCursor(cursor, Const.DB.BookSeriesTable.INIT_UPDATE_UNIX));
         data.setLastUpdateUnix(getLongFromCursor(cursor, Const.DB.BookSeriesTable.LAST_UPDATE_UNIX));
 
+        // TODO delete this
+        Util.getKanaText(data.getTitle());
+
         return data;
     }
 
