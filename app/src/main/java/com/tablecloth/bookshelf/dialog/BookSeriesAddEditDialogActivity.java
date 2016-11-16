@@ -311,7 +311,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         // Memo
         setRowContents(R.id.data_detail_row_memo,
                 R.string.book_series_data_memo,
-                bookSeriesData.getCompanyPronunciation());
+                bookSeriesData.getMemo());
     }
 
     /**

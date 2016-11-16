@@ -31,6 +31,13 @@ public class Const {
         final public static int BOOK_SERIES_ADD_TYPE_SINGELE = 1; // add volume one by one
         final public static int BOOK_SERIES_ADD_TYPE_DEFAULT = BOOK_SERIES_ADD_TYPE_BUNCH;
     }
+
+    public static class SORT {
+        final public static int TYPE_TITLE = 0;
+        final public static int TYPE_AUTHOR = 1;
+        final public static int TYPE_MAGAZINE = 2;
+        final public static int TYPE_COMPANY = 3;
+    }
     
     /**
      * Activity request code related constants
