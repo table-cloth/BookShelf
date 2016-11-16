@@ -6,6 +6,8 @@ import android.os.Bundle;
 import com.crashlytics.android.Crashlytics;
 import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.util.Const;
+import com.tablecloth.bookshelf.util.Util;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -34,7 +36,9 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Fabric.with(this, new Crashlytics());
+        if(!Util.isDebugMode(this)) {
+            Fabric.with(this, new Crashlytics());
+        }
 
         // Do NOT check version updates in splash screen
         doCheckVersionUpdates =false;
