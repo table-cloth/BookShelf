@@ -11,10 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Util class for general fuctions
@@ -128,51 +125,5 @@ public class Util {
         return (int) ((float)dp * density + 0.5f);
     }
 
-
-    public static void getKanaText(String text) {
-
-//        List<String> result = new ArrayList<String>();
-//
-//        JapaneseAnalyzer analyzer = new JapaneseAnalyzer();
-//
-//        try {
-//            TokenStream stream = analyzer.tokenStream(null, new StringReader(text));
-//            stream.reset();
-//            while (stream.incrementToken()) {
-//                result.add(stream.getAttribute(CharTermAttribute.class).toString());
-//            }
-//        } catch (IOException e) {
-//            // not thrown b/c we're using a string reader...
-//            throw new RuntimeException(e);
-//        }
-//
-//        int a = 0;
-//
-//        Tokenizer tokenizer = new Tokenizer.Builder().build();
-//        List<Token> tokenList = tokenizer.tokenize(text);
-//
-//        for(Token token : tokenList) {
-//            String pronounce = token.getPronunciation();
-//            String tex = token.getReading();
-//            String allFeatures = token.getAllFeatures();
-//            String[] allFeatureList = token.getAllFeaturesArray();
-//            int a = 0;
-//        }
-//
-//        StringBuilder sb = new StringBuilder(256);
-//        try (JapaneseTokenizer tokenizer = new JapaneseTokenizer(null, false, JapaneseTokenizer.Mode.NORMAL)) {
-//            tokenizer.setReader(new StringReader(kanjiText));
-//            ReadingAttribute readingAttribute = tokenizer.addAttribute(ReadingAttribute.class);
-//            CharTermAttribute charTermAttribute = tokenizer.addAttribute(CharTermAttribute.class);
-//            tokenizer.reset();
-//            while (tokenizer.incrementToken()) {
-//                String kana = readingAttribute.getReading();
-//                if (kana == null) {
-//                    kana = charTermAttribute.toString();
-//                }
-//                sb.append(kana);
-//            }
-//        }
-    }
 
 }
