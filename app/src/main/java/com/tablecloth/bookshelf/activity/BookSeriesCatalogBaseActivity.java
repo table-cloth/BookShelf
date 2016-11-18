@@ -27,18 +27,16 @@ import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SettingsDao;
-import com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity;
 import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity;
 import com.tablecloth.bookshelf.http.HttpPostHandler;
-import com.tablecloth.bookshelf.http.HttpPostTask;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
-import com.tablecloth.bookshelf.util.HiraganaUtil;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
+import com.tablecloth.bookshelf.util.GooTextConverter;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -391,27 +389,36 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         int viewId = view.getId();
         switch (viewId) {
             case R.id.add_button: // Add book series
+                //        HttpPostTask httpPostTask = new HttpPostTask(
+//                this,
+//                "https://labs.goo.ne.jp/api/hiragana",
+//                new HttpPostHandler() {
+//                    @Override
+//                    public void onPostSuccess(String response) {
+//                        Log.d("Response", "SUCCESS : " + response);
+//                    }
+//
+//                    @Override
+//                    public void onPostFail(String response) {
+//                        Log.d("Response", "FAIL : " + response);
+//                    }
+//                });
 
-//                HiraganaUtil.post();
-                HttpPostTask httpPostTask = new HttpPostTask(
+                GooTextConverter.convert2Katakana(
                         this,
-                        "https://labs.goo.ne.jp/api/hiragana",
+                        "僕らの七日間戦争・そして〜伝説へ＝",
                         new HttpPostHandler() {
                             @Override
                             public void onPostSuccess(String response) {
-                                Log.d("Response", "SUCCESS : " + response);
+                                String converted = GooTextConverter.getConvertedText(response);
+                                Log.d("Response", "SUCCESS : " + converted);
                             }
 
                             @Override
                             public void onPostFail(String response) {
-                                Log.d("Response", "FAIL : " + response);
+                                Log.d("Response", "ERROR : " + response);
                             }
                         });
-                httpPostTask.addPostHeader("Content-type", "application/json");
-                httpPostTask.addPostParam("app_id", getString(R.string.goo_hiragana));
-                httpPostTask.addPostParam("sentence", "僕らの七日間戦争");
-                httpPostTask.addPostParam("output_type", "katakana");
-                httpPostTask.execute();
 
 //                startActivityForResult(
 //                        BookSeriesSelectAddTypeDialogActivity.getIntent(
