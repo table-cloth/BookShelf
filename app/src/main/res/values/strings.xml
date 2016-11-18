@@ -7,6 +7,13 @@
 
     <string name="referrer_update_dialog">update_dialog</string>
 
+    <string name="http_result_sc_not_found">404 Not Found</string>
+    <string name="http_result_sc_error_default">Network Error</string>
+    <string name="http_result_sc_error_invalid_url">Invalid URL</string>
+    <string name="http_result_sc_error_invalid_encode">Encode Error</string>
+    <string name="http_result_sc_error_invalid_protocol">Protocol Error</string>
+    <string name="http_result_sc_error_invalid_io">IO Error</string>
+
     <string name="email_inquiry_line1_title">＊＊お問い合わせ情報＊＊\n</string>
     <string name="email_inquiry_line2_id">お問い合わせID：%1$s\n</string>
     <string name="email_inquiry_line3_app_version">アプリバージョン：%1$s\n</string>

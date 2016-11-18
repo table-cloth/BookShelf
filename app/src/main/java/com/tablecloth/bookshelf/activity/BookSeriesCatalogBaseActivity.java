@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +30,11 @@ import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity;
 import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity;
+import com.tablecloth.bookshelf.http.HttpPostHandler;
+import com.tablecloth.bookshelf.http.HttpPostTask;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
+import com.tablecloth.bookshelf.util.HiraganaUtil;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
@@ -387,15 +391,37 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         int viewId = view.getId();
         switch (viewId) {
             case R.id.add_button: // Add book series
-                startActivityForResult(
-                        BookSeriesSelectAddTypeDialogActivity.getIntent(
-                                this,
-                                R.string.series_data_add_select_how_short,
-                                R.string.series_data_add_select_how_long,
-                                R.string.decide,
-                                R.string.cancel),
-                        Const.REQUEST_CODE.SELECT_ADD_SERIES_TYPE);
-                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
+
+//                HiraganaUtil.post();
+                HttpPostTask httpPostTask = new HttpPostTask(
+                        this,
+                        "https://labs.goo.ne.jp/api/hiragana",
+                        new HttpPostHandler() {
+                            @Override
+                            public void onPostSuccess(String response) {
+                                Log.d("Response", "SUCCESS : " + response);
+                            }
+
+                            @Override
+                            public void onPostFail(String response) {
+                                Log.d("Response", "FAIL : " + response);
+                            }
+                        });
+                httpPostTask.addPostHeader("Content-type", "application/json");
+                httpPostTask.addPostParam("app_id", getString(R.string.goo_hiragana));
+                httpPostTask.addPostParam("sentence", "僕らの七日間戦争");
+                httpPostTask.addPostParam("output_type", "katakana");
+                httpPostTask.execute();
+
+//                startActivityForResult(
+//                        BookSeriesSelectAddTypeDialogActivity.getIntent(
+//                                this,
+//                                R.string.series_data_add_select_how_short,
+//                                R.string.series_data_add_select_how_long,
+//                                R.string.decide,
+//                                R.string.cancel),
+//                        Const.REQUEST_CODE.SELECT_ADD_SERIES_TYPE);
+//                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
                 break;
 
             case R.id.btn_search: // Search book series registered
