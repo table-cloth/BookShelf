@@ -64,10 +64,17 @@
     <string name="rakuten_api_name_all">BooksTotal</string>
 
     <string name="settings_key_view_type_grid">表示形式</string>
-    <string name="settings_value_grid">グリッド形式で作品一覧を表示</string>
-    <string name="settings_value_list">リスト形式で作品一覧を表示</string>
+    <string name="settings_value_view_type_grid">グリッド形式で作品一覧を表示</string>
+    <string name="settings_value_view_type_list">リスト形式で作品一覧を表示</string>
     <string name="inquiry_subject">【お問い合わせ】本棚管理</string>
     <string name="error_no_mailer">お問い合わせを送信できるアプリが発見できません。メーラーアプリなどをインストールしてください。</string>
+
+    <string name="settings_key_manage_book_series">作品管理</string>
+    <string name="settings_value_manage_pronunciation">作品の読みを一括登録</string>
+    <string name="updating_pronunciation_data">作品の読み仮名を更新しています</string>
+    <string name="updating_pronunciation_data_finished">作品の読み仮名の更新が完了しました</string>
+    <string name="error_no_book_series_registered">作品が登録されていません</string>
+
 
     <string name="series_data_no_volume">所持巻なし</string>
     <string name="series_data_volume_symbol">巻</string>

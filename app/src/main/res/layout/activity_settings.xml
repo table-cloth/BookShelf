@@ -52,18 +52,43 @@
                     android:layout_height="50dp"
                     android:background="@drawable/settings_column">
 
-                    <!--<TextView-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:text="ご意見・ご要望はこちら"-->
-                        <!--android:layout_marginLeft="10dp"-->
-                        <!--android:textColor="@color/black"-->
-                        <!--android:textSize="@dimen/text_normal" />-->
-
                     <Spinner
                         android:id="@+id/settings_view_type_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- 作品管理 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/settings_key_manage_book_series"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:id="@+id/settings_manage_book_series_pronunciation"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/settings_column">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_value_manage_pronunciation"
+                        android:layout_marginLeft="10dp"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_large" />
+
                 </RelativeLayout>
             </LinearLayout>
 

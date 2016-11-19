@@ -390,30 +390,15 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         int viewId = view.getId();
         switch (viewId) {
             case R.id.add_button: // Add book series
-                ArrayList<BookSeriesData> seriesList = mBookSeriesDao.loadAllBookSeriesDataList();
-                if(seriesList != null) {
-                    for (final BookSeriesData seriesData : seriesList) {
-                        seriesData.updateAllPronunciationTextData(new ListenerUtil.OnFinishListener() {
-                            @Override
-                            public void onFinish() {
-                                mBookSeriesDao.saveSeries(seriesData);
-                                Log.d("DONE", "Title = " + seriesData.getTitle());
-                            }
-                        });
-                    }
-                } else {
-                    Log.d("ERRROR", "Empty LIST");
-                }
-
-//                startActivityForResult(
-//                        BookSeriesSelectAddTypeDialogActivity.getIntent(
-//                                this,
-//                                R.string.series_data_add_select_how_short,
-//                                R.string.series_data_add_select_how_long,
-//                                R.string.decide,
-//                                R.string.cancel),
-//                        Const.REQUEST_CODE.SELECT_ADD_SERIES_TYPE);
-//                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
+                startActivityForResult(
+                        BookSeriesSelectAddTypeDialogActivity.getIntent(
+                                this,
+                                R.string.series_data_add_select_how_short,
+                                R.string.series_data_add_select_how_long,
+                                R.string.decide,
+                                R.string.cancel),
+                        Const.REQUEST_CODE.SELECT_ADD_SERIES_TYPE);
+                sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_ADD_SERIES_BTN);
                 break;
 
             case R.id.btn_search: // Search book series registered

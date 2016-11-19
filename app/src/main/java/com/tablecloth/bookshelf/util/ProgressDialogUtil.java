@@ -14,7 +14,9 @@ import android.support.annotation.Nullable;
  */
 public class ProgressDialogUtil {
 
-    final private ProgressDialog mProgressDialog;
+    private final ProgressDialog mProgressDialog;
+    private static final int NO_PROGRESS = -1;
+    private int mCurrentProgress = 0;
 
     /**
      * Calls constructor and gets instance of ProgressDialogUtil
@@ -43,8 +45,12 @@ public class ProgressDialogUtil {
      * @param message Message to show in progress dialog
      * @param listener OnDismissListener instance
      */
-    public void show(Handler handler, @Nullable String message, @Nullable DialogInterface.OnDismissListener listener) {
-        show(handler, message, listener, ProgressDialog.STYLE_SPINNER);
+    public void show(
+            Handler handler,
+            @Nullable String message,
+            @Nullable DialogInterface.OnDismissListener listener) {
+
+        show(handler, message, listener, ProgressDialog.STYLE_SPINNER, NO_PROGRESS);
     }
 
     /**
@@ -56,7 +62,33 @@ public class ProgressDialogUtil {
      * @param listener OnDismissListener instance
      * @param progressDialogStyle Style of progress dialog. Set ProgresDialog.xxx
      */
-    public void show(Handler handler, @Nullable final String message, @Nullable final DialogInterface.OnDismissListener listener, final int progressDialogStyle) {
+    public void show(
+            Handler handler,
+            @Nullable final String message,
+            @Nullable final DialogInterface.OnDismissListener listener,
+            final int progressDialogStyle) {
+
+        show(handler, message, listener, progressDialogStyle, NO_PROGRESS);
+    }
+
+    public void show(
+            Handler handler,
+            @Nullable final String message,
+            @Nullable final DialogInterface.OnDismissListener listener,
+            final int progressDialogStyle,
+            final int maxProgress) {
+
+        show(handler, message, listener, progressDialogStyle, NO_PROGRESS, null);
+    }
+
+    public void show(
+            Handler handler,
+            @Nullable final String message,
+            @Nullable final DialogInterface.OnDismissListener dissmissListener,
+            final int progressDialogStyle,
+            final int maxProgress,
+            @Nullable final ListenerUtil.OnFinishListener onShowFinishListener) {
+
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -66,15 +98,24 @@ public class ProgressDialogUtil {
                 // init progress dialog
                 mProgressDialog.setCancelable(false);
                 mProgressDialog.setProgressStyle(progressDialogStyle);
+                if(maxProgress != NO_PROGRESS) {
+                    mProgressDialog.setMax(maxProgress);
+                    mProgressDialog.setProgress(0);
+                }
                 mProgressDialog.setMessage(Util.isEmpty(message)
                         ? "" // set empty text if message is null
                         : message);
-                mProgressDialog.setOnDismissListener(listener); // listener may be null
+                mProgressDialog.setOnDismissListener(dissmissListener); // listener may be null
 
                 // show dialog
                 mProgressDialog.show();
+
+                if(onShowFinishListener != null) {
+                    onShowFinishListener.onFinish();
+                }
             }
         });
+
     }
 
     /**
@@ -82,5 +123,39 @@ public class ProgressDialogUtil {
      */
     public void dismiss() {
         if(mProgressDialog.isShowing()) mProgressDialog.dismiss();
+    }
+
+    /**
+     * Set max progress
+     */
+    public void setMaxProgress(Handler handler, final int maxProgress) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mProgressDialog.setMax(maxProgress);
+            }
+        });
+    }
+
+    /**
+     * Set current progress
+     */
+    public void setProgress(Handler handler, int progress) {
+        mCurrentProgress = progress;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mProgressDialog.setProgress(mCurrentProgress);
+            }
+        });
+    }
+
+    /**
+     * Get current progress
+     *
+     * @return Current progress
+     */
+    public int getProgress() {
+        return mCurrentProgress;
     }
 }

@@ -1,7 +1,9 @@
 package com.tablecloth.bookshelf.activity;
 
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -9,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,13 +19,19 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.data.BookSeriesData;
+import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
+import com.tablecloth.bookshelf.util.ListenerUtil;
+import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Setting Screen to setup all kind of user / application settings
@@ -32,6 +41,8 @@ import java.security.MessageDigest;
 public class SettingsActivity extends BaseActivity {
 
     private SettingsDao mSettingsDao;
+    private BookSeriesDao mBookSeriesDao;
+    private Context mContext;
 
     /**
      * Get Intent instance to activate this activity
@@ -62,14 +73,18 @@ public class SettingsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mContext = this;
+
         // init dao
         mSettingsDao = new SettingsDao(this);
+        mBookSeriesDao = new BookSeriesDao(this);
 
         // init ad
         Util.initAdView(this, (ViewGroup) findViewById(R.id.banner));
 
         // init settings UI
         initCatalogShowTypeSettingUI();
+        initBookSeriesManagementUI();
 
         // Init back button
         findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
@@ -97,13 +112,65 @@ public class SettingsActivity extends BaseActivity {
     }
 
     /**
-     * Initlaize SpinnerView & Adapter for ShowType Setting UI
+     * Initialize UIs related to book management category
+     */
+    private void initBookSeriesManagementUI() {
+        View setPronunciationBtn = findViewById(R.id.settings_manage_book_series_pronunciation);
+        setPronunciationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // show progress dialog
+                final ProgressDialogUtil progressUtil = ProgressDialogUtil.getInstance(SettingsActivity.this);
+                progressUtil.show(
+                        mHandler,
+                        mContext.getString(R.string.updating_pronunciation_data),
+                        null,
+                        ProgressDialog.STYLE_HORIZONTAL,
+                        100, // set 100 for temp value
+                        new ListenerUtil.OnFinishListener() {
+                            @Override
+                            public void onFinish() {
+
+                                final ArrayList<BookSeriesData> bookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
+                                if(Util.isEmpty(bookSeriesDataList)) {
+                                    progressUtil.dismiss();
+                                    ToastUtil.show(mContext, R.string.error_no_book_series_registered);
+                                    return;
+                                }
+
+                                progressUtil.setMaxProgress(mHandler, bookSeriesDataList.size());
+
+                                // Update actual book series
+                                for (final BookSeriesData bookSeriesData : bookSeriesDataList) {
+                                    bookSeriesData.updateAllPronunciationTextData(new ListenerUtil.OnFinishListener() {
+                                        @Override
+                                        public void onFinish() {
+                                            mBookSeriesDao.saveSeries(bookSeriesData);
+                                            int progress = progressUtil.getProgress() + 1;
+                                            progressUtil.setProgress(mHandler, progress);
+
+                                            if(progress >= bookSeriesDataList.size()) {
+                                                progressUtil.dismiss();
+                                                ToastUtil.show(mContext, R.string.updating_pronunciation_data_finished);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+            }
+        });
+    }
+
+    /**
+     * Initilaize SpinnerView & Adapter for ShowType Setting UI
      * Currently the choices are Grid or List
      */
     private void initCatalogShowTypeSettingUI() {
 
-        final int gridTextId = R.string.settings_value_grid;
-        int listTextId = R.string.settings_value_list;
+        final int gridTextId = R.string.settings_value_view_type_grid;
+        int listTextId = R.string.settings_value_view_type_list;
 
         // Initialize spinner
         final String[] spinnerViewTextsList = new String[] {
