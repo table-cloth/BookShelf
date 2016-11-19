@@ -28,6 +28,7 @@ import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
+import com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity;
 import com.tablecloth.bookshelf.http.HttpPostHandler;
 import com.tablecloth.bookshelf.util.Const;
@@ -389,36 +390,20 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         int viewId = view.getId();
         switch (viewId) {
             case R.id.add_button: // Add book series
-                //        HttpPostTask httpPostTask = new HttpPostTask(
-//                this,
-//                "https://labs.goo.ne.jp/api/hiragana",
-//                new HttpPostHandler() {
-//                    @Override
-//                    public void onPostSuccess(String response) {
-//                        Log.d("Response", "SUCCESS : " + response);
-//                    }
-//
-//                    @Override
-//                    public void onPostFail(String response) {
-//                        Log.d("Response", "FAIL : " + response);
-//                    }
-//                });
-
-                GooTextConverter.convert2Katakana(
-                        this,
-                        "僕らの七日間戦争・そして〜伝説へ＝",
-                        new HttpPostHandler() {
+                ArrayList<BookSeriesData> seriesList = mBookSeriesDao.loadAllBookSeriesDataList();
+                if(seriesList != null) {
+                    for (final BookSeriesData seriesData : seriesList) {
+                        seriesData.updateAllPronunciationTextData(new ListenerUtil.OnFinishListener() {
                             @Override
-                            public void onPostSuccess(String response) {
-                                String converted = GooTextConverter.getConvertedText(response);
-                                Log.d("Response", "SUCCESS : " + converted);
-                            }
-
-                            @Override
-                            public void onPostFail(String response) {
-                                Log.d("Response", "ERROR : " + response);
+                            public void onFinish() {
+                                mBookSeriesDao.saveSeries(seriesData);
+                                Log.d("DONE", "Title = " + seriesData.getTitle());
                             }
                         });
+                    }
+                } else {
+                    Log.d("ERRROR", "Empty LIST");
+                }
 
 //                startActivityForResult(
 //                        BookSeriesSelectAddTypeDialogActivity.getIntent(

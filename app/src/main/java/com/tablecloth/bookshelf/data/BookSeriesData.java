@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -15,6 +17,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.db.BookSeriesDao;
+import com.tablecloth.bookshelf.http.HttpPostHandler;
+import com.tablecloth.bookshelf.util.GooTextConverter;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
@@ -26,6 +31,16 @@ import com.tablecloth.bookshelf.util.Util;
  * Created by Minami on 2014/08/16.
  */
 public class BookSeriesData extends BookData {
+
+    // Constants for updating pronounciations
+    public static final int TEXT_TYPE_TITLE = 0;
+    public static final int TEXT_TYPE_AUTHOR = 1;
+    public static final int TEXT_TYPE_MAGAZINE = 2;
+    public static final int TEXT_TYPE_COMPANY = 3;
+    public static final int TEXT_TYPE_TITLE_PRONUNCIATION = 4;
+    public static final int TEXT_TYPE_AUTHOR_PRONUNCIATION = 5;
+    public static final int TEXT_TYPE_MAGAZINE_PRONUNCIATION = 6;
+    public static final int TEXT_TYPE_COMPANY_PRONUNCIATION = 7;
 
     private Context mContext;
 
@@ -468,6 +483,94 @@ public class BookSeriesData extends BookData {
     }
 
     /**
+     *
+     * @param onAllUpdateFinishListener
+     */
+    /**
+     * Update pronunciation text data by converting text data into katakana
+     *
+     * @param onAllUpdateFinishListener Callback called when all fields are updated
+     */
+    public void updateAllPronunciationTextData(@Nullable final ListenerUtil.OnFinishListener onAllUpdateFinishListener) {
+        // title
+        updatePronunciationTextData(TEXT_TYPE_TITLE, TEXT_TYPE_TITLE_PRONUNCIATION, new ListenerUtil.OnFinishListener() {
+            @Override
+            public void onFinish() {
+                // author
+                updatePronunciationTextData(TEXT_TYPE_AUTHOR, TEXT_TYPE_AUTHOR_PRONUNCIATION, new ListenerUtil.OnFinishListener() {
+                    @Override
+                    public void onFinish() {
+                        // magazine
+                        updatePronunciationTextData(TEXT_TYPE_MAGAZINE, TEXT_TYPE_MAGAZINE_PRONUNCIATION, new ListenerUtil.OnFinishListener() {
+                            @Override
+                            public void onFinish() {
+                                // company
+                                updatePronunciationTextData(TEXT_TYPE_COMPANY, TEXT_TYPE_COMPANY_PRONUNCIATION, new ListenerUtil.OnFinishListener() {
+                                    @Override
+                                    public void onFinish() {
+                                        // all done
+                                        onAllUpdateFinishListener.onFinish();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * Update pronunciation text data by converting text data into katakana
+     *
+     * @param textType Text identifier of text to convert into katakana
+     * @param pronunciationTextType Text identifier of text to put converted katakana
+     * @param listener Listener instance to get onFinish callback
+     */
+    public void updatePronunciationTextData(int textType, final int pronunciationTextType, @Nullable final ListenerUtil.OnFinishListener listener) {
+
+        String pronunciationTextData = getTextData(pronunciationTextType);
+        // Finish if any pronunciation data is set
+        if(!Util.isEmpty(pronunciationTextData)) {
+            if(listener != null) {
+                listener.onFinish();
+            }
+            return;
+        }
+
+        String textData = getTextData(textType);
+        // Finish if text itself if empty
+        if(Util.isEmpty(textData)) {
+            if(listener != null) {
+                listener.onFinish();
+            }
+            return;
+        }
+
+        // Convert text into pronunciation text
+        GooTextConverter.convert2Katakana(mContext, textData, new HttpPostHandler() {
+            @Override
+            public void onPostSuccess(String response) {
+                String convertedText = GooTextConverter.getConvertedText(response);
+                if(!Util.isEmpty(convertedText)) {
+                    setTextData(pronunciationTextType, convertedText);
+                }
+
+                if(listener != null) {
+                    listener.onFinish();
+                }
+            }
+
+            @Override
+            public void onPostFail(String response) {
+                if(listener != null) {
+                    listener.onFinish();
+                }
+            }
+        });
+    }
+
+    /**
      * Clear volume text cache
      */
     private void clearVolumeTextCache() {
@@ -620,5 +723,74 @@ public class BookSeriesData extends BookData {
                 listener.onError();
             }
         }).start();
+    }
+
+    /**
+     * Get text data for given text type field
+     *
+     * @param textType Text type identifier
+     * @return Text data of given text type
+     */
+    @Nullable
+    private String getTextData(int textType) {
+        switch(textType) {
+            case TEXT_TYPE_TITLE:
+                return getTitle();
+
+            case TEXT_TYPE_AUTHOR:
+                return getAuthor();
+
+            case TEXT_TYPE_MAGAZINE:
+                return getMagazine();
+
+            case TEXT_TYPE_COMPANY:
+                return getCompany();
+
+            case TEXT_TYPE_TITLE_PRONUNCIATION:
+                return getTitlePronunciation();
+
+            case TEXT_TYPE_AUTHOR_PRONUNCIATION:
+                return getAuthorPronunciation();
+
+            case TEXT_TYPE_MAGAZINE_PRONUNCIATION:
+                return getMagazinePronunciation();
+
+            case TEXT_TYPE_COMPANY_PRONUNCIATION:
+                return getCompanyPronunciation();
+
+            default:
+                Log.e("getTextData", "Unsupported textType " + textType);
+                return null;
+        }
+    }
+
+    /**
+     * Set text data for given text type field
+     *
+     * @param textType Text type identifier
+     * @param textData Text data to set
+     */
+    private void setTextData(int textType, String textData) {
+        switch(textType) {
+            case TEXT_TYPE_TITLE_PRONUNCIATION:
+                setTitlePronunciation(textData);
+                break;
+
+            case TEXT_TYPE_AUTHOR_PRONUNCIATION:
+                setAuthorPronunciation(textData);
+                break;
+
+            case TEXT_TYPE_MAGAZINE_PRONUNCIATION:
+                setMagazinePronunciation(textData);
+                break;
+
+            case TEXT_TYPE_COMPANY_PRONUNCIATION:
+                setCompanyPronunciation(textData);
+                break;
+
+            default:
+                Log.e("setTextData", "Unsupported textType " + textType + " with text \"" + textData + "\"");
+                break;
+        }
     }
 }
