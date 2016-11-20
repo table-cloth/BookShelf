@@ -21,6 +21,9 @@
     <string name="email_inquiry_line5_device">機種名：%1$s\n</string>
     <string name="email_inquiry_line6_closing">＊＊＊＊＊＊＊＊＊＊＊＊\n\n</string>
 
+    <string name="inquiry_subject">【お問い合わせ】本棚管理</string>
+    <string name="error_no_mailer">お問い合わせを送信できるアプリが発見できません。メーラーアプリなどをインストールしてください。</string>
+
     <string name="update_dialog_title">お知らせ</string>
     <string name="update_dialog_do_review">レビューする</string>
     <string name="update_dialog_do_not_review">しない</string>
@@ -66,8 +69,12 @@
     <string name="settings_key_view_type_grid">表示形式</string>
     <string name="settings_value_view_type_grid">グリッド形式で作品一覧を表示</string>
     <string name="settings_value_view_type_list">リスト形式で作品一覧を表示</string>
-    <string name="inquiry_subject">【お問い合わせ】本棚管理</string>
-    <string name="error_no_mailer">お問い合わせを送信できるアプリが発見できません。メーラーアプリなどをインストールしてください。</string>
+    <string name="settings_key_sort_order_registered">表示形式</string>
+    <string name="settings_value_sort_order_id">登録順に表示</string>
+    <string name="settings_value_sort_order_title">タイトル順に表示</string>
+    <string name="settings_value_sort_order_author">作者順に表示</string>
+    <string name="settings_value_sort_order_magazine">掲載誌順に表示</string>
+    <string name="settings_value_sort_order_company">出版社順に表示</string>
 
     <string name="settings_key_manage_book_series">作品管理</string>
     <string name="settings_value_manage_pronunciation">作品の読みを一括登録</string>

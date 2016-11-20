@@ -141,11 +141,17 @@ public class Const {
             // 設定項目はこちらのクラスにて管理する
             public static class KEY {
                 public static final String SERIES_SHOW_TYPE = "series_show_type"; // 作品一覧の表示タイプ
+                public static final String SERIES_SORT_TYPE = "series_sort_type"; // 作品の表示順タイプ
             }
             // 設定値ははこちらのクラスにて管理する
             public static class VALUE {
                 public static final String SERIES_SHOW_TYPE_GRID = "grid"; // 作品一覧の表示タイプ
                 public static final String SERIES_SHOW_TYPE_LIST = "list"; // 作品一覧の表示タイプ
+                public static final String SERIES_SORT_TYPE_ID = "id"; // 作品の表示順タイプ
+                public static final String SERIES_SORT_TYPE_TITLE = "title"; // 作品の表示順タイプ
+                public static final String SERIES_SORT_TYPE_AUTHOR = "author"; // 作品の表示順タイプ
+                public static final String SERIES_SORT_TYPE_MAGAZINE = "magazine"; // 作品の表示順タイプ
+                public static final String SERIES_SORT_TYPE_COMPANY = "company"; // 作品の表示順タイプ
             }
         }
 

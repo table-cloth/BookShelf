@@ -83,7 +83,7 @@ public class SettingsActivity extends BaseActivity {
         Util.initAdView(this, (ViewGroup) findViewById(R.id.banner));
 
         // init settings UI
-        initCatalogShowTypeSettingUI();
+        initShowTypeManagementUI();
         initBookSeriesManagementUI();
 
         // Init back button
@@ -164,7 +164,131 @@ public class SettingsActivity extends BaseActivity {
     }
 
     /**
-     * Initilaize SpinnerView & Adapter for ShowType Setting UI
+     * Initialize UIs related to show type category
+     */
+    private void initShowTypeManagementUI() {
+        initCatalogShowTypeSettingUI();
+        initSortTypeSettingUI();
+    }
+
+    private void initSortTypeSettingUI() {
+        final String[] spinnerTextListSort = {
+                getString(R.string.settings_value_sort_order_id),
+                getString(R.string.settings_value_sort_order_title),
+                getString(R.string.settings_value_sort_order_author),
+                getString(R.string.settings_value_sort_order_magazine),
+                getString(R.string.settings_value_sort_order_company),
+        };
+
+        // This should be relative with spinnerTextListSort order
+        final int itemSortId = 0;
+        final int itemSortTitle = 1;
+        final int itemSortAuthor = 2;
+        final int itemSortMagazine = 3;
+        final int itemSortCompany = 4;
+
+        Spinner spinnerView = getSpinnerViewWithAdapter(
+                R.id.settings_view_sort_spinner,
+                spinnerTextListSort,
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                        String saveValue;
+                        switch (position) {
+                            case itemSortId:
+                                saveValue = Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID;
+                                break;
+
+                            case itemSortTitle:
+                                saveValue = Const.DB.Settings.VALUE.SERIES_SORT_TYPE_TITLE;
+                                break;
+
+                            case itemSortAuthor:
+                                saveValue = Const.DB.Settings.VALUE.SERIES_SORT_TYPE_AUTHOR;
+                                break;
+
+                            case itemSortMagazine:
+                                saveValue = Const.DB.Settings.VALUE.SERIES_SORT_TYPE_MAGAZINE;
+                                break;
+
+                            case itemSortCompany:
+                                saveValue = Const.DB.Settings.VALUE.SERIES_SORT_TYPE_COMPANY;
+                                break;
+
+                            default:
+                                saveValue = Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID;
+                                break;
+                        }
+
+                        // Save to preference
+                        mSettingsDao.save(Const.DB.Settings.KEY.SERIES_SORT_TYPE, saveValue);
+
+                        // Send track event
+                        sendGoogleAnalyticsEvent(
+                                GAEvent.Type.USER_ACTION,
+                                GAEvent.Event.SETTINGS_SET_SHOW_TYPE,
+                                saveValue);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        // Do nothing
+                    }
+                });
+
+        // Set default view for spinner
+        String savedValue = mSettingsDao.load(
+                Const.DB.Settings.KEY.SERIES_SORT_TYPE,
+                Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID);
+        int selection = 0;
+        switch (savedValue) {
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID:
+                selection = itemSortId;
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_TITLE:
+                selection = itemSortTitle;
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_AUTHOR:
+                selection = itemSortAuthor;
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_MAGAZINE:
+                selection = itemSortMagazine;
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_COMPANY:
+                selection = itemSortCompany;
+                break;
+
+            default:
+        }
+        spinnerView.setSelection(selection);
+    }
+
+    /**
+     * Get spinner view with adapter & given text
+     *
+     * @param spinnerViewId Spinner view id
+     * @param textList Text list to show in spinner
+     * @param listener OnItemSelected listener
+     * @return Spinner instance
+     */
+    private Spinner getSpinnerViewWithAdapter(
+            int spinnerViewId, @NonNull String[] textList,
+            @NonNull AdapterView.OnItemSelectedListener listener) {
+
+        ArrayAdapter<String> spinnerAdapter = getSpinnerAdapter(textList);
+        Spinner spinnerView = ((Spinner)findViewById(spinnerViewId));
+        spinnerView.setAdapter(spinnerAdapter);
+        spinnerView.setOnItemSelectedListener(listener);
+        return spinnerView;
+    }
+
+    /**
+     * Initialize SpinnerView & Adapter for ShowType Setting UI
      * Currently the choices are Grid or List
      */
     private void initCatalogShowTypeSettingUI() {
@@ -173,7 +297,7 @@ public class SettingsActivity extends BaseActivity {
         int listTextId = R.string.settings_value_view_type_list;
 
         // Initialize spinner
-        final String[] spinnerViewTextsList = new String[] {
+        final String[] spinnerViewTextsList = {
                 getString(gridTextId), // show grid
                 getString(listTextId)  // show list
         };
