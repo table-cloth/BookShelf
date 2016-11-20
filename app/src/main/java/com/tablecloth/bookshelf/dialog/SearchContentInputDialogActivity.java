@@ -70,6 +70,7 @@ public class SearchContentInputDialogActivity extends DialogBaseActivity {
         setBtnNegativeText(R.id.btn_negative);
 
         findViewById(R.id.btn_positive).setOnClickListener(this);
+        findViewById(R.id.btn_negative).setOnClickListener(this);
 
         initSpinner();
     }
