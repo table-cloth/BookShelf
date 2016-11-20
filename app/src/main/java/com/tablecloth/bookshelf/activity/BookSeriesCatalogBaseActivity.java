@@ -243,6 +243,15 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     }
 
     /**
+     * OnPause
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        mProgress.onPause();
+    }
+
+    /**
      * Get show type from Settings
      *
      * @return show type name in Settings

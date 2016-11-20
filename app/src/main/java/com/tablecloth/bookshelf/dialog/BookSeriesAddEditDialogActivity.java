@@ -1,5 +1,6 @@
 package com.tablecloth.bookshelf.dialog;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,13 +8,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.tablecloth.bookshelf.R;
+import com.tablecloth.bookshelf.activity.SettingsActivity;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.util.Const;
+import com.tablecloth.bookshelf.util.ListenerUtil;
+import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -31,10 +36,14 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
     private BookSeriesDao mBookSeriesDao;
 
     private ViewGroup mTagContainer = null;
+    private View mPronunciationInputAreaView = null;
+    private Button mPronunciationOpenCloseButtonView = null;
 
     // static BookData to use for API search,
     // where there is info, but seriesId is -1
     private static BookSeriesData sTemporaryBookSeriesData = null;
+
+    private ProgressDialogUtil mProgressUtil = null;
 
     /**
      * Get layout ID to show in the activity
@@ -99,6 +108,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         mBookSeriesDao = new BookSeriesDao(this);
         mBookSeriesData = mBookSeriesDao.loadBookSeriesData(getBookSeriesId());
 
+        mProgressUtil = ProgressDialogUtil.getInstance(this);
 
         // Add new book series
         if(mBookSeriesData == null) {
@@ -154,39 +164,71 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
                 break;
 
             case R.id.btn_positive: // saveInt current data
-                saveBookSeries();
-                finishWithResult(Const.RESULT_CODE.POSITIVE,
-                        new Intent().putExtra(
-                                Const.INTENT_EXTRA.KEY_INT_EDIT_SERIES,
-                                Const.INTENT_EXTRA.VALUE_EDIT_SERIES_EDIT));
+                updateInputData2BookSeriesData();
+                // fail to saveInt if the title is empty
+                if(!isBookSeriesDataValid()) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.show(BookSeriesAddEditDialogActivity.this,
+                                    R.string.series_data_error_title_is_empty);
+                        }
+                    });
+                    return;
+                }
+
+                // show progress dialog
+                mProgressUtil.show(
+                        mHandler,
+                        getString(R.string.updating_pronunciation_data),
+                        null,
+                        ProgressDialog.STYLE_HORIZONTAL,
+                        1, // only update for this book
+                        new ListenerUtil.OnFinishListener() {
+                            @Override
+                            public void onFinish() {
+
+                                mBookSeriesData.updateAllPronunciationTextData(new ListenerUtil.OnFinishListener() {
+                                    @Override
+                                    public void onFinish() {
+                                        mBookSeriesDao.saveSeries(mBookSeriesData);
+
+                                        mProgressUtil.dismiss();
+
+                                        ToastUtil.show(
+                                                BookSeriesAddEditDialogActivity.this,
+                                                R.string.series_data_done_add_series);
+
+                                        finishWithResult(Const.RESULT_CODE.POSITIVE,
+                                                new Intent().putExtra(
+                                                        Const.INTENT_EXTRA.KEY_INT_EDIT_SERIES,
+                                                        Const.INTENT_EXTRA.VALUE_EDIT_SERIES_EDIT));
+                                    }
+                                });
+                            }
+                        });
                 break;
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mProgressUtil.onPause();
+    }
+
     /**
-     * Save book series with currently shown data
+     * Put user input data into BookSeriesData
      */
-    private void saveBookSeries() {
+    private void updateInputData2BookSeriesData() {
         String title = getRowContents(R.id.data_detail_row_title);
-
-        // fail to saveInt if the title is empty
-        if(Util.isEmpty(title)) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ToastUtil.show(BookSeriesAddEditDialogActivity.this,
-                            R.string.series_data_error_title_is_empty);
-                }
-            });
-            return;
-        }
-
         String titlePronunciation =getRowContents(R.id.data_detail_row_title_pronunciation);
         String author = getRowContents(R.id.data_detail_row_author);
         String authorPronunciation =getRowContents(R.id.data_detail_row_author_pronunciation);
         String magazine = getRowContents(R.id.data_detail_row_magazine);
-        String magazinePronunciation =getRowContents(R.id.data_detail_row_magazine_pronunctaion);
+        String magazinePronunciation =getRowContents(R.id.data_detail_row_magazine_pronunciation);
         String company = getRowContents(R.id.data_detail_row_company);
+        String companyPronunciation = getRowContents(R.id.data_detail_row_company_pronunciation);
         String memo = getRowContents(R.id.data_detail_row_memo);
 
         mBookSeriesData.setTitle(title);
@@ -196,9 +238,17 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         mBookSeriesData.setMagazine(magazine);
         mBookSeriesData.setMagazinePronunciation(magazinePronunciation);
         mBookSeriesData.setCompany(company);
+        mBookSeriesData.setCompanyPronunciation(companyPronunciation);
         mBookSeriesData.setMemo(memo);
+    }
 
-        mBookSeriesDao.saveSeries(mBookSeriesData);
+    /**
+     * Check if the data needed to save BookSeriesData, is valid
+     *
+     * @return Whether needed data is all set
+     */
+    private boolean isBookSeriesDataValid() {
+        return !Util.isEmpty(mBookSeriesData.getTitle());
     }
 
     /**
@@ -268,9 +318,37 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         setTitleText(R.id.title);
         setBtnPositiveText(R.id.btn_positive);
 
-        // hint for book series title
+        // Hint for book series title
         View titleViewArea = findViewById(R.id.data_detail_row_title);
         ((EditText)titleViewArea.findViewById(R.id.data_content)).setHint(R.string.hint_must);
+
+        // For pronunciation enter area
+        mPronunciationInputAreaView = findViewById(R.id.data_pronunciation_container);
+
+        View inputOpenCloseAreaView = findViewById(R.id.data_area_show_pronunciation);
+        TextView kanaAreaContentTextView = (TextView) inputOpenCloseAreaView.findViewById(R.id.data_name);
+        if(kanaAreaContentTextView != null) {
+            kanaAreaContentTextView.setText(R.string.book_series_data_enter_pronunciation_by_manual);
+        }
+        mPronunciationOpenCloseButtonView = (Button) inputOpenCloseAreaView.findViewById(R.id.data_btn);
+        if(mPronunciationOpenCloseButtonView != null) {
+            mPronunciationOpenCloseButtonView.setText(R.string.open);
+            mPronunciationOpenCloseButtonView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int currentVisibility = mPronunciationInputAreaView.getVisibility();
+                    if(currentVisibility == View.VISIBLE) {
+                        mPronunciationInputAreaView.setVisibility(View.GONE);
+                        mPronunciationOpenCloseButtonView.setText(R.string.open);
+                    } else {
+                        mPronunciationInputAreaView.setVisibility(View.VISIBLE);
+                        mPronunciationOpenCloseButtonView.setText(R.string.close);
+                    }
+                }
+            });
+        }
+        mPronunciationInputAreaView.setVisibility(View.GONE);
+        mPronunciationOpenCloseButtonView.setText(R.string.open);
     }
 
 
@@ -299,7 +377,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         setRowContents(R.id.data_detail_row_magazine,
                 R.string.book_series_data_magazine,
                 bookSeriesData.getMagazine());
-        setRowContents(R.id.data_detail_row_magazine_pronunctaion,
+        setRowContents(R.id.data_detail_row_magazine_pronunciation,
                 R.string.book_series_data_magazine_pronunciation,
                 bookSeriesData.getMagazinePronunciation());
 
@@ -307,6 +385,9 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         setRowContents(R.id.data_detail_row_company,
                 R.string.book_series_data_company,
                 bookSeriesData.getCompany());
+        setRowContents(R.id.data_detail_row_company_pronunciation,
+                R.string.book_series_data_company_pronunciation,
+                bookSeriesData.getCompanyPronunciation());
 
         // Memo
         setRowContents(R.id.data_detail_row_memo,

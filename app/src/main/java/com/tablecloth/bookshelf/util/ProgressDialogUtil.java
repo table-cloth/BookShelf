@@ -96,7 +96,7 @@ public class ProgressDialogUtil {
                 dismiss();
 
                 // init progress dialog
-                mProgressDialog.setCancelable(false);
+                mProgressDialog.setCancelable(true);
                 mProgressDialog.setProgressStyle(progressDialogStyle);
                 if(maxProgress != NO_PROGRESS) {
                     mProgressDialog.setMax(maxProgress);
@@ -116,6 +116,10 @@ public class ProgressDialogUtil {
             }
         });
 
+    }
+
+    public void onPause() {
+        dismiss();
     }
 
     /**

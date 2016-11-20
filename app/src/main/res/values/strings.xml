@@ -51,6 +51,8 @@
     <string name="no">いいえ</string>
     <string name="cancel">キャンセル</string>
     <string name="search">検索</string>
+    <string name="open">開く</string>
+    <string name="close">閉じる</string>
 
     <string name="hint_must">※必須</string>
 
@@ -133,6 +135,8 @@
     <string name="book_series_data_title_pronunciation">タイトル（カナ）</string>
     <string name="book_series_data_author_pronunciation">作者（カナ）</string>
     <string name="book_series_data_magazine_pronunciation">掲載誌（カナ）</string>
+    <string name="book_series_data_company_pronunciation">出版社（カナ）</string>
+    <string name="book_series_data_enter_pronunciation_by_manual">手動で読み仮名を入力</string>
 
     <string name="tag_edit">タグを編集</string>
     <string name="delete_book_series">作品を削除します</string>

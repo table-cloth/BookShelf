@@ -202,14 +202,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
-                        <!-- タイトル（カナ） -->
-
-                        <include
-                            android:id="@+id/data_detail_row_title_pronunciation"
-                            layout="@layout/data_detail_row"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
                         <!-- 作者 -->
 
                         <include
@@ -218,26 +210,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
-                        <!-- 作者（カナ） -->
-
-                        <include
-                            android:id="@+id/data_detail_row_author_pronunciation"
-                            layout="@layout/data_detail_row"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
                         <!-- 掲載誌 -->
 
                         <include
                             android:id="@+id/data_detail_row_magazine"
-                            layout="@layout/data_detail_row"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <!-- 掲載誌（カナ） -->
-
-                        <include
-                            android:id="@+id/data_detail_row_magazine_pronunctaion"
                             layout="@layout/data_detail_row"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
@@ -257,6 +233,63 @@
                             layout="@layout/data_detail_row"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <!-- カナ入力エリアを開ける＆閉じるボタン -->
+                    <include
+                        android:id="@+id/data_area_show_pronunciation"
+                        layout="@layout/data_btn_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        />
+
+                    <!-- カナ入力エリア -->
+
+                    <LinearLayout
+                        android:id="@+id/data_pronunciation_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <!-- タイトル（カナ） -->
+
+                        <include
+                            android:id="@+id/data_detail_row_title_pronunciation"
+                            layout="@layout/data_detail_row"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <!-- 作者（カナ） -->
+
+                        <include
+                            android:id="@+id/data_detail_row_author_pronunciation"
+                            layout="@layout/data_detail_row"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <!-- 掲載誌（カナ） -->
+
+                        <include
+                            android:id="@+id/data_detail_row_magazine_pronunciation"
+                            layout="@layout/data_detail_row"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <!-- 出版社（カナ） -->
+
+                        <include
+                            android:id="@+id/data_detail_row_company_pronunciation"
+                            layout="@layout/data_detail_row"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
                     </LinearLayout>
                 </LinearLayout>
             </ScrollView>

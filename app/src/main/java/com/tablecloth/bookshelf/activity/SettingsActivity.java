@@ -3,7 +3,6 @@ package com.tablecloth.bookshelf.activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -12,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -34,7 +32,6 @@ import com.tablecloth.bookshelf.util.Util;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Setting Screen to setup all kind of user / application settings
@@ -46,6 +43,8 @@ public class SettingsActivity extends BaseActivity {
     private SettingsDao mSettingsDao;
     private BookSeriesDao mBookSeriesDao;
     private Context mContext;
+
+    private ProgressDialogUtil mProgressUtil;
 
     /**
      * Get Intent instance to activate this activity
@@ -82,6 +81,8 @@ public class SettingsActivity extends BaseActivity {
         mSettingsDao = new SettingsDao(this);
         mBookSeriesDao = new BookSeriesDao(this);
 
+        mProgressUtil = ProgressDialogUtil.getInstance(this);
+
         // init ad
         Util.initAdView(this, (ViewGroup) findViewById(R.id.banner));
 
@@ -112,6 +113,12 @@ public class SettingsActivity extends BaseActivity {
                 activateGooglePlay();
             }
         });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mProgressUtil.onPause();
     }
 
     /**
@@ -443,8 +450,7 @@ public class SettingsActivity extends BaseActivity {
      */
     private void doUpdateAllPronunciations() {
         // show progress dialog
-        final ProgressDialogUtil progressUtil = ProgressDialogUtil.getInstance(SettingsActivity.this);
-        progressUtil.show(
+        mProgressUtil.show(
                 mHandler,
                 mContext.getString(R.string.updating_pronunciation_data),
                 null,
@@ -456,12 +462,12 @@ public class SettingsActivity extends BaseActivity {
 
                         final ArrayList<BookSeriesData> bookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
                         if(Util.isEmpty(bookSeriesDataList)) {
-                            progressUtil.dismiss();
+                            mProgressUtil.dismiss();
                             ToastUtil.show(mContext, R.string.error_no_book_series_registered);
                             return;
                         }
 
-                        progressUtil.setMaxProgress(mHandler, bookSeriesDataList.size());
+                        mProgressUtil.setMaxProgress(mHandler, bookSeriesDataList.size());
 
                         // Update actual book series
                         for (final BookSeriesData bookSeriesData : bookSeriesDataList) {
@@ -469,11 +475,11 @@ public class SettingsActivity extends BaseActivity {
                                 @Override
                                 public void onFinish() {
                                     mBookSeriesDao.saveSeries(bookSeriesData);
-                                    int progress = progressUtil.getProgress() + 1;
-                                    progressUtil.setProgress(mHandler, progress);
+                                    int progress = mProgressUtil.getProgress() + 1;
+                                    mProgressUtil.setProgress(mHandler, progress);
 
                                     if(progress >= bookSeriesDataList.size()) {
-                                        progressUtil.dismiss();
+                                        mProgressUtil.dismiss();
                                         ToastUtil.show(mContext, R.string.updating_pronunciation_data_finished);
                                     }
                                 }
