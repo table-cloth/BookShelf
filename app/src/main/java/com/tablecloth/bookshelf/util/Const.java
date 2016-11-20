@@ -21,6 +21,7 @@ public class Const {
         final public static String INIT_VERSION_CODE_INT = "INIT_VERSION_CODE_INT"; // first version installed
         final public static String VERSION_CODE_INT = "VERSION_CODE_INT"; // latest previous version installed
         final public static String BOOK_SERIES_ADD_TYPE_INT = "BOOK_SERIES_ADD_TYPE"; // book series add type
+        final public static String SETTINGS_SORT_MESSAGE_INITIAL_CLICK = "SETTINGS_SORT_MESSAGE_INITIAL_CLICK"; // for first time user changed sort
     }
 
     /**
@@ -53,6 +54,7 @@ public class Const {
         public static final int LIST_SEARCH_RAKUTEN = 8;
         public static final int SIMPLE_CHECK = 9; // 簡易的な確認用
         public static final int TAGS_EDIT = 10;
+        public static final int SETTING_FIRST_SORT_INFO_DIALOG = 11;
 
         public static final int UPDATE_DIALOG = 100;
     }

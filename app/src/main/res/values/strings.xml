@@ -82,6 +82,10 @@
     <string name="updating_pronunciation_data_finished">作品の読み仮名の更新が完了しました</string>
     <string name="error_no_book_series_registered">作品が登録されていません</string>
 
+    <string name="dialog_confirm_update_sort_title">表示順に関するお知らせ</string>
+    <string name="dialog_confirm_update_sort_msg">新しく表示順の設定項目が追加されました！\n\n作品の読み仮名が登録されていない場合は表示順が正常に表示されません。\n既に読み仮名を登録済み出ない場合は設定画面内の「作品の読みを一括登録」のボタンから読み仮名の登録をお願いします。\n\nこの画面の「読み仮名を更新する」からも読み仮名の登録ができますのでご利用ください。</string>
+    <string name="dialog_confirm_update_sort_btn_positive">読み仮名を更新する</string>
+    <string name="dialog_confirm_update_sort_btn_negative">今はしない</string>
 
     <string name="series_data_no_volume">所持巻なし</string>
     <string name="series_data_volume_symbol">巻</string>

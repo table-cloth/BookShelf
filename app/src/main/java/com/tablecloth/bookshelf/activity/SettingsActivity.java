@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,11 @@ import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SettingsDao;
+import com.tablecloth.bookshelf.dialog.SimpleDialogActivity;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.ListenerUtil;
+import com.tablecloth.bookshelf.util.PrefUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
@@ -109,6 +112,22 @@ public class SettingsActivity extends BaseActivity {
                 activateGooglePlay();
             }
         });
+
+        // Show message dialog, if this is first time after sort is put in settings
+        PrefUtil prefUtil = PrefUtil.getInstance(getApplicationContext());
+        int sortChangedTimes = prefUtil.loadInt(Const.PREF_KEYS.SETTINGS_SORT_MESSAGE_INITIAL_CLICK, 0);
+        if(sortChangedTimes == 0) {
+            startActivityForResult(
+                    SimpleDialogActivity.getIntent(
+                            mContext,
+                            R.string.dialog_confirm_update_sort_title,
+                            R.string.dialog_confirm_update_sort_msg,
+                            R.string.dialog_confirm_update_sort_btn_positive,
+                            R.string.dialog_confirm_update_sort_btn_negative),
+                    Const.REQUEST_CODE.SETTING_FIRST_SORT_INFO_DIALOG);
+        }
+        prefUtil.saveInt(Const.PREF_KEYS.SETTINGS_SORT_MESSAGE_INITIAL_CLICK, sortChangedTimes + 1);
+
     }
 
     /**
@@ -119,46 +138,7 @@ public class SettingsActivity extends BaseActivity {
         setPronunciationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // show progress dialog
-                final ProgressDialogUtil progressUtil = ProgressDialogUtil.getInstance(SettingsActivity.this);
-                progressUtil.show(
-                        mHandler,
-                        mContext.getString(R.string.updating_pronunciation_data),
-                        null,
-                        ProgressDialog.STYLE_HORIZONTAL,
-                        100, // set 100 for temp value
-                        new ListenerUtil.OnFinishListener() {
-                            @Override
-                            public void onFinish() {
-
-                                final ArrayList<BookSeriesData> bookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
-                                if(Util.isEmpty(bookSeriesDataList)) {
-                                    progressUtil.dismiss();
-                                    ToastUtil.show(mContext, R.string.error_no_book_series_registered);
-                                    return;
-                                }
-
-                                progressUtil.setMaxProgress(mHandler, bookSeriesDataList.size());
-
-                                // Update actual book series
-                                for (final BookSeriesData bookSeriesData : bookSeriesDataList) {
-                                    bookSeriesData.updateAllPronunciationTextData(new ListenerUtil.OnFinishListener() {
-                                        @Override
-                                        public void onFinish() {
-                                            mBookSeriesDao.saveSeries(bookSeriesData);
-                                            int progress = progressUtil.getProgress() + 1;
-                                            progressUtil.setProgress(mHandler, progress);
-
-                                            if(progress >= bookSeriesDataList.size()) {
-                                                progressUtil.dismiss();
-                                                ToastUtil.show(mContext, R.string.updating_pronunciation_data_finished);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
+                doUpdateAllPronunciations();
             }
         });
     }
@@ -454,6 +434,71 @@ public class SettingsActivity extends BaseActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         return spinnerAdapter;
+    }
+
+    /**
+     * Start updating all pronunciations for all book series
+     */
+    private void doUpdateAllPronunciations() {
+        // show progress dialog
+        final ProgressDialogUtil progressUtil = ProgressDialogUtil.getInstance(SettingsActivity.this);
+        progressUtil.show(
+                mHandler,
+                mContext.getString(R.string.updating_pronunciation_data),
+                null,
+                ProgressDialog.STYLE_HORIZONTAL,
+                100, // set 100 for temp value
+                new ListenerUtil.OnFinishListener() {
+                    @Override
+                    public void onFinish() {
+
+                        final ArrayList<BookSeriesData> bookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
+                        if(Util.isEmpty(bookSeriesDataList)) {
+                            progressUtil.dismiss();
+                            ToastUtil.show(mContext, R.string.error_no_book_series_registered);
+                            return;
+                        }
+
+                        progressUtil.setMaxProgress(mHandler, bookSeriesDataList.size());
+
+                        // Update actual book series
+                        for (final BookSeriesData bookSeriesData : bookSeriesDataList) {
+                            bookSeriesData.updateAllPronunciationTextData(new ListenerUtil.OnFinishListener() {
+                                @Override
+                                public void onFinish() {
+                                    mBookSeriesDao.saveSeries(bookSeriesData);
+                                    int progress = progressUtil.getProgress() + 1;
+                                    progressUtil.setProgress(mHandler, progress);
+
+                                    if(progress >= bookSeriesDataList.size()) {
+                                        progressUtil.dismiss();
+                                        ToastUtil.show(mContext, R.string.updating_pronunciation_data_finished);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Called on activity result
+     *
+     * @param requestCode request code
+     * @param resultCode result code
+     * @param data intent data
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case Const.REQUEST_CODE.SETTING_FIRST_SORT_INFO_DIALOG: // Return from sort message dialog
+                if(resultCode == Const.RESULT_CODE.POSITIVE) { // Update pronunciation data if returned positive
+                    doUpdateAllPronunciations();
+                }
+                break;
+        }
     }
 
 }

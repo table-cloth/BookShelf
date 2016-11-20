@@ -285,7 +285,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     }
 
     /**
-     * Called on activty result
+     * Called on activity result
      *
      * @param requestCode request code
      * @param resultCode result code
