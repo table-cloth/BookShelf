@@ -63,15 +63,6 @@ public class VersionUtil {
             return null;
         }
 
-        if(versionDiff == 1) {
-            return SimpleDialogActivity.getIntent(
-                    appContext,
-                    R.string.update_dialog_title,
-                    R.string.update_dialog_content_form_prev_version,
-                    R.string.update_dialog_do_review,
-                    R.string.update_dialog_do_not_review);
-        }
-
         return SimpleDialogActivity.getIntent(
                 appContext,
                 R.string.update_dialog_title,
