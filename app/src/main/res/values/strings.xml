@@ -28,9 +28,9 @@
     <string name="update_dialog_do_review">レビューする</string>
     <string name="update_dialog_do_not_review">しない</string>
     <string name="update_dialog_content_form_prev_version"></string>
-    <string name="update_dialog_content_normal">■ 作品の並び替え機能を追加しました。\n
-■ 作品の読み仮名の自動登録機能を追加しました。\n
-■ 今までの作品の読み仮名登録に関しては、設定画面の「作品の読み仮名を一括登録」のボタンをご利用ください。\n\n
+    <string name="update_dialog_content_normal"> ■ 作品の並び替え機能を追加しました。\n
+■ 作品の読み仮名の自動登録機能を追加しました。\n\n
+※ 今までの作品の読み仮名登録に関しては、設定画面の「作品の読み仮名を一括登録」のボタンをご利用ください。\n\n
 ーーーーー\n\n
 少しでも良いアプリになるよう改善を行っております。\n
 ★5のレビューを頂けますと励みになります！\n
