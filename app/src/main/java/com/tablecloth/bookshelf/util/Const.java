@@ -144,6 +144,7 @@ public class Const {
             public static class KEY {
                 public static final String SERIES_SHOW_TYPE = "series_show_type"; // 作品一覧の表示タイプ
                 public static final String SERIES_SORT_TYPE = "series_sort_type"; // 作品の表示順タイプ
+                public static final String BOOK_SERIES_AUTO_SAVE_PRONUNCIATION = "book_series_auto_save_pronunciation"; // 自動的にカナ情報を保存する
             }
             // 設定値ははこちらのクラスにて管理する
             public static class VALUE {
@@ -154,6 +155,8 @@ public class Const {
                 public static final String SERIES_SORT_TYPE_AUTHOR = "author"; // 作品の表示順タイプ
                 public static final String SERIES_SORT_TYPE_MAGAZINE = "magazine"; // 作品の表示順タイプ
                 public static final String SERIES_SORT_TYPE_COMPANY = "company"; // 作品の表示順タイプ
+                public static final String BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_ON = "on"; // 自動的にカナ情報を保存する
+                public static final String BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_OFF = "off"; // 自動的にカナ情報を保存する
             }
         }
 

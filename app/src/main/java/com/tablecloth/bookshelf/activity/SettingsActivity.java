@@ -125,13 +125,14 @@ public class SettingsActivity extends BaseActivity {
      * Initialize UIs related to book management category
      */
     private void initBookSeriesManagementUI() {
-        View setPronunciationBtn = findViewById(R.id.settings_manage_book_series_pronunciation);
+        View setPronunciationBtn = findViewById(R.id.settings_update_all_book_series_pronunciation);
         setPronunciationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 doUpdateAllPronunciations();
             }
         });
+        initPronunciationAutoSaveSettingUI();
     }
 
     /**
@@ -141,6 +142,42 @@ public class SettingsActivity extends BaseActivity {
         initCatalogShowTypeSettingUI();
         initSortTypeSettingUI();
     }
+
+    private void initPronunciationAutoSaveSettingUI() {
+        final String[] spinnerTextListAutoSave = {
+                getString(R.string.settings_value_auto_save_pronunciation_on),
+                getString(R.string.settings_value_auto_save_pronunciation_off)
+        };
+
+        Spinner spinnerView = getSpinnerViewWithAdapter(
+                R.id.settings_auto_save_book_series_pronunciation_spinner,
+                spinnerTextListAutoSave,
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        mSettingsDao.save(
+                                Const.DB.Settings.KEY.BOOK_SERIES_AUTO_SAVE_PRONUNCIATION,
+                                position == 0
+                                        ? Const.DB.Settings.VALUE.BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_ON
+                                        : Const.DB.Settings.VALUE.BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_OFF);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+        // Set default view for spinner
+        String savedValue = mSettingsDao.load(
+                Const.DB.Settings.KEY.BOOK_SERIES_AUTO_SAVE_PRONUNCIATION,
+                Const.DB.Settings.VALUE.BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_ON);
+        spinnerView.setSelection(
+                Util.isEqual(savedValue, Const.DB.Settings.VALUE.BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_ON)
+                        ? 0
+                        : 1);
+    }
+
 
     private void initSortTypeSettingUI() {
         final String[] spinnerTextListSort = {

@@ -16,6 +16,7 @@ import com.tablecloth.bookshelf.R;
 import com.tablecloth.bookshelf.activity.SettingsActivity;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.data.BookSeriesData;
+import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
@@ -34,6 +35,7 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
 
     private BookSeriesData mBookSeriesData;
     private BookSeriesDao mBookSeriesDao;
+    private SettingsDao mSettingsDao;
 
     private ViewGroup mTagContainer = null;
     private View mPronunciationInputAreaView = null;
@@ -106,6 +108,8 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         super.onCreate(savedInstanceState);
 
         mBookSeriesDao = new BookSeriesDao(this);
+        mSettingsDao = new SettingsDao(this);
+
         mBookSeriesData = mBookSeriesDao.loadBookSeriesData(getBookSeriesId());
 
         mProgressUtil = ProgressDialogUtil.getInstance(this);
@@ -177,38 +181,60 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
                     return;
                 }
 
-                // show progress dialog
-                mProgressUtil.show(
-                        mHandler,
-                        getString(R.string.updating_pronunciation_data),
-                        null,
-                        ProgressDialog.STYLE_HORIZONTAL,
-                        1, // only update for this book
-                        new ListenerUtil.OnFinishListener() {
-                            @Override
-                            public void onFinish() {
+                String autoSavePronunciationSettings =
+                        mSettingsDao.load(
+                                Const.DB.Settings.KEY.BOOK_SERIES_AUTO_SAVE_PRONUNCIATION,
+                                Const.DB.Settings.VALUE.BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_ON);
 
-                                mBookSeriesData.updateAllPronunciationTextData(new ListenerUtil.OnFinishListener() {
-                                    @Override
-                                    public void onFinish() {
-                                        mBookSeriesDao.saveSeries(mBookSeriesData);
+                // Update pronunciation info, and then save
+                if(Util.isEqual(
+                        autoSavePronunciationSettings,
+                        Const.DB.Settings.VALUE.BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_ON)) {
 
-                                        mProgressUtil.dismiss();
+                    // show progress dialog
+                    mProgressUtil.show(
+                            mHandler,
+                            getString(R.string.updating_pronunciation_data),
+                            null,
+                            ProgressDialog.STYLE_HORIZONTAL,
+                            1, // only update for this book
+                            new ListenerUtil.OnFinishListener() {
+                                @Override
+                                public void onFinish() {
 
-                                        ToastUtil.show(
-                                                BookSeriesAddEditDialogActivity.this,
-                                                R.string.series_data_done_add_series);
+                                    mBookSeriesData.updateAllPronunciationTextData(new ListenerUtil.OnFinishListener() {
+                                        @Override
+                                        public void onFinish() {
 
-                                        finishWithResult(Const.RESULT_CODE.POSITIVE,
-                                                new Intent().putExtra(
-                                                        Const.INTENT_EXTRA.KEY_INT_EDIT_SERIES,
-                                                        Const.INTENT_EXTRA.VALUE_EDIT_SERIES_EDIT));
-                                    }
-                                });
-                            }
-                        });
+                                            mProgressUtil.dismiss();
+                                            finishAfterSave();
+                                        }
+                                    });
+                                }
+                            });
+
+                // Save without checking pronunciation
+                } else {
+                    finishAfterSave();
+                }
                 break;
         }
+    }
+
+    /**
+     * Save current book series data and finish activity
+     */
+    private void finishAfterSave() {
+        mBookSeriesDao.saveSeries(mBookSeriesData);
+
+        ToastUtil.show(
+                BookSeriesAddEditDialogActivity.this,
+                R.string.series_data_done_add_series);
+
+        finishWithResult(Const.RESULT_CODE.POSITIVE,
+                new Intent().putExtra(
+                        Const.INTENT_EXTRA.KEY_INT_EDIT_SERIES,
+                        Const.INTENT_EXTRA.VALUE_EDIT_SERIES_EDIT));
     }
 
     @Override

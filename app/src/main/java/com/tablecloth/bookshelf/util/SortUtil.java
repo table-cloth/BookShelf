@@ -98,11 +98,6 @@ public class SortUtil {
                 String value2;
 
                 switch (sortType) {
-                    case SORT_TYPE_ID:
-                        value1 = String.valueOf(data1.getSeriesId());
-                        value2 = String.valueOf(data2.getSeriesId());
-                        break;
-
                     case SORT_TYPE_TITLE:
                         value1 = String.valueOf(data1.getTitlePronunciation());
                         value2 = String.valueOf(data2.getTitlePronunciation());
@@ -124,9 +119,10 @@ public class SortUtil {
                         break;
 
                     default:
-                        value1 = String.valueOf(data1.getSeriesId());
-                        value2 = String.valueOf(data2.getSeriesId());
-                        break;
+                    case SORT_TYPE_ID:
+                        return data1.getSeriesId() > data2.getSeriesId()
+                                ? 1
+                                : -1;
                 }
 
                 // ones with empty text goes last
