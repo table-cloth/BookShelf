@@ -112,22 +112,6 @@ public class SettingsActivity extends BaseActivity {
                 activateGooglePlay();
             }
         });
-
-        // Show message dialog, if this is first time after sort is put in settings
-        PrefUtil prefUtil = PrefUtil.getInstance(getApplicationContext());
-        int sortChangedTimes = prefUtil.loadInt(Const.PREF_KEYS.SETTINGS_SORT_MESSAGE_INITIAL_CLICK, 0);
-        if(sortChangedTimes == 0) {
-            startActivityForResult(
-                    SimpleDialogActivity.getIntent(
-                            mContext,
-                            R.string.dialog_confirm_update_sort_title,
-                            R.string.dialog_confirm_update_sort_msg,
-                            R.string.dialog_confirm_update_sort_btn_positive,
-                            R.string.dialog_confirm_update_sort_btn_negative),
-                    Const.REQUEST_CODE.SETTING_FIRST_SORT_INFO_DIALOG);
-        }
-        prefUtil.saveInt(Const.PREF_KEYS.SETTINGS_SORT_MESSAGE_INITIAL_CLICK, sortChangedTimes + 1);
-
     }
 
     /**
@@ -199,6 +183,24 @@ public class SettingsActivity extends BaseActivity {
                             default:
                                 saveValue = Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID;
                                 break;
+                        }
+
+                        String currentSetting = mSettingsDao.load(Const.DB.Settings.KEY.SERIES_SORT_TYPE, Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID);
+                        if(!Util.isEqual(currentSetting, saveValue)) {
+                            // Show message dialog, if this is first time user changes setting
+                            PrefUtil prefUtil = PrefUtil.getInstance(getApplicationContext());
+                            int sortChangedTimes = prefUtil.loadInt(Const.PREF_KEYS.SETTINGS_SORT_MESSAGE_INITIAL_CLICK, 0);
+                            if(sortChangedTimes == 0) {
+                                startActivityForResult(
+                                        SimpleDialogActivity.getIntent(
+                                                mContext,
+                                                R.string.dialog_confirm_update_sort_title,
+                                                R.string.dialog_confirm_update_sort_msg,
+                                                R.string.dialog_confirm_update_sort_btn_positive,
+                                                R.string.dialog_confirm_update_sort_btn_negative),
+                                        Const.REQUEST_CODE.SETTING_FIRST_SORT_INFO_DIALOG);
+                            }
+                            prefUtil.saveInt(Const.PREF_KEYS.SETTINGS_SORT_MESSAGE_INITIAL_CLICK, sortChangedTimes + 1);
                         }
 
                         // Save to preference
