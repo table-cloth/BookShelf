@@ -1,6 +1,7 @@
 package com.tablecloth.bookshelf.util;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -76,13 +77,18 @@ public class ToastUtil {
 	 * @param gravity gravity
      */
 	public static void show(Context context, String text, int duration, int gravity) {
-		if(sToast == null) {
-			sToast = Toast.makeText(context, text, duration);
-		} else {
-			sToast.setText(text);
-			sToast.setDuration(duration);
+		try {
+			if (sToast == null) {
+				sToast = Toast.makeText(context, text, duration);
+			} else {
+				sToast.setText(text);
+				sToast.setDuration(duration);
+			}
+			if (gravity != GRAVITY_NONE) sToast.setGravity(gravity, 0, 0);
+			sToast.show();
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			Log.e("ToastUtil", "Trying to show toast using dead context, causing runtime exception with \"Can't create handler inside thread that has not called Looper.preapare()\"");
 		}
-		if(gravity != GRAVITY_NONE) sToast.setGravity(gravity, 0, 0);
-		sToast.show();
 	}
 }

@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -53,6 +52,7 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
     private TextView mBookTitlePronounceTextView = null;
     private TextView mBookAuthorPronounceTextView = null;
     private TextView mBookMagazinePronounceTextView = null;
+    private TextView mBookCompanyPronounceTextView = null;
 
     private TextView mBookMemoTextView = null;
     private TextView mBookVolumeTextView = null;
@@ -128,9 +128,10 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
         mBookAuthorTextView = (TextView)findViewById(R.id.author);
         mBookMagazineTextView = (TextView)findViewById(R.id.magazine);
         mBookCompanyTextView = (TextView)findViewById(R.id.company);
-        mBookTitlePronounceTextView = (TextView)findViewById(R.id.title_pronuncitation);
+        mBookTitlePronounceTextView = (TextView)findViewById(R.id.title_pronunciation);
         mBookAuthorPronounceTextView = (TextView)findViewById(R.id.author_pronunciation);
         mBookMagazinePronounceTextView = (TextView)findViewById(R.id.magazine_pronunciation);
+        mBookCompanyPronounceTextView = (TextView)findViewById(R.id.company_pronunciation);
 
         mBookMemoTextView = (TextView)findViewById(R.id.memo);
         mBookVolumeTextView = (TextView)findViewById(R.id.volume);
@@ -324,6 +325,7 @@ public class SeriesDetailActivity extends BaseActivity implements OnClickListene
         setTextAndVisibility(mBookTitlePronounceTextView, mShowBookSeriesData.getTitlePronunciation());
         setTextAndVisibility(mBookAuthorPronounceTextView, mShowBookSeriesData.getAuthorPronunciation());
         setTextAndVisibility(mBookMagazinePronounceTextView, mShowBookSeriesData.getMagazinePronunciation());
+        setTextAndVisibility(mBookCompanyPronounceTextView, mShowBookSeriesData.getCompanyPronunciation());
 
         // extra data
         setTextAndVisibility(mBookMemoTextView, mShowBookSeriesData.getMemo());

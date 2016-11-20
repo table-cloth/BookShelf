@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,15 +27,19 @@ import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 import com.tablecloth.bookshelf.db.BookSeriesDao;
 import com.tablecloth.bookshelf.db.SettingsDao;
-import com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity;
 import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
+import com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity;
+import com.tablecloth.bookshelf.http.HttpPostHandler;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
+import com.tablecloth.bookshelf.util.PrefUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
+import com.tablecloth.bookshelf.util.GooTextConverter;
+import com.tablecloth.bookshelf.util.SortUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -173,6 +178,36 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 break;
         }
 
+        // sort collection
+        String sortType = mSettingsDao.load(
+                Const.DB.Settings.KEY.SERIES_SORT_TYPE,
+                Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID);
+        switch (sortType) {
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID:
+                mBookSeriesDataList = SortUtil.sortById(mBookSeriesDataList);
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_TITLE:
+                mBookSeriesDataList = SortUtil.sortByTitle(mBookSeriesDataList);
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_AUTHOR:
+                mBookSeriesDataList = SortUtil.sortByAuthor(mBookSeriesDataList);
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_MAGAZINE:
+                mBookSeriesDataList = SortUtil.sortByMagazine(mBookSeriesDataList);
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_COMPANY:
+                mBookSeriesDataList = SortUtil.sortByCompany(mBookSeriesDataList);
+                break;
+
+            default:
+                mBookSeriesDataList = SortUtil.sortById(mBookSeriesDataList);
+                break;
+        }
+
         notifyDataSetChanged();
     }
 
@@ -205,6 +240,15 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                             : BookSeriesListCatalogActivity.class));
             finish();
         }
+    }
+
+    /**
+     * OnPause
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        mProgress.onPause();
     }
 
     /**
@@ -250,7 +294,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     }
 
     /**
-     * Called on activty result
+     * Called on activity result
      *
      * @param requestCode request code
      * @param resultCode result code

@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Util class for general fuctions
@@ -68,6 +69,16 @@ public class Util {
      */
     public static boolean isEmpty(@Nullable ArrayList list) {
         return list == null || list.isEmpty();
+    }
+
+    /**
+     * Whether value is empty
+     *
+     * @param map value
+     * @return whether is empty
+     */
+    public static boolean isEmpty(@Nullable HashMap map) {
+        return map == null || map.isEmpty();
     }
 
     /**

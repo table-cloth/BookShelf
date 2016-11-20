@@ -7,6 +7,13 @@
 
     <string name="referrer_update_dialog">update_dialog</string>
 
+    <string name="http_result_sc_not_found">404 Not Found</string>
+    <string name="http_result_sc_error_default">Network Error</string>
+    <string name="http_result_sc_error_invalid_url">Invalid URL</string>
+    <string name="http_result_sc_error_invalid_encode">Encode Error</string>
+    <string name="http_result_sc_error_invalid_protocol">Protocol Error</string>
+    <string name="http_result_sc_error_invalid_io">IO Error</string>
+
     <string name="email_inquiry_line1_title">＊＊お問い合わせ情報＊＊\n</string>
     <string name="email_inquiry_line2_id">お問い合わせID：%1$s\n</string>
     <string name="email_inquiry_line3_app_version">アプリバージョン：%1$s\n</string>
@@ -14,23 +21,20 @@
     <string name="email_inquiry_line5_device">機種名：%1$s\n</string>
     <string name="email_inquiry_line6_closing">＊＊＊＊＊＊＊＊＊＊＊＊\n\n</string>
 
+    <string name="inquiry_subject">【お問い合わせ】本棚管理</string>
+    <string name="error_no_mailer">お問い合わせを送信できるアプリが発見できません。メーラーアプリなどをインストールしてください。</string>
+
     <string name="update_dialog_title">お知らせ</string>
     <string name="update_dialog_do_review">レビューする</string>
     <string name="update_dialog_do_not_review">しない</string>
-    <string name="update_dialog_content_form_prev_version">
-        ■ 作品のメモを正常に更新できない不具合を修正しました\n\n
-        ーーーーー\n\n
-        少しでも良いアプリになるよう改善を行っております。\n
-        ★5のレビューを頂けますと励みになります！\n
-        宜しくお願い致します (*- -)(*_ _)ペコリ</string>
-
-    <string name="update_dialog_content_normal">
-        ■ 巻数の一括登録機能を追加しました\n
-        ■ 画像の表示、及びタグに関する一部不具合を修正しました\n\n
-        ーーーーー\n\n
-        少しでも良いアプリになるよう改善を行っております。\n
-        ★5のレビューを頂けますと励みになります！\n
-        宜しくお願い致します (*- -)(*_ _)ペコリ</string>
+    <string name="update_dialog_content_form_prev_version"></string>
+    <string name="update_dialog_content_normal"> ■ 作品の並び替え機能を追加しました。\n
+■ 作品の読み仮名の自動登録機能を追加しました。\n\n
+※ 今までの作品の読み仮名登録に関しては、設定画面の「作品の読み仮名を一括登録」のボタンをご利用ください。\n\n
+ーーーーー\n\n
+少しでも良いアプリになるよう改善を行っております。\n
+★5のレビューを頂けますと励みになります！\n
+宜しくお願い致します (*- -)(*_ _)ペコリ</string>
 
     <string name="decide">決定</string>
     <string name="finish">完了</string>
@@ -41,6 +45,8 @@
     <string name="no">いいえ</string>
     <string name="cancel">キャンセル</string>
     <string name="search">検索</string>
+    <string name="open">開く</string>
+    <string name="close">閉じる</string>
 
     <string name="hint_must">※必須</string>
 
@@ -57,10 +63,28 @@
     <string name="rakuten_api_name_all">BooksTotal</string>
 
     <string name="settings_key_view_type_grid">表示形式</string>
-    <string name="settings_value_grid">グリッド形式で作品一覧を表示</string>
-    <string name="settings_value_list">リスト形式で作品一覧を表示</string>
-    <string name="inquiry_subject">【お問い合わせ】本棚管理</string>
-    <string name="error_no_mailer">お問い合わせを送信できるアプリが発見できません。メーラーアプリなどをインストールしてください。</string>
+    <string name="settings_value_view_type_grid">グリッド形式で作品一覧を表示</string>
+    <string name="settings_value_view_type_list">リスト形式で作品一覧を表示</string>
+    <string name="settings_key_sort_order_registered">表示形式</string>
+    <string name="settings_value_sort_order_id">登録順に表示</string>
+    <string name="settings_value_sort_order_title">タイトル順に表示</string>
+    <string name="settings_value_sort_order_author">作者順に表示</string>
+    <string name="settings_value_sort_order_magazine">掲載誌順に表示</string>
+    <string name="settings_value_sort_order_company">出版社順に表示</string>
+
+    <string name="settings_key_manage_book_series">作品管理</string>
+    <string name="settings_value_manage_pronunciation">作品の読み仮名を一括登録</string>
+    <string name="updating_pronunciation_data">作品の読み仮名を更新しています</string>
+    <string name="updating_pronunciation_data_finished">作品の読み仮名の更新が完了しました</string>
+    <string name="error_no_book_series_registered">作品が登録されていません</string>
+    <string name="settings_value_auto_save_pronunciation_on">作品の読み仮名を自動的に登録する</string>
+    <string name="settings_value_auto_save_pronunciation_off">作品の読み仮名を自動的に登録しない</string>
+
+
+    <string name="dialog_confirm_update_sort_title">表示順に関するお知らせ</string>
+    <string name="dialog_confirm_update_sort_msg">新しく表示順の設定項目が追加されました！\n\n作品の読み仮名が登録されていない場合は表示順が正常に表示されません。\n既に読み仮名を登録済み出ない場合は設定画面内の「作品の読み仮名を一括登録」のボタンから読み仮名の登録をお願いします。\n\nこの画面の「読み仮名を更新する」からも読み仮名の登録ができますのでご利用ください。</string>
+    <string name="dialog_confirm_update_sort_btn_positive">読み仮名を更新する</string>
+    <string name="dialog_confirm_update_sort_btn_negative">今はしない</string>
 
     <string name="series_data_no_volume">所持巻なし</string>
     <string name="series_data_volume_symbol">巻</string>
@@ -108,6 +132,8 @@
     <string name="book_series_data_title_pronunciation">タイトル（カナ）</string>
     <string name="book_series_data_author_pronunciation">作者（カナ）</string>
     <string name="book_series_data_magazine_pronunciation">掲載誌（カナ）</string>
+    <string name="book_series_data_company_pronunciation">出版社（カナ）</string>
+    <string name="book_series_data_enter_pronunciation_by_manual">手動で読み仮名を入力</string>
 
     <string name="tag_edit">タグを編集</string>
     <string name="delete_book_series">作品を削除します</string>
