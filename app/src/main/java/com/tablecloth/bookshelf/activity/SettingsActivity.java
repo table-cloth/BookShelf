@@ -241,7 +241,7 @@ public class SettingsActivity extends BaseActivity {
         String savedValue = mSettingsDao.load(
                 Const.DB.Settings.KEY.SERIES_SORT_TYPE,
                 Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID);
-        int selection = 0;
+        int selection;
         switch (savedValue) {
             case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID:
                 selection = itemSortId;
@@ -264,8 +264,70 @@ public class SettingsActivity extends BaseActivity {
                 break;
 
             default:
+                selection = itemSortId;
+                break;
         }
         spinnerView.setSelection(selection);
+    }
+
+
+
+    /**
+     * Initialize SpinnerView & Adapter for ShowType Setting UI
+     * Currently the choices are Grid or List
+     */
+    private void initCatalogShowTypeSettingUI() {
+
+        final int gridTextId = R.string.settings_value_view_type_grid;
+        int listTextId = R.string.settings_value_view_type_list;
+
+        // Initialize spinner
+        final String[] spinnerViewTextsList = {
+                getString(gridTextId), // show grid
+                getString(listTextId)  // show list
+        };
+
+        // Init Spinner to set Book Series Catalog show type (grid or list)
+        Spinner spinnerView = getSpinnerViewWithAdapter(
+                R.id.settings_view_type_spinner,
+                spinnerViewTextsList,
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                        // Whether selected item is View in Grid style
+                        boolean isGridViewTypeSelected =
+                                getString(gridTextId)
+                                .equals(spinnerViewTextsList[position]);
+
+                        // Save view type
+                        mSettingsDao.save(Const.DB.Settings.KEY.SERIES_SHOW_TYPE,
+                                isGridViewTypeSelected
+                                        ? Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID
+                                        : Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST);
+
+                        // Send track event
+                        sendGoogleAnalyticsEvent(
+                                GAEvent.Type.USER_ACTION,
+                                GAEvent.Event.SETTINGS_SET_SHOW_TYPE,
+                                isGridViewTypeSelected
+                                        ? GAEvent.Param.SETTINGS_SET_SHOW_TYPE_GRID
+                                        : GAEvent.Param.SETTINGS_SET_SHOW_TYPE_LIST);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+
+        // Update selected position of Spinner
+        String currentViewSetting = mSettingsDao.load(
+                Const.DB.Settings.KEY.SERIES_SHOW_TYPE,
+                Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
+        spinnerView.setSelection(
+                Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID.equals(currentViewSetting)
+                        ? 0
+                        : 1);
     }
 
     /**
@@ -285,65 +347,6 @@ public class SettingsActivity extends BaseActivity {
         spinnerView.setAdapter(spinnerAdapter);
         spinnerView.setOnItemSelectedListener(listener);
         return spinnerView;
-    }
-
-    /**
-     * Initialize SpinnerView & Adapter for ShowType Setting UI
-     * Currently the choices are Grid or List
-     */
-    private void initCatalogShowTypeSettingUI() {
-
-        final int gridTextId = R.string.settings_value_view_type_grid;
-        int listTextId = R.string.settings_value_view_type_list;
-
-        // Initialize spinner
-        final String[] spinnerViewTextsList = {
-                getString(gridTextId), // show grid
-                getString(listTextId)  // show list
-        };
-
-        // Init Spinner to set Book Series Catalog show type (grid or list)
-        ArrayAdapter<String> spinnerAdapter = getSpinnerAdapter(spinnerViewTextsList);
-        Spinner spinnerView = ((Spinner)findViewById(R.id.settings_view_type_spinner));
-        spinnerView.setAdapter(spinnerAdapter);
-
-        // Set item click callback
-        spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                // Whether selected item is View in Grid style
-                boolean isGridViewTypeSelected =
-                        getString(gridTextId)
-                        .equals(spinnerViewTextsList[position]);
-
-                // Save view type
-                mSettingsDao.save(Const.DB.Settings.KEY.SERIES_SHOW_TYPE,
-                        isGridViewTypeSelected
-                                ? Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID
-                                : Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_LIST);
-
-                // Send track event
-                sendGoogleAnalyticsEvent(
-                        GAEvent.Type.USER_ACTION,
-                        GAEvent.Event.SETTINGS_SET_SHOW_TYPE,
-                        isGridViewTypeSelected
-                                ? GAEvent.Param.SETTINGS_SET_SHOW_TYPE_GRID
-                                : GAEvent.Param.SETTINGS_SET_SHOW_TYPE_LIST);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
-        // Update selected position of Spinner
-        String currentViewSetting = mSettingsDao.load(
-                Const.DB.Settings.KEY.SERIES_SHOW_TYPE,
-                Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID);
-        spinnerView.setSelection(spinnerAdapter.getPosition(getString(
-                Const.DB.Settings.VALUE.SERIES_SHOW_TYPE_GRID.equals(currentViewSetting)
-                        ? gridTextId
-                        : listTextId)));
     }
 
     /**

@@ -35,9 +35,11 @@ import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
+import com.tablecloth.bookshelf.util.PrefUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
 import com.tablecloth.bookshelf.util.GooTextConverter;
+import com.tablecloth.bookshelf.util.SortUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
 import com.tablecloth.bookshelf.util.ViewUtil;
@@ -173,6 +175,36 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
             case Const.VIEW_MODE.VIEW: // default view mode
             default:
                 mBookSeriesDataList = mBookSeriesDao.loadAllBookSeriesDataList();
+                break;
+        }
+
+        // sort collection
+        String sortType = mSettingsDao.load(
+                Const.DB.Settings.KEY.SERIES_SORT_TYPE,
+                Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID);
+        switch (sortType) {
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_ID:
+                mBookSeriesDataList = SortUtil.sortById(mBookSeriesDataList);
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_TITLE:
+                mBookSeriesDataList = SortUtil.sortByTitle(mBookSeriesDataList);
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_AUTHOR:
+                mBookSeriesDataList = SortUtil.sortByAuthor(mBookSeriesDataList);
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_MAGAZINE:
+                mBookSeriesDataList = SortUtil.sortByMagazine(mBookSeriesDataList);
+                break;
+
+            case Const.DB.Settings.VALUE.SERIES_SORT_TYPE_COMPANY:
+                mBookSeriesDataList = SortUtil.sortByCompany(mBookSeriesDataList);
+                break;
+
+            default:
+                mBookSeriesDataList = SortUtil.sortById(mBookSeriesDataList);
                 break;
         }
 
