@@ -29,6 +29,7 @@ public class GAEvent {
         final public static String ADD_SERIES = "AddSeries";
         final public static String TAP_SETTINGS_BTN = "TapSettingsBtn";
         final public static String SETTINGS_SET_SHOW_TYPE = "SettingsSetShowType";
+        final public static String SETTINGS_SET_SORT_TYPE = "SettingsSetSortType";
         final public static String SETTINGS_TAP_REVIEW = "SettingsReview";
         final public static String SETTINGS_TAP_MAILER = "SettingsTapShowType";
 

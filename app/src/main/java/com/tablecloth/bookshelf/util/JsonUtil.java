@@ -98,6 +98,7 @@ public class JsonUtil {
      * @param key search key
      * @return value related with key
      */
+    @NonNull
     public static String getValue(@NonNull JSONObject jsonObj, @NonNull String key) {
         String data = "";
         try {

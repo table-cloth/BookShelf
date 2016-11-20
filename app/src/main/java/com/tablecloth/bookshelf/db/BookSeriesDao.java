@@ -8,7 +8,10 @@ import android.support.annotation.Nullable;
 
 import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
+import com.tablecloth.bookshelf.http.HttpPostHandler;
 import com.tablecloth.bookshelf.util.Const;
+import com.tablecloth.bookshelf.util.GooTextConverter;
+import com.tablecloth.bookshelf.util.ListenerUtil;
 import com.tablecloth.bookshelf.util.Util;
 
 import java.util.ArrayList;

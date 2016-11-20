@@ -21,6 +21,7 @@ public class Const {
         final public static String INIT_VERSION_CODE_INT = "INIT_VERSION_CODE_INT"; // first version installed
         final public static String VERSION_CODE_INT = "VERSION_CODE_INT"; // latest previous version installed
         final public static String BOOK_SERIES_ADD_TYPE_INT = "BOOK_SERIES_ADD_TYPE"; // book series add type
+        final public static String SETTINGS_SORT_MESSAGE_INITIAL_CLICK = "SETTINGS_SORT_MESSAGE_INITIAL_CLICK"; // for first time user changed sort
     }
 
     /**
@@ -53,6 +54,7 @@ public class Const {
         public static final int LIST_SEARCH_RAKUTEN = 8;
         public static final int SIMPLE_CHECK = 9; // 簡易的な確認用
         public static final int TAGS_EDIT = 10;
+        public static final int SETTING_FIRST_SORT_INFO_DIALOG = 11;
 
         public static final int UPDATE_DIALOG = 100;
     }
@@ -141,11 +143,20 @@ public class Const {
             // 設定項目はこちらのクラスにて管理する
             public static class KEY {
                 public static final String SERIES_SHOW_TYPE = "series_show_type"; // 作品一覧の表示タイプ
+                public static final String SERIES_SORT_TYPE = "series_sort_type"; // 作品の表示順タイプ
+                public static final String BOOK_SERIES_AUTO_SAVE_PRONUNCIATION = "book_series_auto_save_pronunciation"; // 自動的にカナ情報を保存する
             }
             // 設定値ははこちらのクラスにて管理する
             public static class VALUE {
                 public static final String SERIES_SHOW_TYPE_GRID = "grid"; // 作品一覧の表示タイプ
                 public static final String SERIES_SHOW_TYPE_LIST = "list"; // 作品一覧の表示タイプ
+                public static final String SERIES_SORT_TYPE_ID = "id"; // 作品の表示順タイプ
+                public static final String SERIES_SORT_TYPE_TITLE = "title"; // 作品の表示順タイプ
+                public static final String SERIES_SORT_TYPE_AUTHOR = "author"; // 作品の表示順タイプ
+                public static final String SERIES_SORT_TYPE_MAGAZINE = "magazine"; // 作品の表示順タイプ
+                public static final String SERIES_SORT_TYPE_COMPANY = "company"; // 作品の表示順タイプ
+                public static final String BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_ON = "on"; // 自動的にカナ情報を保存する
+                public static final String BOOK_SERIES_AUTO_SAVE_PRONUNCIATION_OFF = "off"; // 自動的にカナ情報を保存する
             }
         }
 

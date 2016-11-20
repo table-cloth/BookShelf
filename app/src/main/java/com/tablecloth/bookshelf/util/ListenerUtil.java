@@ -27,4 +27,15 @@ public class ListenerUtil {
          */
         public void onError();
     }
+
+    /**
+     * Listener to check event finish
+     * Simple onFinish checker, so will not implement error callbacks
+     */
+    public interface OnFinishListener {
+        /**
+         * Called when finished
+         */
+        public void onFinish();
+    }
 }
