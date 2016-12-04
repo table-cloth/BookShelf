@@ -2,6 +2,7 @@ package com.tablecloth.bookshelf.util;
 
 import android.support.annotation.NonNull;
 
+import com.tablecloth.bookshelf.data.BookData;
 import com.tablecloth.bookshelf.data.BookSeriesData;
 
 import java.text.Collator;
@@ -89,7 +90,7 @@ public class SortUtil {
             @NonNull ArrayList<BookSeriesData> seriesDataList,
             final int sortType) {
 
-        final Collator jaCollator = Collator.getInstance(Locale.JAPANESE);;
+        final Collator jaCollator = Collator.getInstance(Locale.JAPANESE);
         Collections.sort(seriesDataList, new Comparator<BookSeriesData>() {
             @Override
             public int compare(BookSeriesData data1, BookSeriesData data2) {
@@ -99,38 +100,60 @@ public class SortUtil {
 
                 switch (sortType) {
                     case SORT_TYPE_TITLE:
-                        value1 = String.valueOf(data1.getTitlePronunciation());
-                        value2 = String.valueOf(data2.getTitlePronunciation());
+                        value1 = data1 == null
+                                ? ""
+                                : String.valueOf(data1.getTitlePronunciation());
+                        value2 = data2 == null
+                                ? ""
+                                : String.valueOf(data2.getTitlePronunciation());
                         break;
 
                     case SORT_TYPE_AUTHOR:
-                        value1 = String.valueOf(data1.getAuthorPronunciation());
-                        value2 = String.valueOf(data2.getAuthorPronunciation());
+                        value1 = data1 == null
+                                ? ""
+                                : String.valueOf(data1.getAuthorPronunciation());
+                        value2 = data2 == null
+                                ? ""
+                                : String.valueOf(data2.getAuthorPronunciation());
                         break;
 
                     case SORT_TYPE_MAGAZINE:
-                        value1 = String.valueOf(data1.getMagazinePronunciation());
-                        value2 = String.valueOf(data2.getMagazinePronunciation());
+                        value1 = data1 == null
+                                ? ""
+                                : String.valueOf(data1.getMagazinePronunciation());
+                        value2 = data2 == null
+                                ? ""
+                                : String.valueOf(data2.getMagazinePronunciation());
                         break;
 
                     case SORT_TYPE_COMPANY:
-                        value1 = String.valueOf(data1.getCompanyPronunciation());
-                        value2 = String.valueOf(data2.getCompanyPronunciation());
+                        value1 = data1 == null
+                                ? ""
+                                : String.valueOf(data1.getCompanyPronunciation());
+                        value2 =  data2 == null
+                                ? ""
+                                : String.valueOf(data2.getCompanyPronunciation());
                         break;
 
                     default:
                     case SORT_TYPE_ID:
-                        return data1.getSeriesId() > data2.getSeriesId()
+                        int id1 = data1 == null
+                                ? BookData.BOOK_SERIES_ERROR_VALUE
+                                : data1.getSeriesId();
+                        int id2 = data2 == null
+                                ? BookData.BOOK_SERIES_ERROR_VALUE
+                                : data2.getSeriesId();
+                        return id1 > id2
                                 ? 1
                                 : -1;
                 }
 
                 // ones with empty text goes last
                 if(Util.isEmpty(value1)) {
-                    return 1;
+                    value1 = "";
                 }
                 if(Util.isEmpty(value2)) {
-                    return -1;
+                    value2 = "";
                 }
 
                 // do compare
