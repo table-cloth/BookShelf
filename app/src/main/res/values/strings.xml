@@ -123,6 +123,7 @@
 
     <string name="apu_search_hit_count_over">%1$d件以上の作品がヒットしました</string>
     <string name="apu_search_hit_count">%1$d件の作品がヒットしました</string>
+    <string name="apu_search_current_show_result">%1$d件〜%2$d件の検索結果を表示しています</string>
 
     <string name="book_series_data_title">タイトル</string>
     <string name="book_series_data_author">作者</string>
@@ -160,5 +161,6 @@
     <string name="search_result_separator">/</string>
     <string name="search_result_before">&lt;&lt;</string>
     <string name="search_result_after">&gt;&gt;</string>
+    <string name="search_result_page_index_error">正しい値を入力してください</string>
 
 </resources>

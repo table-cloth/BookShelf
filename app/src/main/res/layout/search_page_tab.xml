@@ -13,45 +13,45 @@
         android:text="@string/search_result_separator"/>
 
     <EditText
-        android:id="@+id/search_result_from"
+        android:id="@+id/search_result_current_page"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/search_result_separator"
         android:textSize="@dimen/text_large"
+        android:inputType="number"
         android:text="1"
-        android:focusable="false"
+        android:maxLines="1"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         />
 
-    <EditText
-        android:id="@+id/search_result_to"
+    <TextView
+        android:id="@+id/search_result_max_page"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/search_result_separator"
         android:textSize="@dimen/text_large"
         android:text="2"
-        android:focusable="false"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         />
 
     <Button
-        android:id="@+id/search_result_move_before"
+        android:id="@+id/btn_search_result_move_before"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/search_result_from"
+        android:layout_toLeftOf="@id/search_result_current_page"
         android:textSize="@dimen/text_large"
         android:layout_marginRight="10dp"
         android:text="@string/search_result_before"/>
 
     <Button
-        android:id="@+id/search_result_move_after"
+        android:id="@+id/btn_search_result_move_after"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/search_result_to"
+        android:layout_toRightOf="@id/search_result_max_page"
         android:textSize="@dimen/text_large"
         android:layout_marginLeft="10dp"
         android:text="@string/search_result_after"/>

@@ -25,7 +25,9 @@
         layout="@layout/search_page_tab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/footer" />
+        android:layout_above="@id/footer"
+        android:visibility="gone"
+        />
 
     <!-- main view -->
 
