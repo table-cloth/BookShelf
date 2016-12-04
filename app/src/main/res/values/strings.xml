@@ -157,4 +157,8 @@
     <string name="search_mode_company">出版社名</string>
     <string name="search_mode_tag">タグ</string>
 
+    <string name="search_result_separator">/</string>
+    <string name="search_result_before">&lt;&lt;</string>
+    <string name="search_result_after">&gt;&gt;</string>
+
 </resources>
