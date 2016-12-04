@@ -243,6 +243,12 @@ public class BookSeriesAddEditDialogActivity extends DialogBaseActivity {
         mProgressUtil.onPause();
     }
 
+    @Override
+    public void onDestroy() {
+        sTemporaryBookSeriesData = null;
+        super.onDestroy();
+    }
+
     /**
      * Put user input data into BookSeriesData
      */

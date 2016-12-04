@@ -80,17 +80,18 @@ public class Rakuten {
      * @param context context
      * @param key search key
      * @param value search value
+     * @param pageIndex search page index
      * @return search URI
      */
     @NonNull
-    public static String getRakutenBooksBookURI(@NonNull Context context, @NonNull String key, @NonNull String value) {
+    public static String getRakutenBooksBookURI(@NonNull Context context, @NonNull String key, @NonNull String value, int pageIndex) {
         // 楽天ブックス系API・楽天ブックス書籍検索API
         // https://app.rakuten.co.jp/services/api/BooksBook/Search/20130522?format=json&isbn=9784812471692&applicationId=1019452313987815323
         // 楽天ブックス系API・楽天ブックス総合検索API
         // https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522?format=json&isbnjan=9784812471692&applicationId=1019452313987815323
 
         String apiName = context.getString(R.string.rakuten_api_name_books);
-        return getRakutenURI(context, apiName, key, value);
+        return getRakutenURI(context, apiName, key, value, pageIndex);
     }
 
     /**
@@ -99,12 +100,13 @@ public class Rakuten {
      * @param context context
      * @param key search key
      * @param value search value
+     * @param pageIndex Search page index
      * @return search URI
      */
     @NonNull
-    public static String getRakutenBooksTotalUri(@NonNull Context context, @NonNull String key, @NonNull String value) {
+    public static String getRakutenBooksTotalUri(@NonNull Context context, @NonNull String key, @NonNull String value, int pageIndex) {
         String apiName = context.getString(R.string.rakuten_api_name_all);
-        return getRakutenURI(context, apiName, key, value);
+        return getRakutenURI(context, apiName, key, value, pageIndex);
     }
 
     /**
@@ -134,12 +136,13 @@ public class Rakuten {
      * @param handler handler
      * @param searchKey Search key for rakuten API
      * @param searchValue Search value for rakuten API
+     * @param pageIndex Search page index
      * @param listener Search result listener
      */
     public static void searchFromRakutenAPI(
             @NonNull final Context context, @NonNull final Handler handler,
             @Nullable final String searchKey, @Nullable final String searchValue,
-            @NonNull final SearchResultListener listener) {
+            final int pageIndex, @NonNull final SearchResultListener listener) {
         if(Util.isEmpty(searchKey)
                 || Util.isEmpty(searchValue)) {
             listener.onSearchError("invalid search key or value. [SearchKey]" + searchKey + " / [SearchValue]" + searchValue);
@@ -153,7 +156,7 @@ public class Rakuten {
 
                 // search in Books / Books category
                 String booksBookUri = Rakuten.getRakutenBooksBookURI(
-                        context, searchKey, searchValue);
+                        context, searchKey, searchValue, pageIndex);
                 RakutenAPIAsyncLoader loader =
                         new RakutenAPIAsyncLoader(context, booksBookUri);
                 final String booksBookJsonText = loader.loadInBackground();
@@ -171,7 +174,7 @@ public class Rakuten {
 
                 // search in Total category
                 String booksTotalUri = Rakuten.getRakutenBooksTotalUri(
-                        context, searchKey, searchValue);
+                        context, searchKey, searchValue, pageIndex);
                 loader = new RakutenAPIAsyncLoader(context, booksTotalUri);
                 final String booksTotalJsonText = loader.loadInBackground();
 
@@ -193,12 +196,71 @@ public class Rakuten {
         }).start();
     }
 
+    /**
+     * Get max count in search result
+     *
+     * @param jsonText Json text
+     * @return search result max count
+     */
+    public static int getBookSeriesResultMaxCount(@NonNull String jsonText) {
+        JSONObject jsonObj = JsonUtil.getJsonObject(jsonText);
+
+        // get value registered with key "count"
+        try {
+            return Integer.valueOf(JsonUtil.getValue(jsonObj, Key.SEARCH_RESULT_COUNT));
+        } catch(Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    /**
+     * Get max page in search result
+     *
+     * @param jsonText Json text
+     * @return search result max page
+     */
+    public static int getBookSeriesResultMaxPage(@NonNull String jsonText) {
+        JSONObject jsonObj = JsonUtil.getJsonObject(jsonText);
+
+        // get value registered with key "count"
+        try {
+            return Integer.valueOf(JsonUtil.getValue(jsonObj, Key.SEARCH_RESULT_PAGE_COUNT));
+        } catch(Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    /**
+     * Get current page in search result
+     *
+     * @param jsonText Json text
+     * @return search result max page
+     */
+    public static int getBookSeriesResultCurrentPage(@NonNull String jsonText) {
+        JSONObject jsonObj = JsonUtil.getJsonObject(jsonText);
+
+        // get value registered with key "count"
+        try {
+            return Integer.valueOf(JsonUtil.getValue(jsonObj, Key.SEARCH_RESULT_COUNT));
+        } catch(Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
 
     @NonNull
     public static ArrayList<BookSeriesData> convertJsonText2BookSeriesDataList(
-            @NonNull Context context, @NonNull String jsonText, @NonNull int maxCount) {
+            @NonNull Context context, @NonNull String jsonText, int indexFrom, int indexTo) {
+
         ArrayList<BookSeriesData> seriesDataList = new ArrayList<>();
         if(Util.isEmpty(jsonText)) {
+            return seriesDataList;
+        }
+
+        int maxCount = getBookSeriesResultMaxCount(jsonText);
+        if(indexFrom >= maxCount) {
             return seriesDataList;
         }
 
@@ -206,30 +268,12 @@ public class Rakuten {
         JSONArray jsonArray = JsonUtil.getJsonArray(jsonObj, Rakuten.Key.ITEM_LIST);
         List<JSONObject> jsonObjList = JsonUtil.convertJsonArray2JsonObjectList(jsonArray);
 
-        // get value registered with key "count"
-        int count;
-        try {
-            count = Integer.valueOf(
-                    JsonUtil.getValue(jsonObj, Rakuten.Key.SEARCH_RESULT_COUNT));
-        } catch(Exception e) {
-            e.printStackTrace();
-            return seriesDataList;
-        }
-
-        // show search result toast
-        if(count >= maxCount) {
-            ToastUtil.show(context, context.getString(R.string.apu_search_hit_count_over, maxCount));
-        } else {
-            ToastUtil.show(context, context.getString(R.string.apu_search_hit_count, count));
-        }
-
-        int showStartInex = 0;
-        int showEndIndex = count >= maxCount
+        int showEndIndex = indexTo >= maxCount
                 ? maxCount
-                : count;
+                : indexTo;
 
         // 取得した結果を作品情報一覧へと分解する
-        for(int i = showStartInex ; i < showEndIndex ; i ++) {
+        for(int i = indexFrom ; i < showEndIndex ; i ++) {
             if(i >= jsonObjList.size()) {
                 continue;
             }
@@ -250,11 +294,12 @@ public class Rakuten {
      * @param apiName api name
      * @param key search key
      * @param value search value
+     * @param pageIndex search page index
      * @return URI for searching in Rakuten URI
      */
     @NonNull
     private static String getRakutenURI(
-            @NonNull Context context, @NonNull String apiName, @NonNull String key, String value) {
+            @NonNull Context context, @NonNull String apiName, @NonNull String key, String value, int pageIndex) {
         if(!Util.isEmpty(value)) {
             value = value.replace("　", "%E3%80%80");
             value = value.replace(" ", "%20");
@@ -265,6 +310,7 @@ public class Rakuten {
         uri += apiName;
         uri += "/Search/20130522?format=json";
         uri += "&" + key + "=" + value;
+        uri += "&page=" + pageIndex;
         uri += "&sort=%2BreleaseDate"; // Sort with old one comes first
         uri += "&applicationId=" + context.getString(R.string.id_rakuten_app_id);
         return uri;

@@ -9,14 +9,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -30,15 +32,12 @@ import com.tablecloth.bookshelf.db.SettingsDao;
 import com.tablecloth.bookshelf.dialog.BookSeriesAddEditDialogActivity;
 import com.tablecloth.bookshelf.dialog.BookSeriesSelectAddTypeDialogActivity;
 import com.tablecloth.bookshelf.dialog.SearchContentInputDialogActivity;
-import com.tablecloth.bookshelf.http.HttpPostHandler;
 import com.tablecloth.bookshelf.util.Const;
 import com.tablecloth.bookshelf.util.GAEvent;
 import com.tablecloth.bookshelf.util.ImageUtil;
 import com.tablecloth.bookshelf.util.ListenerUtil;
-import com.tablecloth.bookshelf.util.PrefUtil;
 import com.tablecloth.bookshelf.util.ProgressDialogUtil;
 import com.tablecloth.bookshelf.util.Rakuten;
-import com.tablecloth.bookshelf.util.GooTextConverter;
 import com.tablecloth.bookshelf.util.SortUtil;
 import com.tablecloth.bookshelf.util.ToastUtil;
 import com.tablecloth.bookshelf.util.Util;
@@ -87,6 +86,19 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     EditText mSearchContentEditText;
     Spinner mSearchContentSpinnerView;
 
+    // search
+    View mSearchPageTabView;
+    EditText mSearchPageCurrentPageEditText;
+    TextView mSearchPageMaxPageTextView;
+    Button mSearchPageNextButton;
+    Button mSearchPagePrevButton;
+
+    private int mSearchPageCurrentIndex = 1;
+    private int mSearchCountMaxIndex = 1;
+    private int mSearchPageMaxIndex = 1;
+    private String mSearchSelectKey;
+    private String mSearchSelectValue;
+
     /**
      * Constructor
      *
@@ -95,6 +107,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         // initialize dao
         mBookSeriesDao = new BookSeriesDao(this);
@@ -107,6 +121,17 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
         mHeaderApiSearchAreaView = mHeaderAreaView.findViewById(R.id.header_area_mode_api_search);
         mSearchContentEditText = (EditText)findViewById(R.id.search_content);
         mSearchContentSpinnerView = ((Spinner)findViewById(R.id.spinner_search_content));
+
+        mSearchPageTabView = findViewById(R.id.search_page_tab);
+        mSearchPageMaxPageTextView =
+                (TextView)mSearchPageTabView.findViewById(R.id.search_result_max_page);
+        mSearchPageCurrentPageEditText =
+                (EditText)mSearchPageTabView.findViewById(R.id.search_result_current_page);
+        mSearchPagePrevButton =
+                (Button)mSearchPageTabView.findViewById(R.id.btn_search_result_move_before);
+        mSearchPageNextButton =
+                (Button)mSearchPageTabView.findViewById(R.id.btn_search_result_move_after);
+        initSearchData();
 
         initializeCallbackEvents();
 
@@ -135,6 +160,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 mHeaderModeAreaView.setVisibility(View.VISIBLE);
                 mHeaderSearchAreaView.setVisibility(View.GONE);
                 mHeaderApiSearchAreaView.setVisibility(View.GONE);
+                initSearchData();
+                mSearchPageTabView.setVisibility(View.GONE);
                 break;
 
             case Const.VIEW_MODE.SEARCH_DB:
@@ -144,6 +171,8 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 mHeaderSearchAreaView.setVisibility(View.VISIBLE);
                 mHeaderApiSearchAreaView.setVisibility(View.GONE);
                 mSearchContentEditText.requestFocus();
+                initSearchData();
+                mSearchPageTabView.setVisibility(View.GONE);
                 break;
 
             case Const.VIEW_MODE.SEARCH_API:
@@ -152,6 +181,7 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 mHeaderModeAreaView.setVisibility(View.GONE);
                 mHeaderSearchAreaView.setVisibility(View.GONE);
                 mHeaderApiSearchAreaView.setVisibility(View.VISIBLE);
+                mSearchPageTabView.setVisibility(View.VISIBLE);
                 break;
         }
         mShowMode = newMode;
@@ -362,31 +392,10 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
 
                     mProgress.show(mHandler, getString(R.string.searching_now), null);
 
-                    String selectKey = data.getStringExtra(Const.INTENT_EXTRA.KEY_STR_SELECTED_KEY);
-                    String selectValue = data.getStringExtra(Const.INTENT_EXTRA.KEY_STR_SELECTED_VALUE);
+                    mSearchSelectKey = data.getStringExtra(Const.INTENT_EXTRA.KEY_STR_SELECTED_KEY);
+                    mSearchSelectValue = data.getStringExtra(Const.INTENT_EXTRA.KEY_STR_SELECTED_VALUE);
 
-                    Rakuten.searchFromRakutenAPI(this, mHandler, selectKey, selectValue,
-                            new Rakuten.SearchResultListener() {
-                                @Override
-                                public void onSearchSuccess(@NonNull String searchResults) {
-                                    mSearchResultBookSeriesCache = Rakuten.convertJsonText2BookSeriesDataList(
-                                            BookSeriesCatalogBaseActivity.this,
-                                            searchResults,
-                                            API_SEARCH_RESULT_SERIES_PER_PAGE);
-
-                                    mProgress.dismiss();
-
-                                    switchMode(Const.VIEW_MODE.SEARCH_API);
-                                    refreshData();
-                                }
-
-                                @Override
-                                public void onSearchError(@NonNull String errorContent) {
-                                    ToastUtil.show(
-                                            BookSeriesCatalogBaseActivity.this,
-                                            R.string.series_data_error_no_search_result_found_please_retry);
-                                }
-                            });
+                    updateSearchResult();
                 }
                 break;
         }
@@ -458,6 +467,22 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 sendGoogleAnalyticsEvent(GAEvent.Type.USER_ACTION, GAEvent.Event.TAP_SETTINGS_BTN);
                 break;
 
+            case R.id.btn_search_result_move_before: // show prev page of search result
+                mSearchPageCurrentIndex --;
+                if(mSearchPageCurrentIndex < 1) {
+                    mSearchPageCurrentIndex = 1;
+                }
+                updateSearchResult();
+                break;
+
+            case R.id.btn_search_result_move_after: // show next page of search result
+                mSearchPageCurrentIndex ++;
+                if(mSearchPageCurrentIndex > mSearchPageMaxIndex) {
+                    mSearchPageCurrentIndex = mSearchPageMaxIndex;
+                }
+                updateSearchResult();
+                break;
+
         }
     }
 
@@ -510,6 +535,11 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                 // do nothing
             }
         });
+
+        // search page
+        mSearchPageCurrentPageEditText.setOnEditorActionListener(getSearchPageEditText());
+        mSearchPageNextButton.setOnClickListener(this);
+        mSearchPagePrevButton.setOnClickListener(this);
     }
 
     /**
@@ -700,6 +730,103 @@ public abstract class BookSeriesCatalogBaseActivity extends BaseActivity impleme
                     mBookSeriesDataList.get(position), isGridCatalog());
         }
     }
+
+    /**
+     * Get editor action listener for search current page edit text
+     *
+     * @return OnEditorActionListener for tag edit text
+     */
+    @NonNull
+    private TextView.OnEditorActionListener getSearchPageEditText() {
+        return new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                // Action of enter key is set as "EditorInfo.IME_ACTION_DONE" in xml
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+                    String text = v.getText().toString();
+                    try {
+                        mSearchPageCurrentIndex = Integer.valueOf(text);
+                        if(mSearchPageCurrentIndex > mSearchPageMaxIndex) {
+                            mSearchPageCurrentIndex = mSearchPageMaxIndex;
+                        }
+                        updateSearchResult();
+                    } catch (NumberFormatException e) {
+                        ToastUtil.show(
+                                BookSeriesCatalogBaseActivity.this,
+                                R.string.search_result_page_index_error);
+                        e.printStackTrace();
+                    }
+                }
+                return false;
+            }
+        };
+    }
+
+    /**
+     * Update search page
+     */
+    private void updateSearchResult()
+    {
+        Rakuten.searchFromRakutenAPI(
+                this, mHandler,
+                mSearchSelectKey, mSearchSelectValue,
+                mSearchPageCurrentIndex,
+                new Rakuten.SearchResultListener() {
+                    @Override
+                    public void onSearchSuccess(@NonNull String searchResults) {
+                        mSearchCountMaxIndex = Rakuten.getBookSeriesResultMaxCount(searchResults);
+                        mSearchPageMaxIndex = Rakuten.getBookSeriesResultMaxPage(searchResults);
+
+                        mSearchPageCurrentPageEditText.setText(String.valueOf(mSearchPageCurrentIndex));
+                        mSearchPageMaxPageTextView.setText(String.valueOf(mSearchPageMaxIndex));
+
+                        int showResultStart = (mSearchPageCurrentIndex - 1) * API_SEARCH_RESULT_SERIES_PER_PAGE;
+                        int showResultEnd = showResultStart + API_SEARCH_RESULT_SERIES_PER_PAGE;
+                        if(showResultEnd > mSearchCountMaxIndex) {
+                            showResultEnd = mSearchCountMaxIndex;
+                        }
+
+                        ToastUtil.show(BookSeriesCatalogBaseActivity.this,
+                                getString(R.string.apu_search_current_show_result,
+                                        showResultStart, showResultEnd));
+
+                        int startIndex = 0;
+                        int endIndex = startIndex + API_SEARCH_RESULT_SERIES_PER_PAGE;
+
+                        mSearchResultBookSeriesCache =
+                                Rakuten.convertJsonText2BookSeriesDataList(
+                                        BookSeriesCatalogBaseActivity.this,
+                                        searchResults,
+                                        startIndex,
+                                        endIndex);
+
+                        mProgress.dismiss();
+
+                        switchMode(Const.VIEW_MODE.SEARCH_API);
+                        refreshData();
+                    }
+
+                    @Override
+                    public void onSearchError(@NonNull String errorContent) {
+                        ToastUtil.show(
+                                BookSeriesCatalogBaseActivity.this,
+                                R.string.series_data_error_no_search_result_found_please_retry);
+                    }
+                });
+    }
+
+    /**
+     * Initialize api search data
+     */
+    private void initSearchData() {
+        mSearchPageCurrentIndex = 1;
+        mSearchPageMaxIndex = 1;
+
+        mSearchPageCurrentPageEditText.setText(String.valueOf(mSearchPageCurrentIndex));
+        mSearchPageMaxPageTextView.setText(String.valueOf(mSearchPageMaxIndex));
+    }
+
 
     /**
      * Check if current catalog is shown in Grid format

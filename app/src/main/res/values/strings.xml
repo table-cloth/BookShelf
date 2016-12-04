@@ -28,9 +28,10 @@
     <string name="update_dialog_do_review">レビューする</string>
     <string name="update_dialog_do_not_review">しない</string>
     <string name="update_dialog_content_form_prev_version"></string>
-    <string name="update_dialog_content_normal"> ■ 作品の並び替え機能を追加しました。\n
-■ 作品の読み仮名の自動登録機能を追加しました。\n\n
-※ 今までの作品の読み仮名登録に関しては、設定画面の「作品の読み仮名を一括登録」のボタンをご利用ください。\n\n
+    <string name="update_dialog_content_normal"> ■ 作品の追加方法を改善しました。\n
+・最大３０冊までしか表示されていなかった問題を修正しました。\n
+・こちらの機能は「キーワードから検索」からお試しください。\n\n
+■ また一部条件下でアプリが正常に起動しない不具合を修正しました。\n\n
 ーーーーー\n\n
 少しでも良いアプリになるよう改善を行っております。\n
 ★5のレビューを頂けますと励みになります！\n
@@ -123,6 +124,7 @@
 
     <string name="apu_search_hit_count_over">%1$d件以上の作品がヒットしました</string>
     <string name="apu_search_hit_count">%1$d件の作品がヒットしました</string>
+    <string name="apu_search_current_show_result">%1$d件〜%2$d件の検索結果を表示しています</string>
 
     <string name="book_series_data_title">タイトル</string>
     <string name="book_series_data_author">作者</string>
@@ -156,5 +158,10 @@
     <string name="search_mode_magazine">掲載誌名</string>
     <string name="search_mode_company">出版社名</string>
     <string name="search_mode_tag">タグ</string>
+
+    <string name="search_result_separator">/</string>
+    <string name="search_result_before">&lt;&lt;</string>
+    <string name="search_result_after">&gt;&gt;</string>
+    <string name="search_result_page_index_error">正しい値を入力してください</string>
 
 </resources>
